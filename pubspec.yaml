@@ -1,5 +1,5 @@
 name: textify
-description: "Convert digital reports into text."
+description: "This package allows you to convert digital images into text."
 version: 0.0.1
 homepage: https://vteam.com/textify
 
