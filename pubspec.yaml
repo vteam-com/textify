@@ -1,7 +1,7 @@
 name: textify
 description: "Convert digital reports into text."
 version: 0.0.1
-homepage: vteam.com/textify
+homepage: https://vteam.com/textify
 
 environment:
   sdk: ^3.5.3
