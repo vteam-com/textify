@@ -1,0 +1,21 @@
+name: textify
+description: "Convert digital reports into text."
+version: 0.0.1
+homepage: vteam.com/textify
+
+environment:
+  sdk: ^3.5.3
+  flutter: ">=3.24.3"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  assets:
+    - assets/matrices.json

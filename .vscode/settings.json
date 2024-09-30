@@ -1,0 +1,46 @@
+{
+    "editor.wordWrap": "off",
+    "editor.wordWrapColumn": 120,
+    "editor.overviewRulerBorder": false,
+    "editor.rulers": [
+        120
+    ],
+    "yaml.format.printWidth": 120,
+    "dart.lineLength": 120,
+    "dart.renameFilesWithClasses": "always",
+    "[dart]": {
+        "editor.defaultFormatter": "Dart-Code.dart-code"
+    },
+    "editor.formatOnType": true,
+    "cSpell.words": [
+        "ADEFGHIJKLMNOPQRSTUVWXYZ",
+        "ARGB",
+        "binarize",
+        "binarized",
+        "grayscale",
+        "jpdup",
+        "LTRB",
+        "LTWH",
+        "prefs",
+        "Rgba",
+        "Suen",
+        "textify",
+        "Upscaling",
+        "vsync",
+        "vteam",
+    ],
+    "cSpell.ignoreRegExpList": [
+        "^(?!lib/).*$"
+    ],
+    "explorer.fileNesting.enabled": true,
+    "editor.formatOnSave": true,
+    "workbench.editor.closeOnFileDelete": true,
+    "files.exclude": {
+        "android": true,
+        "ios": true,
+        "linux": true,
+        "macos": true,
+        "windows": true,
+        "web": true,
+    },
+}
