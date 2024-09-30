@@ -7,21 +7,21 @@ class Band {
   List<Artifact> artifacts = [];
   Rect rectangle;
 
-  double _avergageGap = -1;
-  double _avergageWidth = -1;
+  double _averageGap = -1;
+  double _averageWidth = -1;
 
-  double get avergageGap {
-    if ((_avergageGap == -1 || _avergageWidth == -1)) {
+  double get averageGap {
+    if ((_averageGap == -1 || _averageWidth == -1)) {
       calculateAverages();
     }
-    return _avergageGap;
+    return _averageGap;
   }
 
-  double get avergageWidth {
-    if ((_avergageGap == -1 || _avergageWidth == -1)) {
+  double get averageWidth {
+    if ((_averageGap == -1 || _averageWidth == -1)) {
       calculateAverages();
     }
-    return _avergageWidth;
+    return _averageWidth;
   }
 
   /// Calculates the average gap between adjacent artifacts in a list.
@@ -32,8 +32,8 @@ class Band {
   ///
   void calculateAverages() {
     if (artifacts.length < 2) {
-      _avergageGap = -1;
-      _avergageWidth = -1;
+      _averageGap = -1;
+      _averageWidth = -1;
       return;
     }
 
@@ -47,8 +47,8 @@ class Band {
       totalGap += gap;
       totalWidth += artifact.rectangle.width;
     }
-    _avergageWidth = totalWidth / count;
-    _avergageGap = totalGap / count;
+    _averageWidth = totalWidth / count;
+    _averageGap = totalGap / count;
   }
 
   void sortLeftToRight() {

@@ -23,8 +23,8 @@ class EditScreen extends StatefulWidget {
 }
 
 class _EditScreenState extends State<EditScreen> {
-  final int h = templateBaseDimentionHeight;
-  final int w = templateBaseDimentionWidth;
+  final int h = templateBaseDimensionHeight;
+  final int w = templateBaseDimensionWidth;
 
   @override
   Widget build(BuildContext context) {
@@ -212,7 +212,7 @@ class _EditScreenState extends State<EditScreen> {
         title +=
             '\nTeamplate "${match.character}"\nScore = ${(match.score * 100).toStringAsFixed(1)}% E:${definition.enclosers}, ${verticalLinesTemplate(definition)}';
 
-        final List<String> overlayGridText = Matrix.getStringListOfOverlayedGrids(
+        final List<String> overlayGridText = Matrix.getStringListOfOverladedGrids(
           matrixNormalized,
           definition.matrices.first,
         );

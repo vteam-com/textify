@@ -2,8 +2,8 @@ import 'dart:convert';
 
 import 'package:textify/matrix.dart';
 
-const templateBaseDimentionWidth = 40;
-const templateBaseDimentionHeight = 60;
+const templateBaseDimensionWidth = 40;
+const templateBaseDimensionHeight = 60;
 
 class CharacterDefinition {
   CharacterDefinition({
@@ -13,7 +13,7 @@ class CharacterDefinition {
     this.isDate = false,
     this.isDigit = false,
     this.isLetter = false,
-    this.isPonctuation = false,
+    this.isPunctuation = false,
     this.lineLeft = false,
     this.lineRight = false,
     this.matrices = const [],
@@ -30,7 +30,7 @@ class CharacterDefinition {
       isAmount: json['isAmount'] as bool,
       isDate: json['isDate'] as bool,
       isDigit: json['isDigit'] as bool,
-      isPonctuation: json['isPonctuation'] as bool,
+      isPunctuation: json['isPunctuation'] as bool,
       matrices: (json['matrices'] as List).map((m) => Matrix.fromJson(m as Map<String, dynamic>)).toList(),
     );
 
@@ -51,7 +51,7 @@ class CharacterDefinition {
   bool isDate;
   bool isDigit;
   bool isLetter;
-  bool isPonctuation;
+  bool isPunctuation;
   bool lineLeft;
   bool lineRight;
   List<Matrix> matrices;
@@ -65,7 +65,7 @@ class CharacterDefinition {
       'isDate': isDate,
       'isDigit': isDigit,
       'isLetter': isLetter,
-      'isPonctuation': isPonctuation,
+      'isPunctuation': isPunctuation,
       'lineLeft': lineLeft,
       'lineRight': lineRight,
       'matrices': matrices.map((m) => m.toJson()).toList(),

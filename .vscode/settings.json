@@ -43,4 +43,5 @@
         "windows": true,
         "web": true,
     },
+    "cSpell.enabled": true,
 }

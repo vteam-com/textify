@@ -49,7 +49,7 @@ class Textify {
     final int numberOfEnclosure = matrix.enclosures;
     final bool hasVerticalLineOnTheLeftSide = matrix.verticalLineLeft;
     final bool hasVerticalLineOnTheRightSide = matrix.verticalLineRight;
-    final bool ponctuation = matrix.isPonctuation();
+    final bool punctuation = matrix.isPunctuation();
 
     const double percentageNeeded = 0.3; // Adjust this value as needed
     const int totalChecks = 4; // Total number of checks we perform
@@ -57,7 +57,8 @@ class Textify {
     final List<CharacterDefinition> qualifiedTemplates =
         characterDefinitions.definitions.where((CharacterDefinition template) {
       //
-      // The caller has a restricted set of possibl characters match
+      // The caller has a restricted set of possible characters to match
+      //
       if (supportedCharacters.isNotEmpty && !supportedCharacters.contains(template.character)) {
         return false;
       }
@@ -68,7 +69,7 @@ class Textify {
       if (numberOfEnclosure == template.enclosers) {
         matchingChecks++;
       }
-      if (ponctuation == template.isPonctuation) {
+      if (punctuation == template.isPunctuation) {
         matchingChecks++;
       }
       if (hasVerticalLineOnTheLeftSide == template.lineLeft) {
@@ -348,7 +349,7 @@ class Textify {
             connectedPoints,
           );
 
-          if (artifactFound.matrixOriginal.isConsidreredLine()) {
+          if (artifactFound.matrixOriginal.isConsideredLine()) {
             // discard lines
           } else {
             // Add the found artifact to the list
@@ -473,8 +474,8 @@ class Textify {
 
       for (final artifact in band.artifacts) {
         artifact.resize(
-          templateBaseDimentionWidth,
-          templateBaseDimentionHeight,
+          templateBaseDimensionWidth,
+          templateBaseDimensionHeight,
         );
         String characterFound = _getCharacterFromArtifacts(artifact, supportedCharacters);
         line += characterFound;
@@ -535,8 +536,8 @@ class Textify {
     band.sortLeftToRight();
     band.calculateAverages();
 
-    final double averageWidth = band.avergageWidth;
-    final double averageGap = band.avergageGap;
+    final double averageWidth = band.averageWidth;
+    final double averageGap = band.averageGap;
     final double exceeding = averageGap * 1.8;
 
     for (int indexOfArtifact = 0; indexOfArtifact < band.artifacts.length; indexOfArtifact++) {

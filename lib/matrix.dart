@@ -309,14 +309,14 @@ class Matrix {
     int desiredHeight,
   ) {
     // help resizing by ensuring there's a border
-    if (isPonctuation()) {
+    if (isPunctuation()) {
       // do not crop and center
       return createWrapGridWithFalse().createResizedGrid(
         desiredWidth,
         desiredHeight,
       );
     } else {
-      // Resise
+      // Resize
       return createCropGrid().createWrapGridWithFalse().createResizedGrid(
             desiredWidth,
             desiredHeight,
@@ -348,12 +348,12 @@ class Matrix {
         double srcY = y * yScale;
 
         if (targetWidth > cols || targetHeight > rows) {
-          // Upscaling: Use nearest-neighbor interpolation
+          // UpScaling: Use nearest-neighbor interpolation
           int srcXInt = srcX.floor();
           int srcYInt = srcY.floor();
           resizedGrid.data[y][x] = data[srcYInt][srcXInt];
         } else {
-          // Downscaling: Average the values in the sub-grid
+          // DownScaling: Average the values in the sub-grid
           int startX = srcX.floor();
           int endX = (srcX + xScale).ceil();
           int startY = srcY.floor();
@@ -616,7 +616,7 @@ class Matrix {
     return contentRect.size;
   }
 
-  static List<String> getStringListOfOverlayedGrids(
+  static List<String> getStringListOfOverladedGrids(
     final Matrix grid1,
     final Matrix grid2,
   ) {
@@ -627,30 +627,30 @@ class Matrix {
       throw Exception('Grids must have the same dimensions');
     }
 
-    List<String> overlayedGrid = [];
+    List<String> overladedGrid = [];
 
     for (int row = 0; row < height; row++) {
-      String overlayedRow = '';
+      String overladedRow = '';
 
       for (int col = 0; col < width; col++) {
         final bool cell1 = grid1.data[row][col];
         final bool cell2 = grid2.data[row][col];
 
         if (cell1 && cell2) {
-          overlayedRow += '=';
+          overladedRow += '=';
         } else if (cell1) {
-          overlayedRow += '*';
+          overladedRow += '*';
         } else if (cell2) {
-          overlayedRow += '#';
+          overladedRow += '#';
         } else {
-          overlayedRow += '.';
+          overladedRow += '.';
         }
       }
 
-      overlayedGrid.add(overlayedRow);
+      overladedGrid.add(overladedRow);
     }
 
-    return overlayedGrid;
+    return overladedGrid;
   }
 
   String gridToText({
@@ -692,7 +692,7 @@ class Matrix {
     return normalizedSimilarity;
   }
 
-  bool isConsidreredLine() {
+  bool isConsideredLine() {
     var ar = aspectRatioOfContent();
     if (ar < 0.25 || ar > 50) {
       return true;
@@ -704,8 +704,8 @@ class Matrix {
 
   bool get isNotEmpty => data.isEmpty == false;
 
-// smaller (~30%) in height artifacts will be considred ponctuation
-  bool isPonctuation() {
+  // smaller (~30%) in height artifacts will be considered punctuation
+  bool isPunctuation() {
     // Calculate the height of the content
     final Size size = getSizeOfContent();
 
