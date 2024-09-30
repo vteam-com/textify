@@ -42,8 +42,9 @@ class Textify {
   }
 
   List<ScoreMatch> getMatchingScores(
-    final Artifact artifact,
-  ) {
+    final Artifact artifact, [
+    final String supportedCharacters = '',
+  ]) {
     final matrix = artifact.matrixNormalized;
     final int numberOfEnclosure = matrix.enclosures;
     final bool hasVerticalLineOnTheLeftSide = matrix.verticalLineLeft;
@@ -51,17 +52,22 @@ class Textify {
     final bool ponctuation = matrix.isPonctuation();
 
     const double percentageNeeded = 0.3; // Adjust this value as needed
-    const int totalChecks = 3; // Total number of checks we perform
+    const int totalChecks = 4; // Total number of checks we perform
 
     final List<CharacterDefinition> qualifiedTemplates =
         characterDefinitions.definitions.where((CharacterDefinition template) {
-      if (numberOfEnclosure != template.enclosers) {
+      //
+      // The caller has a restricted set of possibl characters match
+      if (supportedCharacters.isNotEmpty && !supportedCharacters.contains(template.character)) {
         return false;
       }
 
       int matchingChecks = 0;
 
       // Count matching characteristics
+      if (numberOfEnclosure == template.enclosers) {
+        matchingChecks++;
+      }
       if (ponctuation == template.isPonctuation) {
         matchingChecks++;
       }
@@ -89,13 +95,14 @@ class Textify {
 
   String getTextFromBinaryImage({
     required final Matrix imageAsBinary,
+    final String supportedCharacters = '',
   }) {
     _findArtifacts(imageAsBinary);
 
     // merge disconnected parts of artifacts found
     _globalMergeOfArtifacts();
 
-    return _getTextFromArtifacts();
+    return _getTextFromArtifacts(supportedCharacters: supportedCharacters);
   }
 
   static String getTextFromBinaryImageStatic({
@@ -390,9 +397,10 @@ class Textify {
   }
 
   String _getCharacterFromArtifacts(
-    final Artifact artifact,
-  ) {
-    final List<ScoreMatch> scores = getMatchingScores(artifact);
+    final Artifact artifact, [
+    final String supportedCharacters = '',
+  ]) {
+    final List<ScoreMatch> scores = getMatchingScores(artifact, supportedCharacters);
 
     return scores.isNotEmpty ? scores.first.character : '';
   }
@@ -453,7 +461,7 @@ class Textify {
   /// Returns:
   ///   A String containing the extracted text, with attempts made to preserve
   ///   the original layout through the use of spaces between rows.
-  String _getTextFromArtifacts() {
+  String _getTextFromArtifacts({final String supportedCharacters = ''}) {
     // First group connected artifacts(Characters) into their bands to form words
     _createBandsFromArtifactsPositions();
     textFound = '';
@@ -468,7 +476,7 @@ class Textify {
           templateBaseDimentionWidth,
           templateBaseDimentionHeight,
         );
-        String characterFound = _getCharacterFromArtifacts(artifact);
+        String characterFound = _getCharacterFromArtifacts(artifact, supportedCharacters);
         line += characterFound;
       }
       linesFound.add(line);
@@ -529,7 +537,7 @@ class Textify {
 
     final double averageWidth = band.avergageWidth;
     final double averageGap = band.avergageGap;
-    final double exceeding = averageGap * 1.6;
+    final double exceeding = averageGap * 1.8;
 
     for (int indexOfArtifact = 0; indexOfArtifact < band.artifacts.length; indexOfArtifact++) {
       if (indexOfArtifact > 0) {
