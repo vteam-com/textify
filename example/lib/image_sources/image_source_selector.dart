@@ -95,7 +95,7 @@ class ImageSourceSelectorState extends State<ImageSourceSelector> with SingleTic
           transformationController: widget.transformationController,
           onImageChanged: (final ui.Image? newImage) {
             _imageSelected = newImage;
-            _expectedText = 'ABCDEFGH';
+            _expectedText = '';
             if (mounted) {
               setState(() {
                 widget.onSourceChanged(_imageSelected, _expectedText);
