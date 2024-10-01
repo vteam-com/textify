@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 0.0.7
+
+* 2024-10-01 Support characters  $  ;  \
+* 2024-10-01 Refactor to enable better Editing of templates
+
 ## 0.0.6
 
 * 2024-10-01 Document Matrix.dart

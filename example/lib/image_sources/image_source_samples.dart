@@ -13,7 +13,7 @@ class ImageSourceSamples extends StatefulWidget {
     required this.onImageChanged,
   });
 
-  final Function(ui.Image?, String) onImageChanged;
+  final Function(ui.Image?, List<String> expectedStrings) onImageChanged;
   final TransformationController transformationController;
 
   @override
@@ -104,11 +104,11 @@ class _ImageSourceSamplesState extends State<ImageSourceSamples> {
     );
   }
 
-  String getSampeExpectedText(int index) {
+  List<String> getSampeExpectedText(int index) {
     if (index < 0 && index >= imageFileData.length) {
       index = 0;
     }
-    return imageFileData[index].expected;
+    return [imageFileData[index].expected];
   }
 
   String getSampleAssetName(int index) {

@@ -1,6 +1,6 @@
 name: textify
-description: "This package allows you to convert digital images into text."
-version: 0.0.6
+description: "This package converts digital images into text."
+version: 0.0.7
 homepage: https://github.com/vteam-com/textify
 
 environment:

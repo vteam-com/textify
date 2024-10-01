@@ -1,7 +1,10 @@
 import 'dart:math';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:textify/image_pipeline.dart';
+import 'package:textify/textify.dart';
 
 import '../../widgets/gap.dart';
 import 'debouce.dart';
@@ -30,7 +33,9 @@ class ImageSourceGenerated extends StatefulWidget {
     required this.onImageChanged,
   });
 
-  final Function(ui.Image?, String) onImageChanged;
+  final Function(
+          ui.Image? image, List<String> expectedCharacters, String fontName)
+      onImageChanged;
   final TransformationController transformationController;
 
   @override
@@ -267,12 +272,13 @@ class _ImageSourceGeneratedState extends State<ImageSourceGenerated> {
           _textControllerLine1.text,
           _textControllerLine2.text,
           _textControllerLine3.text,
-        ].join(' '),
+        ],
+        imageSettings.selectedFont,
       );
     });
   }
 
-  void resetSettings() {
+  void resetSettings() async {
     setState(() {
       imageSettings = ImageGeneratorInput.empty();
       _textControllerLine1.text = imageSettings.defaultTextLine1;
@@ -289,9 +295,53 @@ class _ImageSourceGeneratedState extends State<ImageSourceGenerated> {
     debouncer.run(() {
       widget.onImageChanged(
         _imageGenerated,
-        _textControllerLine1.text + _textControllerLine1.text,
+        [
+          _textControllerLine1.text,
+          _textControllerLine2.text,
+          _textControllerLine3.text
+        ],
+        imageSettings.selectedFont,
       );
     });
+
+    final textify = await Textify().init();
+
+    final List<String> allCharacters = (imageSettings.defaultTextLine1 +
+            imageSettings.defaultTextLine2 +
+            imageSettings.defaultTextLine3)
+        .split('');
+
+    for (final fontName in availableFonts) {
+      for (final String char in allCharacters) {
+        final ui.Image newImageSource = await createColorImageSingleCharacter(
+          imageWidth: 40 * 6,
+          imageHeight: 60,
+          character: 'A|$char|W',
+          fontFamily: fontName,
+          fontSize: imageSettings.fontSize.toInt(),
+        );
+
+        final ImagePipeline interimImages =
+            await ImagePipeline.apply(newImageSource);
+
+        textify.findArtifactsFromBinaryImage(interimImages.imageBinary);
+        if (textify.bands.length == 1) {
+          final targetArtifact =
+              textify.bands.first.artifacts[2]; // second character from "A|?|W"
+
+          textify.characterDefinitions.upsertTemplate(
+            fontName,
+            char,
+            targetArtifact.matrixOriginal
+                .createNormalizeMatrix(40, 60), // the second artifact
+          );
+        }
+      }
+    }
+
+    Clipboard.setData(
+      ClipboardData(text: textify.characterDefinitions.toJsonString()),
+    );
   }
 
   Future<void> saveText(String key, String value) async {
@@ -365,6 +415,51 @@ class _ImageSourceGeneratedState extends State<ImageSourceGenerated> {
       ),
     );
   }
+}
+
+Future<ui.Image> createColorImageSingleCharacter({
+  required final int imageWidth,
+  required final int imageHeight,
+  required final String character,
+  // Font
+  required final String fontFamily,
+  required final int fontSize,
+}) async {
+  final ui.PictureRecorder recorder = ui.PictureRecorder();
+  final ui.Canvas newCanvas = ui.Canvas(recorder);
+
+  final ui.Paint paint = ui.Paint();
+  paint.color = Colors.white;
+  paint.style = ui.PaintingStyle.fill;
+
+  newCanvas.drawRect(
+    ui.Rect.fromPoints(
+      const ui.Offset(0.0, 0.0),
+      ui.Offset(
+        imageWidth.toDouble(),
+        imageHeight.toDouble(),
+      ),
+    ),
+    paint,
+  );
+
+  TextPainter textPainter = myDrawText(
+    paint: paint,
+    width: imageWidth,
+    text: character,
+    color: Colors.black,
+    fontSize: fontSize,
+    fontFamily: fontFamily,
+  );
+
+  textPainter.paint(
+    newCanvas,
+    Offset(0, 0),
+  );
+
+  final ui.Picture picture = recorder.endRecording();
+  final ui.Image image = await picture.toImage(imageWidth, imageHeight);
+  return image;
 }
 
 Future<ui.Image> createColorImageUsingTextPainter({

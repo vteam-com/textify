@@ -70,7 +70,7 @@ class Textify {
     final String supportedCharacters = '',
   ]) {
     if (artifact.characterMatched == ' ') {
-      return [ScoreMatch(character: ' ', score: 1)];
+      return [ScoreMatch(character: ' ', matrixIndex: 0, score: 1)];
     }
 
     final matrix = artifact.matrixNormalized;
@@ -80,7 +80,7 @@ class Textify {
     final bool punctuation = matrix.isPunctuation();
 
     const double percentageNeeded = 0.3;
-    const int totalChecks = 4;
+    const int totalChecks = 3;
 
     final List<CharacterDefinition> qualifiedTemplates = characterDefinitions
         .definitions
@@ -118,6 +118,14 @@ class Textify {
     // Sort scores in descending order (higher score is better)
     scores.sort((a, b) => b.score.compareTo(a.score));
     return scores;
+  }
+
+  List<Artifact> getAlCharacterFoundFromBands() {
+    List<Artifact> artifacts = [];
+    for (final band in bands) {
+      artifacts.addAll(band.artifacts);
+    }
+    return artifacts;
   }
 
   /// Extracts text from a given image.
@@ -170,12 +178,18 @@ class Textify {
       characterDefinitions.count > 0,
       'No character definitions loaded, did you forget to call Init()',
     );
+    findArtifactsFromBinaryImage(imageAsBinary);
+
+    return _getTextFromArtifacts(supportedCharacters: supportedCharacters);
+  }
+
+  void findArtifactsFromBinaryImage(Matrix imageAsBinary) {
     _findArtifacts(imageAsBinary);
 
     // merge disconnected parts of artifacts found
     _globalMergeOfArtifacts();
 
-    return _getTextFromArtifacts(supportedCharacters: supportedCharacters);
+    _createBandsFromArtifactsPositions();
   }
 
   /// Adjusts the height of artifacts to match their respective band heights.
@@ -488,10 +502,12 @@ class Textify {
     for (final CharacterDefinition template in templates) {
       if (normalizedArtifact.isNotEmpty) {
         // Calculate the similarity score and create a ScoreMatch object
-        for (final Matrix matrix in template.matrices) {
+        for (int i = 0; i < template.matrices.length; i++) {
+          final Matrix matrix = template.matrices[i];
           ScoreMatch scoreMatch = ScoreMatch(
             character: template.character,
-            score: Matrix.getDistancePercentage(
+            matrixIndex: i,
+            score: Matrix.hammingDistancePercentage(
               normalizedArtifact,
               matrix,
             ),
@@ -503,8 +519,48 @@ class Textify {
       }
     }
 
-    // Sort the scores list in descending order of score
+    // Sort the scores list in descending order of score 1.0 to 0.0
     scores.sort((a, b) => b.score.compareTo(a.score));
+
+    if (scores.length >= 2) {
+      // Implement tie breaker
+      if (scores[0].score == scores[1].score) {
+        final CharacterDefinition template1 = templates.firstWhere(
+          (t) => t.character == scores[0].character,
+        );
+        final CharacterDefinition template2 = templates.firstWhere(
+          (t) => t.character == scores[1].character,
+        );
+
+        double totalScore1 = 0;
+        double totalScore2 = 0;
+
+        for (final matrix in template1.matrices) {
+          totalScore1 += Matrix.hammingDistancePercentage(
+            normalizedArtifact,
+            matrix,
+          );
+        }
+        totalScore1 /= template1.matrices.length; // averaging
+
+        for (final matrix in template2.matrices) {
+          totalScore2 += Matrix.hammingDistancePercentage(
+            normalizedArtifact,
+            matrix,
+          );
+        }
+
+        totalScore2 /= template2.matrices.length; // averaging
+
+        if (totalScore2 > totalScore1) {
+          // Swap the first two elements if the second template has a higher total score
+          final temp = scores[0];
+          scores[0] = scores[1];
+          scores[1] = temp;
+        }
+      }
+    }
+
     return scores;
   }
 
@@ -529,7 +585,7 @@ class Textify {
   ///   the original layout through the use of spaces between rows.
   String _getTextFromArtifacts({final String supportedCharacters = ''}) {
     // First group connected artifacts(Characters) into their bands to form words
-    _createBandsFromArtifactsPositions();
+
     textFound = '';
 
     List<String> linesFound = [];
@@ -537,14 +593,15 @@ class Textify {
     for (final band in bands) {
       String line = '';
 
-      for (final artifact in band.artifacts) {
+      for (final Artifact artifact in band.artifacts) {
         artifact.resize(
           templateWidth,
           templateHeight,
         );
-        String characterFound =
+        artifact.characterMatched =
             _getCharacterFromArtifacts(artifact, supportedCharacters);
-        line += characterFound;
+
+        line += artifact.characterMatched;
       }
       linesFound.add(line);
     }
@@ -841,11 +898,24 @@ class Textify {
 }
 
 class ScoreMatch {
+  // Factory method for creating an empty ScoreMatch
+  factory ScoreMatch.empty() {
+    return ScoreMatch(
+      character: '',
+      matrixIndex: -1,
+      score: 0.0,
+    );
+  }
   ScoreMatch({
     required this.character,
+    required this.matrixIndex,
     required this.score,
   });
 
   String character;
+  int matrixIndex;
   double score;
+
+  // Optional: Method to check if the ScoreMatch is empty
+  bool get isEmpty => character.isEmpty && matrixIndex == -1 && score == 0.0;
 }

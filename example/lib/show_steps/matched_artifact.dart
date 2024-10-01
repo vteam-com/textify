@@ -5,12 +5,12 @@ import '../../widgets/gap.dart';
 class MatchedArtifact extends StatelessWidget {
   const MatchedArtifact({
     super.key,
-    required this.firstChar,
-    required this.secondChar,
+    required this.characterExpected,
+    required this.characterFound,
   });
 
-  final String firstChar;
-  final String secondChar;
+  final String characterExpected;
+  final String characterFound;
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +30,7 @@ class MatchedArtifact extends StatelessWidget {
       width: 18,
       decoration: BoxDecoration(
         border: Border.all(
-          color: firstChar == secondChar
+          color: characterExpected == characterFound
               ? Theme.of(context).colorScheme.onSurface.withOpacity(0.5)
               : Colors.orange,
           width: 1.0,
@@ -42,13 +42,14 @@ class MatchedArtifact extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(
-            firstChar,
-            style: firstChar == secondChar ? greenStyle : blackStyle,
+            characterExpected,
+            style:
+                characterExpected == characterFound ? greenStyle : blackStyle,
           ),
           gap(6),
           Text(
-            secondChar,
-            style: firstChar == secondChar ? greenStyle : redStyle,
+            characterFound,
+            style: characterExpected == characterFound ? greenStyle : redStyle,
           ),
         ],
       ),

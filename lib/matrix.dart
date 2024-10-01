@@ -76,6 +76,7 @@ class Matrix {
   /// [json] A map containing 'rows', 'cols', and 'data' keys.
   factory Matrix.fromJson(Map<String, dynamic> json) {
     Matrix matrix = Matrix();
+    matrix.font = json['font'];
     matrix.rows = json['rows'];
     matrix.cols = json['cols'];
     matrix.data = (json['data'] as List<dynamic>).map((row) {
@@ -99,6 +100,9 @@ class Matrix {
       width,
     );
   }
+
+  /// Font this matrix template is based on
+  String font = '';
 
   /// The number of columns in the matrix.
   int cols = 0;
@@ -490,44 +494,6 @@ class Matrix {
     );
   }
 
-  /// Calculates a match score between an input grid and a template grid.
-  ///
-  /// This function compares two boolean grids and returns a score indicating how
-  /// well they match. The score is based on several factors including similarity,
-  /// aspect ratio, edge characteristics, and center enclosure.
-  ///
-  /// Parameters:
-  /// - [inputGrid]: The grid being evaluated. It should be a 2D list of booleans
-  ///   where true represents an active cell and false an inactive cell.
-  /// - [templateGrid]: The reference grid to compare against. It should have the
-  ///   same structure as the inputGrid.
-  ///
-  /// Returns:
-  /// A [double] representing the match score. A higher score indicates a better
-  /// match. The score is calculated as follows:
-  /// - 50% of the score is based on the similarity (Hamming distance)
-  /// - 20% is based on the aspect ratio comparison
-  /// - 10% is deducted based on edge characteristics
-  /// - 20% is added if the center of the input grid is enclosed
-  ///
-  /// The final score is normalized and typically falls between 0 and 1, but may
-  /// exceed 1 in some cases.
-  ///
-  static double getDistancePercentage(
-    Matrix inputGrid,
-    Matrix templateGrid,
-  ) {
-    if (inputGrid.isEmpty ||
-        templateGrid.isEmpty ||
-        inputGrid.rows != templateGrid.rows ||
-        inputGrid.cols != templateGrid.cols) {
-      throw ArgumentError('Grids must be non-empty and of the same size.');
-    }
-
-    final double hammingDist = Matrix.hammingDistance(inputGrid, templateGrid);
-    return hammingDist;
-  }
-
   /// Creates a string representation of two overlaid matrices.
   ///
   /// This static method compares two matrices cell by cell and generates a new
@@ -673,22 +639,29 @@ class Matrix {
   /// Note: This method assumes that both matrices have the same dimensions.
   /// If the matrices have different sizes, the behavior is undefined and may
   /// result in errors or incorrect results.
-  static double hammingDistance(
+  static double hammingDistancePercentage(
     Matrix inputGrid,
     Matrix templateGrid,
   ) {
-    int distance = 0;
+    int matchingPixels = 0;
+    int totalPixels = 0;
+
     for (int y = 0; y < inputGrid.rows; y++) {
       for (int x = 0; x < inputGrid.cols; x++) {
-        if (inputGrid.data[y][x] != templateGrid.data[y][x]) {
-          distance++;
+        if (inputGrid.data[y][x] || templateGrid.data[y][x]) {
+          totalPixels++;
+          if (inputGrid.data[y][x] == templateGrid.data[y][x]) {
+            matchingPixels++;
+          }
         }
       }
     }
 
-    final int gridSize = inputGrid.area;
-    final double normalizedSimilarity = 1.0 - (distance / gridSize.toDouble());
-    return normalizedSimilarity;
+    if (totalPixels == 0) {
+      return 0.0;
+    } // If no true pixels, consider it a perfect match
+
+    return matchingPixels / totalPixels;
   }
 
   /// Determines if the current Matrix is considered a line based on its aspect ratio.
@@ -811,6 +784,7 @@ class Matrix {
 
   Map<String, dynamic> toJson() {
     return {
+      'font': font,
       'rows': rows,
       'cols': cols,
       'data': data.map((row) {

@@ -17,9 +17,9 @@ class ImageGeneratorInput {
 
   factory ImageGeneratorInput.empty() {
     return ImageGeneratorInput(
-      defaultTextLine1: 'ABCDEFGHIJKLM NOPQRSTUVWXYZ',
-      defaultTextLine2: 'abcdefghijklm nopqrstuvwxyz',
-      defaultTextLine3: '0123456789 /-(),:.',
+      defaultTextLine1: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+      defaultTextLine2: 'abcdefghijklmnopqrstuvwxyz',
+      defaultTextLine3: '0123456789/\\-(),;:.\$',
       fontSize: 40,
       imageBackgroundColor: Colors.yellow.shade100,
       imageTextColorAlphabet: Colors.pink,

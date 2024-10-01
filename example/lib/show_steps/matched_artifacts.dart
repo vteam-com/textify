@@ -1,6 +1,6 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:textify/artifact.dart';
 import 'package:textify/textify.dart';
 
 import '../image_sources/panel_content.dart';
@@ -12,15 +12,17 @@ class MatchedArtifacts extends StatelessWidget {
   const MatchedArtifacts({
     super.key,
     required this.textify,
-    required this.charactersExpected,
+    required this.expectedStrings,
+    required this.font,
   });
 
+  final String font;
   final Textify textify;
-  final String charactersExpected;
+  final List<String> expectedStrings;
 
   @override
   Widget build(BuildContext context) {
-    if (charactersExpected.isEmpty) {
+    if (expectedStrings.isEmpty) {
       return _buildFreeStyleResults(context);
     } else {
       return _buildMatchingCharacter(context);
@@ -37,46 +39,6 @@ class MatchedArtifacts extends StatelessWidget {
     }
 
     return count;
-  }
-
-  void fix() {
-    final String characterWithoutSpace = charactersExpected.replaceAll(' ', '');
-
-    for (int index = 0; index < characterWithoutSpace.length; index++) {
-      textify.characterDefinitions.upsertTemplate(
-        characterWithoutSpace[index],
-        textify.list[index].matrixNormalized,
-      );
-    }
-  }
-
-  Widget _buildActionButtons() {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          SizedBox(
-            width: 100,
-            child: OutlinedButton(
-                onPressed: () => fix(), child: const Text('Fix')),
-          ),
-          gap(),
-          SizedBox(
-            width: 100,
-            child: OutlinedButton(
-              child: const Text('Copy'),
-              onPressed: () {
-                Clipboard.setData(
-                  ClipboardData(
-                      text: textify.characterDefinitions.toJsonString()),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
-    );
   }
 
   Widget _buildFreeStyleResults(final BuildContext context) {
@@ -99,42 +61,49 @@ class MatchedArtifacts extends StatelessWidget {
   }
 
   Widget _buildListOfMatches(final BuildContext context) {
+    List<Widget> widgets = [];
+    int line = 0;
+
+    for (final band in textify.bands) {
+      int charIndex = 0;
+      for (final artifact in band.artifacts) {
+        final String text =
+            line < expectedStrings.length ? expectedStrings[line] : '';
+
+        final expectedCharacter =
+            charIndex < text.length ? text[charIndex] : '!';
+
+        charIndex++;
+        final button = InkWell(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => EditScreen(
+                  textify: textify,
+                  artifact: artifact,
+                  characterExpected: expectedCharacter,
+                  characterFound: artifact.characterMatched,
+                ),
+              ),
+            );
+          },
+          child: MatchedArtifact(
+            characterExpected: expectedCharacter,
+            characterFound: artifact.characterMatched,
+          ),
+        );
+        widgets.add(button);
+      }
+      line++;
+      widgets.add(gap());
+    }
+
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          ...List.generate(charactersExpected.length, (index) {
-            final String characterExpected = charactersExpected[index];
-            final String characterFound = index < textify.textFound.length
-                ? textify.textFound[index]
-                : '!';
-            return InkWell(
-              onTap: () {
-                final discountSpacesForIndexPositionInArtifactFound =
-                    countSpaces(charactersExpected.substring(0, index));
-                final Artifact artifactToUse = textify.list[
-                    index - discountSpacesForIndexPositionInArtifactFound];
-
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => EditScreen(
-                      textify: textify,
-                      artifact: artifactToUse,
-                      characterExpected: characterExpected,
-                      characterFound: characterFound,
-                    ),
-                  ),
-                );
-              },
-              child: MatchedArtifact(
-                firstChar: characterExpected,
-                secondChar: characterFound.replaceAll('\n', ' '),
-              ),
-            );
-          }),
-        ],
+        children: widgets,
       ),
     );
   }
@@ -156,7 +125,7 @@ class MatchedArtifacts extends StatelessWidget {
           ),
         ),
       ),
-      end: _buildActionButtons(),
+      end: const SizedBox(),
     );
   }
 
@@ -173,21 +142,68 @@ class MatchedArtifacts extends StatelessWidget {
   }
 }
 
-double getPercentageOfMatches(String characters, String textFound) {
-  if (characters.isEmpty) {
+double getPercentageOfMatches(List<String> expectedStrings, String textFound) {
+  if (expectedStrings.isEmpty) {
     return 0;
   }
 
   int matchCount = 0;
-  textFound = textFound.replaceAll('\n', ' ');
-  for (int i = 0; i < characters.length; i++) {
-    if (i < textFound.length) {
-      if (characters[i] == textFound[i]) {
-        matchCount++;
+  List<String> stringsFound = textFound.split('\n');
+
+  // Implement distance matching
+  for (int i = 0; i < expectedStrings.length && i < stringsFound.length; i++) {
+    String expected = expectedStrings[i];
+    String found = stringsFound[i];
+
+    // Calculate Levenshtein distance
+    int distance = damerauLevenshteinDistance(expected, found);
+
+    // Consider it a match if the distance is less than 30% of the expected string length
+    if (distance <= (expected.length * 0.3).round()) {
+      matchCount++;
+    }
+  }
+
+  double percentage = (matchCount / expectedStrings.length) * 100;
+  return percentage;
+}
+
+int damerauLevenshteinDistance(String source, String target) {
+  if (source == target) return 0;
+  if (source.isEmpty) return target.length;
+  if (target.isEmpty) return source.length;
+
+  List<List<int>> matrix = List.generate(
+    source.length + 1,
+    (i) => List.generate(target.length + 1, (j) => 0),
+  );
+
+  for (int i = 0; i <= source.length; i++) {
+    matrix[i][0] = i;
+  }
+  for (int j = 0; j <= target.length; j++) {
+    matrix[0][j] = j;
+  }
+
+  for (int i = 1; i <= source.length; i++) {
+    for (int j = 1; j <= target.length; j++) {
+      int cost = source[i - 1] == target[j - 1] ? 0 : 1;
+
+      matrix[i][j] = [
+        matrix[i - 1][j] + 1, // Deletion
+        matrix[i][j - 1] + 1, // Insertion
+        matrix[i - 1][j - 1] + cost, // Substitution
+      ].reduce((curr, next) => curr < next ? curr : next);
+
+      if (i > 1 &&
+          j > 1 &&
+          source[i - 1] == target[j - 2] &&
+          source[i - 2] == target[j - 1]) {
+        matrix[i][j] =
+            min(matrix[i][j], matrix[i - 2][j - 2] + cost); // Transposition
       }
     }
   }
 
-  double percentage = (matchCount / characters.length) * 100;
-  return percentage;
+  return matrix[source.length][target.length];
 }

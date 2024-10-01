@@ -24,7 +24,8 @@ class _HomeScreenState extends State<HomeScreen> {
   // The image that will be use for detecting the text
   ImagePipeline? _imagePipeline;
   ui.Image? _imageSource;
-  String _charactersExpectedToBeFoundInTheImage = '';
+  String _fontName = '';
+  List<String> _charactersExpectedToBeFoundInTheImage = [];
   bool _cleanUpArtifactFound = false;
   String _textFound = '';
 
@@ -132,7 +133,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   titleRight: '',
                   isExpanded: _isExpandedResults,
                   content: MatchedArtifacts(
-                    charactersExpected: _charactersExpectedToBeFoundInTheImage,
+                    font: _fontName,
+                    expectedStrings: _charactersExpectedToBeFoundInTheImage,
                     textify: _textify,
                   ),
                 ),
@@ -233,9 +235,11 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildImageSourceSelector() {
     return ImageSourceSelector(
       transformationController: _transformationController,
-      onSourceChanged: (final ui.Image? newImage, final String expectedText) {
+      onSourceChanged: (final ui.Image? newImage,
+          final List<String> expectedText, final String fontName) {
         _imageSource = newImage;
         _charactersExpectedToBeFoundInTheImage = expectedText;
+        _fontName = fontName;
         _triggetTextifyConvertion();
       },
     );

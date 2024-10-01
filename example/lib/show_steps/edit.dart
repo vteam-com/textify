@@ -121,6 +121,36 @@ class _EditScreenState extends State<EditScreen> {
   }
 
   Widget _buildContent(final BuildContext context) {
+    final List<ScoreMatch> scoreMatches =
+        widget.textify.getMatchingScores(widget.artifact);
+
+    final ScoreMatch scoreOfExpectedCharacter = scoreMatches.firstWhere(
+      (scoreMatch) => scoreMatch.character == widget.characterExpected,
+      orElse: () => ScoreMatch.empty(),
+    );
+
+    if (scoreOfExpectedCharacter.isEmpty) {
+      // not found
+    } else {
+      if (scoreMatches.first != scoreOfExpectedCharacter) {
+        // We do not have a expecte match
+        // Move the expected match to the second position of the list
+        scoreMatches.remove(scoreOfExpectedCharacter);
+        scoreMatches.insert(1, scoreOfExpectedCharacter);
+      }
+    }
+    // Make sure that we don't have redundant trailing entries
+    final scoresMatchToDisplay = scoreMatches
+        .fold<List<ScoreMatch>>([], (uniqueList, entry) {
+          if (uniqueList.length < 2 ||
+              !uniqueList.any((e) => e.character == entry.character)) {
+            uniqueList.add(entry);
+          }
+          return uniqueList;
+        })
+        .take(20)
+        .toList();
+
     final int w = widget.textify.templateWidth;
     final int h = widget.textify.templateHeight;
 
@@ -140,8 +170,10 @@ class _EditScreenState extends State<EditScreen> {
         widget.artifact.getResizedString(w: w, h: h, onChar: '*'),
         widget.artifact.getResizedString(w: w, h: h, forCode: true),
       ),
+
       // Expected templates and matches
       ..._buildTemplates(
+        scoresMatchToDisplay,
         w,
         h,
         // Artifact found
@@ -190,6 +222,7 @@ class _EditScreenState extends State<EditScreen> {
   }
 
   List<Widget> _buildTemplates(
+    List<ScoreMatch> scoreMatches,
     final int w,
     final int h,
     final Matrix matrixNormalized,
@@ -199,10 +232,8 @@ class _EditScreenState extends State<EditScreen> {
     List<Widget> widgets = [];
 
     int index = 0;
-    final List<ScoreMatch> scoreMatches =
-        widget.textify.getMatchingScores(widget.artifact);
 
-    for (final ScoreMatch match in scoreMatches.take(20)) {
+    for (final ScoreMatch match in scoreMatches) {
       if (match.score > 0) {
         String title = 'Match ${++index}';
         Color headerColor = index == 1
@@ -217,31 +248,93 @@ class _EditScreenState extends State<EditScreen> {
         final CharacterDefinition? definition =
             widget.textify.characterDefinitions.getDefinition(match.character);
         if (definition != null) {
+          final templateMatrix = definition.matrices[match.matrixIndex];
+
           title +=
-              '\nTeamplate "${match.character}"\nScore = ${(match.score * 100).toStringAsFixed(1)}% E:${definition.enclosers}, ${verticalLinesTemplate(definition)}';
+              '\nTeamplate "${match.character}"[${match.matrixIndex}] ${templateMatrix.font}\nScore = ${(match.score * 100).toStringAsFixed(1)}% E:${definition.enclosers}, ${verticalLinesTemplate(definition)}';
 
           overlayGridText = Matrix.getStringListOfOverladedGrids(
             matrixNormalized,
-            definition.matrices.first,
+            templateMatrix,
           );
         }
 
         widgets.add(gap());
         widgets.add(
-          _buildArtifactGrid(
-            title,
-            headerColor,
-            overlayGridText.join('\n'),
-            _getMultiLineTextForTemplate(
-              match.character,
-              false,
-              true,
-            ),
+          Column(
+            children: [
+              _buildArtifactGrid(
+                title,
+                headerColor,
+                overlayGridText.join('\n'),
+                _getMultiLineTextForTemplate(
+                  match.character,
+                  false,
+                  true,
+                ),
+              ),
+              ..._buildVariations(
+                  match.character,
+                  matrixNormalized,
+                  [0, 1, 2, 3]
+                      .where((number) => number != match.matrixIndex)
+                      .toList())
+            ],
           ),
         );
       }
     }
     return widgets;
+  }
+
+  List<Widget> _buildVariations(
+    final String character,
+    final Matrix matrixFound,
+    final List<int> matrixIndexes,
+  ) {
+    List<Widget> widgets = [];
+    for (final matrixIndex in matrixIndexes) {
+      final variation = _buildVariation(character, matrixFound, matrixIndex);
+      if (variation != null) {
+        widgets.add(variation);
+      }
+    }
+    return widgets;
+  }
+
+  Widget? _buildVariation(
+    final String character,
+    final Matrix matrixFound,
+    final int matrixIndex,
+  ) {
+    final CharacterDefinition? definition =
+        widget.textify.characterDefinitions.getDefinition(character);
+    if (definition != null && matrixIndex < definition.matrices.length) {
+      final templatedMatrix = definition.matrices[matrixIndex];
+
+      List<String> overlayGridText = [];
+      overlayGridText = Matrix.getStringListOfOverladedGrids(
+        matrixFound,
+        templatedMatrix,
+      );
+
+      final double scoreForThisVariation = Matrix.hammingDistancePercentage(
+            matrixFound,
+            templatedMatrix,
+          ) *
+          100;
+      return _buildArtifactGrid(
+        'Template "$character"[$matrixIndex]${templatedMatrix.font}\n${scoreForThisVariation.toStringAsFixed(2)}%',
+        Colors.grey.shade900,
+        overlayGridText.join('\n'),
+        _getMultiLineTextForTemplate(
+          character,
+          false,
+          true,
+        ),
+      );
+    }
+    return null;
   }
 
   String _getMultiLineTextForTemplate(

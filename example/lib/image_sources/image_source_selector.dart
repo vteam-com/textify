@@ -14,7 +14,9 @@ class ImageSourceSelector extends StatefulWidget {
     required this.onSourceChanged,
   });
 
-  final Function(ui.Image? imageSelected, String expectedText) onSourceChanged;
+  final Function(
+          ui.Image? imageSelected, List<String> expectedText, String fontName)
+      onSourceChanged;
   final TransformationController transformationController;
 
   @override
@@ -30,7 +32,9 @@ class ImageSourceSelectorState extends State<ImageSourceSelector>
     'Clipboard',
   ];
 
-  String _expectedText = '';
+  List<String> _expectedText = [];
+  String _fontName = 'Font???';
+
   // Keep track of user choices
   ui.Image? _imageSelected;
 
@@ -61,7 +65,8 @@ class ImageSourceSelectorState extends State<ImageSourceSelector>
               onTap: (index) {
                 _tabController.animateTo(index);
                 _saveLastTab(index);
-                widget.onSourceChanged(_imageSelected, _expectedText);
+                widget.onSourceChanged(
+                    _imageSelected, _expectedText, _fontName);
               },
             ),
             IntrinsicHeight(
@@ -79,12 +84,14 @@ class ImageSourceSelectorState extends State<ImageSourceSelector>
       case 1:
         return ImageSourceSamples(
           transformationController: widget.transformationController,
-          onImageChanged: (final ui.Image? image, final expectedText) async {
+          onImageChanged:
+              (final ui.Image? image, final List<String> expectedText) async {
             _imageSelected = image;
             _expectedText = expectedText;
             if (mounted) {
               setState(() {
-                widget.onSourceChanged(_imageSelected, _expectedText);
+                widget.onSourceChanged(
+                    _imageSelected, _expectedText, _fontName);
               });
             }
           },
@@ -96,10 +103,11 @@ class ImageSourceSelectorState extends State<ImageSourceSelector>
           transformationController: widget.transformationController,
           onImageChanged: (final ui.Image? newImage) {
             _imageSelected = newImage;
-            _expectedText = '';
+            _expectedText = [];
             if (mounted) {
               setState(() {
-                widget.onSourceChanged(_imageSelected, _expectedText);
+                widget.onSourceChanged(
+                    _imageSelected, _expectedText, _fontName);
               });
             }
           },
@@ -110,12 +118,15 @@ class ImageSourceSelectorState extends State<ImageSourceSelector>
       default:
         return ImageSourceGenerated(
           transformationController: widget.transformationController,
-          onImageChanged: (final ui.Image? newImage, final expectedText) {
+          onImageChanged: (final ui.Image? newImage,
+              final List<String> expectedText, final String fontName) {
             _imageSelected = newImage;
             _expectedText = expectedText;
+            _fontName = fontName;
             if (mounted) {
               setState(() {
-                widget.onSourceChanged(_imageSelected, _expectedText);
+                widget.onSourceChanged(
+                    _imageSelected, _expectedText, _fontName);
               });
             }
           },

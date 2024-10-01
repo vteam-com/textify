@@ -35,6 +35,13 @@ class CharacterDefinitions {
     }
   }
 
+  List<String> getSupportedCharacters() {
+    final List<String> list =
+        _definitions.map((entry) => entry.character).toList();
+    list.sort();
+    return list;
+  }
+
   List<String> getTemplateAsString(final String character) {
     if (character == ' ') {
       return List.generate(
@@ -86,29 +93,48 @@ class CharacterDefinitions {
     }
   }
 
-  /// Upsert a template for a given character by adding or updating its matrix.
+  /// Updates or inserts a template matrix for a given character and font.
   ///
-  /// This method either adds a new CharacterDefinition if one doesn't exist
-  /// for the given character, or updates an existing one by adding a new matrix.
+  /// This method either adds a new [CharacterDefinition] or updates an existing one.
+  /// If a matrix for the given character and font already exists, it is replaced.
+  /// Otherwise, a new matrix is added to the existing character definition or
+  /// a new character definition is created.
   ///
   /// Parameters:
-  /// - [character]: The character for which to upsert the template.
-  /// - [matrix]: The Matrix to be added to the character's definition.
-  void upsertTemplate(final String character, Matrix matrix) {
+  /// - [font]: The font name for the matrix.
+  /// - [character]: The character this matrix represents.
+  /// - [matrix]: The [Matrix] object containing the character's pixel data.
+  ///
+  /// The method performs the following steps:
+  /// 1. Checks if a [CharacterDefinition] exists for the given character.
+  /// 2. If no definition exists, creates a new one with the given matrix.
+  /// 3. If a definition exists, checks for an existing matrix with the same font.
+  /// 4. Replaces the existing matrix if found, or adds a new one if not found.
+  void upsertTemplate(
+    final String font,
+    final String character,
+    Matrix matrix,
+  ) {
+    matrix.font = font;
     final CharacterDefinition? found = getDefinition(character);
     if (found == null) {
       // Create a new CharacterDefinition and add it to the collection
-      final newDefinition = CharacterDefinition(
+      final CharacterDefinition newDefinition = CharacterDefinition(
         character: character,
         matrices: [matrix],
       );
       _definitions.add(newDefinition);
     } else {
-      // Add the new matrix to the existing definition if it's not already present
-      if (!found.matrices.any(
-        (Matrix existingMatrix) => Matrix.matrixEquals(existingMatrix, matrix),
-      )) {
+      // Check if a matrix with the same font already exists
+      final existingMatrixIndex =
+          found.matrices.indexWhere((m) => m.font == font);
+
+      if (existingMatrixIndex == -1) {
+        // Add the new matrix if no matrix with the same font exists
         found.matrices.add(matrix);
+      } else {
+        // Replace the existing matrix if it has the same font
+        found.matrices[existingMatrixIndex] = matrix;
       }
     }
   }
