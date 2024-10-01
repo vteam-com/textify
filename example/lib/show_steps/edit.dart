@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:textify/artifact.dart';
+import 'package:textify/character_definitions.dart';
+import 'package:textify/matrix.dart';
 
 import 'package:textify/textify.dart';
 
@@ -23,9 +26,6 @@ class EditScreen extends StatefulWidget {
 }
 
 class _EditScreenState extends State<EditScreen> {
-  final int h = templateBaseDimensionHeight;
-  final int w = templateBaseDimensionWidth;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -121,6 +121,9 @@ class _EditScreenState extends State<EditScreen> {
   }
 
   Widget _buildContent(final BuildContext context) {
+    final int w = widget.textify.templateHeight;
+    final int h = widget.textify.templateHeight;
+
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(

@@ -2,9 +2,6 @@ import 'dart:convert';
 
 import 'package:textify/matrix.dart';
 
-const templateBaseDimensionWidth = 40;
-const templateBaseDimensionHeight = 60;
-
 class CharacterDefinition {
   CharacterDefinition({
     required this.character,
@@ -45,6 +42,8 @@ class CharacterDefinition {
       jsonDecode(jsonString) as Map<String, dynamic>,
     );
   }
+  static int templateWidth = 40;
+  static int templateHeight = 60;
 
   final String character;
   final int enclosers;

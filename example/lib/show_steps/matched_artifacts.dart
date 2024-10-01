@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:textify/artifact.dart';
 import 'package:textify/textify.dart';
 
 import '../image_sources/panel_content.dart';

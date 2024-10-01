@@ -1,7 +1,9 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:textify/artifact.dart';
 import 'package:textify/band.dart';
+import 'package:textify/matrix.dart';
 import 'package:textify/textify.dart';
 
 const int offsetX = 00;

@@ -7,10 +7,6 @@ import 'package:textify/character_definitions.dart';
 import 'package:textify/image_pipeline.dart';
 import 'package:textify/matrix.dart';
 
-export 'package:textify/artifact.dart';
-export 'package:textify/character_definitions.dart';
-export 'package:textify/matrix.dart';
-
 /// Textify is a class designed to extract text from clean digital images.
 ///
 /// This class provides functionality to process binary images, identify text artifacts,
@@ -58,6 +54,9 @@ class Textify {
     bands.clear();
     textFound = '';
   }
+
+  int get templateWidth => CharacterDefinition.templateWidth;
+  int get templateHeight => CharacterDefinition.templateHeight;
 
   int get count => list.length;
 
@@ -536,8 +535,8 @@ class Textify {
 
       for (final artifact in band.artifacts) {
         artifact.resize(
-          templateBaseDimensionWidth,
-          templateBaseDimensionHeight,
+          templateWidth,
+          templateHeight,
         );
         String characterFound =
             _getCharacterFromArtifacts(artifact, supportedCharacters);
