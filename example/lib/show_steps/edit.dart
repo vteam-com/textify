@@ -121,41 +121,41 @@ class _EditScreenState extends State<EditScreen> {
   }
 
   Widget _buildContent(final BuildContext context) {
-    final int w = widget.textify.templateHeight;
+    final int w = widget.textify.templateWidth;
     final int h = widget.textify.templateHeight;
+
+    List<Widget> widgets = [
+      // as found
+      _buildArtifactGrid(
+        'Artifact\nBand #${widget.artifact.bandId}',
+        Colors.black,
+        widget.artifact.toText(onChar: '*'),
+        widget.artifact.toText(forCode: true),
+      ),
+      gap(),
+      // Found Normalized
+      _buildArtifactGrid(
+        'Artifact\nNormalized\n${w}x$h E:${widget.artifact.matrixNormalized.enclosures} ${verticalLines(widget.artifact.matrixNormalized)}',
+        Colors.grey.withAlpha(100),
+        widget.artifact.getResizedString(w: w, h: h, onChar: '*'),
+        widget.artifact.getResizedString(w: w, h: h, forCode: true),
+      ),
+      // Expected templates and matches
+      ..._buildTemplates(
+        w,
+        h,
+        // Artifact found
+        widget.artifact.matrixNormalized,
+
+        // Expected Character
+        widget.characterExpected,
+      ),
+    ];
 
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // as found
-          _buildArtifactGrid(
-            'Artifact\nBand #${widget.artifact.bandId}',
-            Colors.black,
-            widget.artifact.toText(onChar: '*'),
-            widget.artifact.toText(forCode: true),
-          ),
-          gap(),
-          // Found Normalized
-          _buildArtifactGrid(
-            'Artifact\nNormalized\n${w}x$h E:${widget.artifact.matrixNormalized.enclosures} ${verticalLines(widget.artifact.matrixNormalized)}',
-            Colors.grey.withAlpha(100),
-            widget.artifact.getResizedString(w: w, h: h, onChar: '*'),
-            widget.artifact.getResizedString(w: w, h: h, forCode: true),
-          ),
-          // Expected templates and matches
-          ..._buildTemplates(
-            w,
-            h,
-            // Artifact found
-            widget.artifact.matrixNormalized,
-
-            // Expected Character
-            widget.characterExpected,
-          ),
-        ],
-      ),
+      child:
+          Row(crossAxisAlignment: CrossAxisAlignment.start, children: widgets),
     );
   }
 
@@ -202,7 +202,7 @@ class _EditScreenState extends State<EditScreen> {
     final List<ScoreMatch> scoreMatches =
         widget.textify.getMatchingScores(widget.artifact);
 
-    for (final ScoreMatch match in scoreMatches) {
+    for (final ScoreMatch match in scoreMatches.take(20)) {
       if (match.score > 0) {
         String title = 'Match ${++index}';
         Color headerColor = index == 1
@@ -213,17 +213,18 @@ class _EditScreenState extends State<EditScreen> {
           headerColor = Colors.green.withAlpha(100);
         }
 
-        final CharacterDefinition definition =
-            CharacterDefinitions().getDefinition(match.character)!;
+        List<String> overlayGridText = [];
+        final CharacterDefinition? definition =
+            widget.textify.characterDefinitions.getDefinition(match.character);
+        if (definition != null) {
+          title +=
+              '\nTeamplate "${match.character}"\nScore = ${(match.score * 100).toStringAsFixed(1)}% E:${definition.enclosers}, ${verticalLinesTemplate(definition)}';
 
-        title +=
-            '\nTeamplate "${match.character}"\nScore = ${(match.score * 100).toStringAsFixed(1)}% E:${definition.enclosers}, ${verticalLinesTemplate(definition)}';
-
-        final List<String> overlayGridText =
-            Matrix.getStringListOfOverladedGrids(
-          matrixNormalized,
-          definition.matrices.first,
-        );
+          overlayGridText = Matrix.getStringListOfOverladedGrids(
+            matrixNormalized,
+            definition.matrices.first,
+          );
+        }
 
         widgets.add(gap());
         widgets.add(
@@ -249,8 +250,8 @@ class _EditScreenState extends State<EditScreen> {
     final bool forCode,
   ) {
     final List<String> textTemplate =
-        CharacterDefinitions().getTemplateAsString(character);
+        widget.textify.characterDefinitions.getTemplateAsString(character);
     return Matrix.fromAsciiDefinition(textTemplate)
-        .gridToText(forCode: forCode);
+        .gridToString(forCode: forCode);
   }
 }
