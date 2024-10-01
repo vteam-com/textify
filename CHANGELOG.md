@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.0.3
+
+* Update README.md
+
 ## 0.0.2
 
 * 2024-09-30 Fix many typos
