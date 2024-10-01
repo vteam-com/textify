@@ -1,8 +1,12 @@
 # CHANGELOG
 
+## 0.0.4
+
+* 2024-09-30 Link Package to GitHub repo <https://github.com/vteam-com/textify>
+
 ## 0.0.3
 
-* Update README.md
+* 2024-09-30 Update README.md
 
 ## 0.0.2
 
