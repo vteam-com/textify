@@ -43,7 +43,7 @@ class CharacterDefinitions {
       );
     }
 
-    return getDefinition(character)!.matrices.first.getAsListOfString();
+    return getDefinition(character)!.matrices.first.gridToStrings();
   }
 
   Future<CharacterDefinitions> loadDefinitions([

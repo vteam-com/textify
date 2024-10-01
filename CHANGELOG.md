@@ -1,9 +1,15 @@
 # CHANGELOG
 
+## 0.0.6
+
+* 2024-10-01 Document Matrix.dart
+* 2024-10-01 Perf improvement avoid scoring the Artifact for space " "
+* 2024-10-01 Fix bug in the Example:Edit Screen
+
 ## 0.0.5
 
-* 2024-09-30 new top level API "String getTextFromImage(IMAGE)"
-* 2024-09-30 dart format .
+* 2024-09-30 New top level API "String getTextFromImage(IMAGE)"
+* 2024-09-30 [dart format .]
 
 ## 0.0.4
 

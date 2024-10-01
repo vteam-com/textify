@@ -6,7 +6,6 @@
         120
     ],
     "yaml.format.printWidth": 120,
-    "dart.lineLength": 120,
     "dart.renameFilesWithClasses": "always",
     "[dart]": {
         "editor.defaultFormatter": "Dart-Code.dart-code"

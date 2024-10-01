@@ -9,7 +9,17 @@ extension RectArea on Rect {
   double area() => width * height;
 }
 
+/// Represents a 2D grid of boolean values, primarily used for image processing
+/// and pattern recognition tasks.
+///
+/// This class provides various ways to create, manipulate, and analyze boolean matrices,
+/// including methods for resizing, comparing, and extracting information from the grid.
 class Matrix {
+  /// Creates a new Matrix with the specified dimensions, filled with the given value.
+  ///
+  /// [width] The number of columns in the matrix.
+  /// [height] The number of rows in the matrix.
+  /// [value] The initial value for all cells (default is false).
   Matrix([num width = 0, num height = 0, bool value = false]) {
     data = List.generate(
       height.toInt(),
@@ -19,6 +29,9 @@ class Matrix {
     rows = height.toInt();
   }
 
+  /// Creates a Matrix from an ASCII representation.
+  ///
+  /// [template] A list of strings where '#' represents true and any other character represents false.
   factory Matrix.fromAsciiDefinition(final List<String> template) {
     Matrix matrix = Matrix();
     matrix.rows = template.length;
@@ -30,12 +43,19 @@ class Matrix {
     return matrix;
   }
 
+  /// Creates a Matrix from an existing 2D boolean list.
+  ///
+  /// [input] A 2D list of boolean values.
   factory Matrix.fromBoolMatrix(final List<List<bool>> input) {
     Matrix matrix = Matrix();
     matrix.setGrid(input);
     return matrix;
   }
 
+  /// Creates a Matrix from a flat list of boolean values.
+  ///
+  /// [inputList] A flat list of boolean values.
+  /// [width] The width of the resulting matrix.
   factory Matrix.fromFlatListOfBool(
     final List<bool> inputList,
     final int width,
@@ -51,6 +71,9 @@ class Matrix {
     return matrix;
   }
 
+  /// Creates a Matrix from JSON data.
+  ///
+  /// [json] A map containing 'rows', 'cols', and 'data' keys.
   factory Matrix.fromJson(Map<String, dynamic> json) {
     Matrix matrix = Matrix();
     matrix.rows = json['rows'];
@@ -61,6 +84,10 @@ class Matrix {
     return matrix;
   }
 
+  /// Creates a Matrix from a Uint8List, typically used for image data.
+  ///
+  /// [pixels] A Uint8List representing pixel data.
+  /// [width] The width of the image.
   factory Matrix.fromUint8List(
     final Uint8List pixels,
     int width,
@@ -73,8 +100,13 @@ class Matrix {
     );
   }
 
+  /// The number of columns in the matrix.
   int cols = 0;
+
+  /// The 2D list representing the boolean grid.
   List<List<bool>> data = [];
+
+  /// The number of rows in the matrix.
   int rows = 0;
 
   int _enclosures = -1;
@@ -84,6 +116,9 @@ class Matrix {
 
   int get area => cols * rows;
 
+  /// Calculates the aspect ratio of the content within the matrix.
+  ///
+  /// Returns the height-to-width ratio of the bounding box containing all true cells.
   double aspectRatioOfContent() {
     int minX = cols;
     int maxX = 0;
@@ -106,116 +141,9 @@ class Matrix {
     return height / width.toDouble(); // Aspect ratio
   }
 
-  /// Calculates a penalty based on differences in aspect ratios between grids.
-  static double calculateAspectRatioPenalty(
-    Matrix inputGrid,
-    Matrix templateGrid,
-  ) {
-    // Get bounding boxes for both grids
-    Rect inputBoundingBox = Matrix.getBoundingBox(inputGrid);
-    Rect templateBoundingBox = Matrix.getBoundingBox(templateGrid);
-
-    // Calculate aspect ratios
-    double inputAspectRatio = inputBoundingBox.width / inputBoundingBox.height;
-    double templateAspectRatio =
-        templateBoundingBox.width / templateBoundingBox.height;
-
-    // Calculate the difference in aspect ratios
-    double aspectRatioDifference =
-        (inputAspectRatio - templateAspectRatio).abs();
-
-    // Normalize the penalty based on the aspect ratios
-    return aspectRatioDifference;
-  }
-
-  // Function to penalize mismatches along the outer boundary of the shape
-  static double calculateBoundaryMismatchPenalty(
-    Matrix inputGrid,
-    Matrix templateGrid,
-  ) {
-    int rows = inputGrid.rows;
-    int cols = inputGrid.cols;
-
-    int boundaryMismatchCount = 0;
-
-    // Check edges of the grid (outermost rows and columns)
-    for (int i = 0; i < rows; i++) {
-      if (inputGrid.data[i][0] != templateGrid.data[i][0] ||
-          inputGrid.data[i][cols - 1] != templateGrid.data[i][cols - 1]) {
-        boundaryMismatchCount++;
-      }
-    }
-
-    for (int j = 0; j < cols; j++) {
-      if (inputGrid.data[0][j] != templateGrid.data[0][j] ||
-          inputGrid.data[rows - 1][j] != templateGrid.data[rows - 1][j]) {
-        boundaryMismatchCount++;
-      }
-    }
-
-    // Return a penalty proportional to the number of boundary mismatches
-    return boundaryMismatchCount.toDouble() * 0.1; // Tune this factor
-  }
-
-  /// Calculates a penalty based on differences in bounding boxes between grids.
-  static double calculateBoundingBoxPenalty(
-    Matrix inputGrid,
-    Matrix templateGrid,
-  ) {
-    // Get bounding boxes for both grids
-    Rect inputBoundingBox = Matrix.getBoundingBox(inputGrid);
-    Rect templateBoundingBox = Matrix.getBoundingBox(templateGrid);
-
-    // Calculate the difference in areas of the bounding boxes
-    double areaDifference =
-        (inputBoundingBox.area() - templateBoundingBox.area()).abs();
-
-    // Normalize the penalty based on bounding box area
-    double maxArea = (inputBoundingBox.area() > templateBoundingBox.area())
-        ? inputBoundingBox.area()
-        : templateBoundingBox.area();
-
-    return areaDifference / maxArea;
-  }
-
-  // Calculate the center of mass (centroid) of a grid
-  static List<double> calculateCenterOfMass(Matrix grid) {
-    int totalPoints = 0;
-    double sumX = 0;
-    double sumY = 0;
-
-    for (int y = 0; y < grid.rows; y++) {
-      for (int x = 0; x < grid.cols; x++) {
-        if (grid.data[y][x]) {
-          sumX += x;
-          sumY += y;
-          totalPoints++;
-        }
-      }
-    }
-
-    if (totalPoints == 0) {
-      return [0, 0]; // Avoid division by zero if grid is empty
-    }
-
-    return [sumX / totalPoints, sumY / totalPoints];
-  }
-
-  static double calculateHorizontalLinePenalty(
-    Matrix inputGrid,
-    Matrix templateGrid,
-  ) {
-    bool hasHorizontalLineInput = inputGrid.detectHorizontalLine();
-    bool hasHorizontalLineTemplate = templateGrid.detectHorizontalLine();
-
-    // Penalize if a horizontal line is present in one grid but not the other
-    if (hasHorizontalLineInput != hasHorizontalLineTemplate) {
-      return 0.1; // Adjust penalty value based on experimentation
-    }
-
-    return 0.0;
-  }
-
+  /// Retrieves the value of a cell at the specified coordinates.
+  ///
+  /// Returns false if the coordinates are out of bounds.
   bool cellGet(final int x, final int y) {
     if (isValidXY(x, y)) {
       return data[y][x];
@@ -223,13 +151,16 @@ class Matrix {
     return false;
   }
 
+  /// Sets the value of a cell at the specified coordinates.
+  ///
+  /// Does nothing if the coordinates are out of bounds.
   void cellSet(final int x, final int y, bool value) {
     if (isValidXY(x, y)) {
       data[y][x] = value;
     }
   }
 
-  /// Helper function to copy a grid onto another at a specific offset
+  /// Copies the content of one matrix onto another at a specific offset.
   static void copyGrid(
     final Matrix source,
     final Matrix target,
@@ -245,20 +176,19 @@ class Matrix {
     }
   }
 
-  // Calculate the number of true cells in a grid
-  int countTrueCells() {
-    int count = 0;
-    for (final List<bool> row in data) {
-      for (final bool cell in row) {
-        if (cell) {
-          count++;
-        }
-      }
-    }
-    return count;
-  }
-
-  Matrix createCropGrid() {
+  /// Trims the matrix by removing empty rows and columns from all sides.
+  ///
+  /// This method removes rows and columns that contain only false values from
+  /// the edges of the matrix, effectively trimming it to the smallest possible
+  /// size that contains all true values.
+  ///
+  /// Returns:
+  /// A new Matrix object that is a trimmed version of the original. If the
+  /// original matrix is empty or contains only false values, it returns an
+  /// empty Matrix.
+  ///
+  /// Note: This method does not modify the original matrix but returns a new one.
+  Matrix trim() {
     if (isEmpty || isEmpty) {
       return Matrix();
     }
@@ -309,6 +239,9 @@ class Matrix {
     );
   }
 
+  /// Creates a normalized Matrix with the specified dimensions.
+  ///
+  /// This method handles resizing and special cases like punctuation.
   Matrix createNormalizeMatrix(
     int desiredWidth,
     int desiredHeight,
@@ -322,25 +255,32 @@ class Matrix {
       );
     } else {
       // Resize
-      return createCropGrid().createWrapGridWithFalse().createResizedGrid(
+      return trim().createWrapGridWithFalse().createResizedGrid(
             desiredWidth,
             desiredHeight,
           );
     }
   }
 
-  Matrix createResizedGrid(
-    int targetWidth,
-    int targetHeight,
-  ) {
+  /// Creates a resized version of the current matrix.
+  ///
+  /// This method resizes the matrix to the specified target dimensions using
+  /// different strategies for upscaling and downscaling.
+  ///
+  /// Parameters:
+  /// - [targetWidth]: The desired width of the resized matrix.
+  /// - [targetHeight]: The desired height of the resized matrix.
+  ///
+  /// Returns:
+  /// A new Matrix object with the specified dimensions, containing a resized
+  /// version of the original matrix's content.
+  ///
+  /// Resizing strategy:
+  /// - For upscaling (target size larger than original), it uses nearest-neighbor interpolation.
+  /// - For downscaling (target size smaller than original), it averages the values in each sub-grid.
+  Matrix createResizedGrid(final int targetWidth, final int targetHeight) {
     // Initialize the resized grid
-    Matrix resizedGrid = Matrix.fromBoolMatrix(
-      List.generate(
-        targetHeight,
-        (i) => List.filled(targetWidth, false),
-        growable: true,
-      ),
-    );
+    Matrix resizedGrid = Matrix(targetWidth, targetHeight);
 
     // Calculate the scale factors
     double xScale = cols / targetWidth;
@@ -412,28 +352,21 @@ class Matrix {
     return newGrid;
   }
 
-  /// Helper function to detect the presence of horizontal lines in a grid.
-  bool detectHorizontalLine() {
-    for (int y = 0; y < rows; y++) {
-      bool hasActiveCell = false;
-      for (int x = 0; x < cols; x++) {
-        if (data[y][x]) {
-          hasActiveCell = true;
-          break;
-        }
-      }
-      if (hasActiveCell) {
-        // Check if the line spans the whole width or a significant part
-        int activeCells = data[0].length;
-        int threshold = (0.5 * activeCells).toInt(); // Example threshold
-        if (activeCells >= threshold) {
-          return true;
-        }
-      }
-    }
-    return false;
-  }
-
+  /// Gets the number of enclosed regions in the matrix.
+  ///
+  /// An enclosed region is a contiguous area of false cells completely
+  /// surrounded by true cells. This getter calculates the number of such
+  /// regions in the matrix.
+  ///
+  /// The calculation is performed only once and the result is cached for
+  /// subsequent calls to improve performance.
+  ///
+  /// Returns:
+  /// An integer representing the number of enclosed regions in the matrix.
+  ///
+  /// Note: The actual counting is performed by the `countEnclosedRegion`
+  /// function, which is assumed to be defined elsewhere in the class or
+  /// imported from another file.
   int get enclosures {
     if (_enclosures == -1) {
       _enclosures = countEnclosedRegion(this);
@@ -441,6 +374,24 @@ class Matrix {
     return _enclosures;
   }
 
+  /// Extracts a sub-grid from a larger binary image matrix.
+  ///
+  /// This static method creates a new Matrix object representing a portion of
+  /// the input binary image, as specified by the given rectangle.
+  ///
+  /// Parameters:
+  /// - [binaryImage]: The source Matrix from which to extract the sub-grid.
+  /// - [rect]: A Rect object specifying the region to extract. The rect's
+  ///   coordinates are relative to the top-left corner of the binaryImage.
+  ///
+  /// Returns:
+  /// A new Matrix object containing the extracted sub-grid.
+  ///
+  /// Note:
+  /// - If the specified rectangle extends beyond the boundaries of the source
+  ///   image, the out-of-bounds areas in the resulting sub-grid will be false.
+  /// - The method uses integer coordinates, so any fractional values in the
+  ///   rect will be truncated.
   static Matrix extractSubGrid({
     required final Matrix binaryImage,
     required final Rect rect,
@@ -466,55 +417,45 @@ class Matrix {
     return subImagePixels;
   }
 
-  List<String> getAsListOfString() {
-    List<String> result = [];
-
-    for (int row = 0; row < rows; row++) {
-      String rowString = '';
-      for (int col = 0; col < cols; col++) {
-        rowString += cellGet(col, row) ? '#' : '.';
-      }
-
-      result.add(rowString);
-    }
-
-    return result;
+  /// Calculates the size of the content area in the matrix.
+  ///
+  /// This method determines the dimensions of the smallest rectangle that
+  /// encompasses all true cells in the matrix. It uses the `getContentRect`
+  /// method to find the bounding rectangle and then returns its size.
+  ///
+  /// Returns:
+  /// A Size object representing the width and height of the content area.
+  ///
+  /// If the matrix is empty or contains no true cells, it returns a Size
+  /// with zero width and height.
+  ///
+  /// Note:
+  /// - The returned Size uses double values for width and height to be
+  ///   compatible with Flutter's Size class.
+  /// - This method is a convenient way to get the dimensions of the content
+  ///   without needing the full Rect information.
+  Size getContentSize() {
+    Rect contentRect = getContentRect();
+    return contentRect.size;
   }
 
-  /// Helper function to get the bounding box of the active area in the grid.
-  static Rect getBoundingBox(Matrix grid) {
-    int minX = grid.cols;
-    int minY = grid.rows;
-    int maxX = 0;
-    int maxY = 0;
-
-    for (int y = 0; y < grid.rows; y++) {
-      for (int x = 0; x < grid.cols; x++) {
-        if (grid.data[y][x]) {
-          if (x < minX) {
-            minX = x;
-          }
-          if (x > maxX) {
-            maxX = x;
-          }
-          if (y < minY) {
-            minY = y;
-          }
-          if (y > maxY) {
-            maxY = y;
-          }
-        }
-      }
-    }
-
-    return Rect.fromLTWH(
-      minX.toDouble(),
-      minY.toDouble(),
-      (maxX - minX + 1).toDouble(),
-      (maxY - minY + 1).toDouble(),
-    );
-  }
-
+  /// Calculates the bounding rectangle of the content in the matrix.
+  ///
+  /// This method finds the smallest rectangle that encompasses all true cells
+  /// in the matrix. It's useful for determining the area of the matrix that
+  /// contains actual content.
+  ///
+  /// Returns:
+  /// A Rect object representing the bounding rectangle of the content.
+  /// The rectangle is defined by its left, top, right, and bottom coordinates.
+  ///
+  /// If the matrix is empty or contains no true cells, it returns Rect.zero.
+  ///
+  /// Note:
+  /// - The returned Rect uses double values for coordinates to be compatible
+  ///   with Flutter's Rect class.
+  /// - The right and bottom coordinates are exclusive (i.e., they point to
+  ///   the cell just after the last true cell in each direction).
   Rect getContentRect() {
     if (data.isEmpty || data[0].isEmpty) {
       return Rect.zero;
@@ -585,43 +526,32 @@ class Matrix {
 
     final double hammingDist = Matrix.hammingDistance(inputGrid, templateGrid);
     return hammingDist;
-/*
-  // Calculate number of active cells (true values) in both grids
-  int activeInputCells = countTrueCells(inputGrid);
-  int activeTemplateCells = countTrueCells(templateGrid);
-
-  // Calculate size difference
-  double sizeDifference = (activeInputCells - activeTemplateCells).abs() /
-      activeTemplateCells.toDouble();
-  double sizePenalty =
-      sizeDifference / 30; // Tune this factor based on experimentation
-
-  // Compute bounding box, aspect ratio, and specific feature penalties
-  double boundingBoxPenalty =
-      calculateBoundingBoxPenalty(inputGrid, templateGrid);
-  double aspectRatioPenalty =
-      calculateAspectRatioPenalty(inputGrid, templateGrid);
-  double horizontalLinePenalty =
-      calculateHorizontalLinePenalty(inputGrid, templateGrid);
-
-  // Adjust final score with peak and loop counts, and additional penalties
-  double finalScore = normalizedSimilarity -
-      boundingBoxPenalty -
-      aspectRatioPenalty -
-      horizontalLinePenalty;
-
-  // Penalize size difference
-  finalScore -= sizePenalty;
-
-  return finalScore;
-  */
   }
 
-  Size getSizeOfContent() {
-    Rect contentRect = getContentRect();
-    return contentRect.size;
-  }
-
+  /// Creates a string representation of two overlaid matrices.
+  ///
+  /// This static method compares two matrices cell by cell and generates a new
+  /// representation where each cell is represented by a character based on the
+  /// values in both input matrices.
+  ///
+  /// Parameters:
+  /// - [grid1]: The first Matrix to be overlaid.
+  /// - [grid2]: The second Matrix to be overlaid.
+  ///
+  /// Returns:
+  /// A List<String> where each string represents a row in the overlaid result.
+  /// The characters in the resulting strings represent:
+  ///   '=' : Both matrices have true in this cell
+  ///   '*' : Only grid1 has true in this cell
+  ///   '#' : Only grid2 has true in this cell
+  ///   '.' : Both matrices have false in this cell
+  ///
+  /// Throws:
+  /// An Exception if the input matrices have different dimensions.
+  ///
+  /// Note:
+  /// This method is useful for visualizing the differences and similarities
+  /// between two matrices, which can be helpful in debugging or analysis tasks.
   static List<String> getStringListOfOverladedGrids(
     final Matrix grid1,
     final Matrix grid2,
@@ -659,27 +589,90 @@ class Matrix {
     return overladedGrid;
   }
 
-  String gridToText({
+  /// Converts the matrix to a string representation.
+  ///
+  /// This method creates a string representation of the matrix, with options
+  /// to format it for code or for display.
+  ///
+  /// Parameters:
+  /// - [forCode]: If true, formats the output as a Dart string literal.
+  ///              Default is false.
+  /// - [onChar]: The character to represent true cells. Default is '#'.
+  /// - [offChar]: The character to represent false cells. Default is '.'.
+  ///
+  /// Returns:
+  /// A string representation of the matrix. If [forCode] is true, the string
+  /// is formatted as a multi-line Dart string literal.
+  ///
+  /// Example:
+  /// If [forCode] is false:
+  /// "#.#\n.#.\n#.#"
+  ///
+  /// If [forCode] is true:
+  /// "\"#.#\",\n\".#.\",\n\"#.#\""
+  String gridToString({
     bool forCode = false,
     String onChar = '#',
     String offChar = '.',
   }) {
-    List<String> rows = [];
-    for (int y = 0; y < this.rows; y++) {
-      String row = '';
-      for (int x = 0; x < cols; x++) {
-        row += cellGet(x, y) ? onChar : offChar;
-      }
-      //row += ' ${row.length}';
-      rows.add(row);
-    }
+    final List<String> list = gridToStrings(onChar: onChar, offChar: offChar);
+
     if (forCode) {
-      String rowsAsText = rows.join('",\n"');
-      return '"$rowsAsText"';
+      String listAsText = list.join('",\n"');
+      return '"$listAsText"';
     }
-    return rows.join('\n');
+    return list.join('\n');
   }
 
+  /// Converts the matrix to a list of strings.
+  ///
+  /// This method creates a list where each string represents a row in the matrix.
+  ///
+  /// Parameters:
+  /// - [onChar]: The character to represent true cells. Default is '#'.
+  /// - [offChar]: The character to represent false cells. Default is '.'.
+  ///
+  /// Returns:
+  /// A List<String> where each string represents a row in the matrix.
+  ///
+  /// Example:
+  /// ["#.#", ".#.", "#.#"]
+  List<String> gridToStrings({
+    String onChar = '#',
+    String offChar = '.',
+  }) {
+    List<String> result = [];
+
+    for (int row = 0; row < rows; row++) {
+      String rowString = '';
+      for (int col = 0; col < cols; col++) {
+        rowString += cellGet(col, row) ? onChar : offChar;
+      }
+
+      result.add(rowString);
+    }
+
+    return result;
+  }
+
+  /// Calculates the normalized Hamming distance between two matrices.
+  ///
+  /// The Hamming distance is the number of positions at which the corresponding
+  /// elements in two matrices are different. This method computes a normalized
+  /// similarity score based on the Hamming distance.
+  ///
+  /// Parameters:
+  /// - [inputGrid]: The first Matrix to compare.
+  /// - [templateGrid]: The second Matrix to compare against.
+  ///
+  /// Returns:
+  /// A double value between 0 and 1, where:
+  /// - 1.0 indicates perfect similarity (no differences)
+  /// - 0.0 indicates maximum dissimilarity (all elements are different)
+  ///
+  /// Note: This method assumes that both matrices have the same dimensions.
+  /// If the matrices have different sizes, the behavior is undefined and may
+  /// result in errors or incorrect results.
   static double hammingDistance(
     Matrix inputGrid,
     Matrix templateGrid,
@@ -698,6 +691,24 @@ class Matrix {
     return normalizedSimilarity;
   }
 
+  /// Determines if the current Matrix is considered a line based on its aspect ratio.
+  ///
+  /// This method calculates the aspect ratio of the Matrix's content and checks if it falls
+  /// within a specific range to determine if it should be considered a line.
+  ///
+  /// Returns:
+  ///   * true if the aspect ratio is less than 0.25 or greater than 50,
+  ///     indicating that the Matrix is likely representing a line.
+  ///   * false otherwise, suggesting the Matrix is not representing a line.
+  ///
+  /// The aspect ratio is calculated by the aspectRatioOfContent() method, which is
+  /// assumed to return width divided by height of the Matrix's content. Therefore:
+  ///   * A very small aspect ratio (< 0.25) indicates a tall, narrow Matrix.
+  ///   * A very large aspect ratio (> 50) indicates a wide, short Matrix.
+  /// Both of these cases are considered to be line-like in this context.
+  ///
+  /// This method is useful in image processing or OCR tasks where distinguishing
+  /// between line-like structures and other shapes is important.
   bool isConsideredLine() {
     var ar = aspectRatioOfContent();
     if (ar < 0.25 || ar > 50) {
@@ -710,10 +721,10 @@ class Matrix {
 
   bool get isNotEmpty => data.isEmpty == false;
 
-  // smaller (~30%) in height artifacts will be considered punctuation
+  /// smaller (~30%) in height artifacts will be considered punctuation
   bool isPunctuation() {
     // Calculate the height of the content
-    final Size size = getSizeOfContent();
+    final Size size = getContentSize();
 
     // If there's no content, it's not punctuation
     if (size == Size.zero) {
@@ -728,7 +739,7 @@ class Matrix {
     return (x >= 0 && x < cols) && (y >= 0 && y < rows);
   }
 
-  // Custom comparison method for matrices
+  /// Custom comparison method for matrices
   static bool matrixEquals(Matrix a, Matrix b) {
     // Check if dimensions are the same
     if (a.rows != b.rows || a.cols != b.cols) {

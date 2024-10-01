@@ -367,7 +367,7 @@ class Textify {
     // Create and return the Artifact object
     final Artifact artifact = Artifact();
     artifact.rectangle = rectangle;
-    artifact.setMatrix(subGrid);
+    artifact.matrixOriginal = subGrid;
 
     return artifact;
   }
@@ -485,12 +485,12 @@ class Textify {
   ) {
     final List<ScoreMatch> scores = [];
     // Iterate through each template in the map
-    for (var entry in templates) {
+    for (final CharacterDefinition template in templates) {
       if (normalizedArtifact.isNotEmpty) {
         // Calculate the similarity score and create a ScoreMatch object
-        for (final matrix in entry.matrices) {
+        for (final Matrix matrix in template.matrices) {
           ScoreMatch scoreMatch = ScoreMatch(
-            character: entry.character,
+            character: template.character,
             score: Matrix.getDistancePercentage(
               normalizedArtifact,
               matrix,
@@ -589,7 +589,7 @@ class Textify {
         }
 
         if (artifactA.rectangle.overlaps(artifactB.rectangle)) {
-          artifactA.setMatrix(_mergeArtifacts(artifactA, artifactB));
+          artifactA.matrixOriginal = _mergeArtifacts(artifactA, artifactB);
           toRemove.add(artifactB);
         }
       }
@@ -627,10 +627,12 @@ class Textify {
             averageWidth,
             artifactLeft.rectangle.height,
           );
-          artifactSpace.resize(
+
+          artifactSpace.matrixOriginal = Matrix(
             artifactSpace.rectangle.width.toInt(),
             artifactSpace.rectangle.height.toInt(),
           );
+
           artifactSpace.characterMatched = ' ';
 
           {
@@ -807,7 +809,8 @@ class Textify {
                 artifactA.rectangle,
                 artifactB.rectangle,
               )) {
-                artifactA.setMatrix(_mergeArtifacts(artifactA, artifactB));
+                artifactA.matrixOriginal =
+                    _mergeArtifacts(artifactA, artifactB);
                 toRemove.add(artifactB);
               }
             }

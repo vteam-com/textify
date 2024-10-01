@@ -96,7 +96,7 @@ class Artifact {
     _matrixNormalized.cols = w;
     _matrixNormalized.rows = h;
 
-    return _matrixNormalized.gridToText(
+    return _matrixNormalized.gridToString(
       forCode: forCode,
       onChar: onChar,
     );
@@ -110,9 +110,15 @@ class Artifact {
     return !isEmpty;
   }
 
-  Matrix get matrixNormalized => _matrixNormalized;
-
   Matrix get matrixOriginal => _matrix;
+
+  set matrixOriginal(final Matrix value) {
+    _matrix.data = value.data;
+    _matrix.cols = value.cols;
+    _matrix.rows = value.rows;
+  }
+
+  Matrix get matrixNormalized => _matrixNormalized;
 
   Matrix resize(int w, int h) {
     _matrixNormalized.setGrid(
@@ -126,17 +132,11 @@ class Artifact {
     return _matrixNormalized;
   }
 
-  void setMatrix(final Matrix value) {
-    _matrix.data = value.data;
-    _matrix.cols = value.cols;
-    _matrix.rows = value.rows;
-  }
-
   String toText({
     String onChar = '#',
     bool forCode = false,
   }) {
-    return _matrix.gridToText(
+    return _matrix.gridToString(
       forCode: forCode,
       onChar: onChar,
     );
