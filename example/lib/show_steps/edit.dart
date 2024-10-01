@@ -196,23 +196,28 @@ class _EditScreenState extends State<EditScreen> {
     List<Widget> widgets = [];
 
     int index = 0;
-    final List<ScoreMatch> scoreMatches = widget.textify.getMatchingScores(widget.artifact);
+    final List<ScoreMatch> scoreMatches =
+        widget.textify.getMatchingScores(widget.artifact);
 
     for (final ScoreMatch match in scoreMatches) {
       if (match.score > 0) {
         String title = 'Match ${++index}';
-        Color headerColor = index == 1 ? const Color.fromARGB(255, 169, 61, 2) : Colors.red.withAlpha(100);
+        Color headerColor = index == 1
+            ? const Color.fromARGB(255, 169, 61, 2)
+            : Colors.red.withAlpha(100);
         if (match.character == characterExpected) {
           title += ' EXPECTED';
           headerColor = Colors.green.withAlpha(100);
         }
 
-        final CharacterDefinition definition = CharacterDefinitions().getDefinition(match.character)!;
+        final CharacterDefinition definition =
+            CharacterDefinitions().getDefinition(match.character)!;
 
         title +=
             '\nTeamplate "${match.character}"\nScore = ${(match.score * 100).toStringAsFixed(1)}% E:${definition.enclosers}, ${verticalLinesTemplate(definition)}';
 
-        final List<String> overlayGridText = Matrix.getStringListOfOverladedGrids(
+        final List<String> overlayGridText =
+            Matrix.getStringListOfOverladedGrids(
           matrixNormalized,
           definition.matrices.first,
         );
@@ -240,7 +245,9 @@ class _EditScreenState extends State<EditScreen> {
     final bool resize,
     final bool forCode,
   ) {
-    final List<String> textTemplate = CharacterDefinitions().getTemplateAsString(character);
-    return Matrix.fromAsciiDefinition(textTemplate).gridToText(forCode: forCode);
+    final List<String> textTemplate =
+        CharacterDefinitions().getTemplateAsString(character);
+    return Matrix.fromAsciiDefinition(textTemplate)
+        .gridToText(forCode: forCode);
   }
 }

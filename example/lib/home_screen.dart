@@ -33,7 +33,8 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _isExpandedResults = true;
   bool _isExpandedSource = true;
 
-  final TransformationController _transformationController = TransformationController();
+  final TransformationController _transformationController =
+      TransformationController();
 
   @override
   void initState() {
@@ -153,14 +154,16 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           OutlinedButton(
             onPressed: () {
-              _transformationController.value = _transformationController.value.scaled(1 / 1.5);
+              _transformationController.value =
+                  _transformationController.value.scaled(1 / 1.5);
             },
             child: const Text('Zoom -'),
           ),
           gap(),
           OutlinedButton(
             onPressed: () {
-              _transformationController.value = _transformationController.value.scaled(1.5);
+              _transformationController.value =
+                  _transformationController.value.scaled(1.5);
             },
             child: const Text('Zoom +'),
           ),

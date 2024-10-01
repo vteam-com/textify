@@ -21,7 +21,8 @@ class ImageSourceSelector extends StatefulWidget {
   ImageSourceSelectorState createState() => ImageSourceSelectorState();
 }
 
-class ImageSourceSelectorState extends State<ImageSourceSelector> with SingleTickerProviderStateMixin {
+class ImageSourceSelectorState extends State<ImageSourceSelector>
+    with SingleTickerProviderStateMixin {
   // Choice of Images sources
   final List<String> tabViews = [
     'Generate',

@@ -15,7 +15,8 @@ int countEnclosedRegion(Matrix grid) {
     for (int x = 0; x < cols; x++) {
       if (!grid.data[y][x] && !visited.data[y][x]) {
         int regionSize = exploreRegion(grid, visited, x, y);
-        if (regionSize >= minRegionSize && isEnclosedRegion(grid, x, y, regionSize)) {
+        if (regionSize >= minRegionSize &&
+            isEnclosedRegion(grid, x, y, regionSize)) {
           loopCount++;
         }
       }
@@ -51,7 +52,12 @@ int exploreRegion(
     ]) {
       int newX = x + dir[0], newY = y + dir[1];
 
-      if (newX >= 0 && newX < cols && newY >= 0 && newY < rows && !grid.data[newY][newX] && !visited.data[newY][newX]) {
+      if (newX >= 0 &&
+          newX < cols &&
+          newY >= 0 &&
+          newY < rows &&
+          !grid.data[newY][newX] &&
+          !visited.data[newY][newX]) {
         queue.add([newX, newY]);
         visited.data[newY][newX] = true;
       }

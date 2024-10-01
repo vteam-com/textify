@@ -22,7 +22,8 @@ class CharacterDefinitions {
   void fromJSonString(String jsonString) {
     final dynamic jsonObject = jsonDecode(jsonString);
     final List<dynamic> jsonList = jsonObject['templates'];
-    _definitions = jsonList.map((json) => CharacterDefinition.fromJson(json)).toList();
+    _definitions =
+        jsonList.map((json) => CharacterDefinition.fromJson(json)).toList();
   }
 
   // Get a specific template
@@ -46,7 +47,8 @@ class CharacterDefinitions {
   }
 
   Future<CharacterDefinitions> loadDefinitions([
-    final String pathToAssetsDefinition = 'packages/textify/assets/matrices.json',
+    final String pathToAssetsDefinition =
+        'packages/textify/assets/matrices.json',
   ]) async {
     // Load the JSON file from the assets
     String jsonString = await rootBundle.loadString(pathToAssetsDefinition);
@@ -73,7 +75,8 @@ class CharacterDefinitions {
 
   // Update an existing template
   void updateDefinition(CharacterDefinition template) {
-    final index = _definitions.indexWhere((t) => t.character == template.character);
+    final index =
+        _definitions.indexWhere((t) => t.character == template.character);
     if (index != -1) {
       _definitions[index] = template;
     } else {

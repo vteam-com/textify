@@ -31,7 +31,9 @@ class CharacterDefinition {
       isDate: json['isDate'] as bool,
       isDigit: json['isDigit'] as bool,
       isPunctuation: json['isPunctuation'] as bool,
-      matrices: (json['matrices'] as List).map((m) => Matrix.fromJson(m as Map<String, dynamic>)).toList(),
+      matrices: (json['matrices'] as List)
+          .map((m) => Matrix.fromJson(m as Map<String, dynamic>))
+          .toList(),
     );
 
     return definition;

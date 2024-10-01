@@ -19,8 +19,10 @@ class MatchedArtifact extends StatelessWidget {
       fontFamily: 'CourierPrime',
     );
 
-    final TextStyle greenStyle = style.copyWith(color: Colors.lightGreen.shade400);
-    final TextStyle blackStyle = style.copyWith(color: Theme.of(context).colorScheme.onPrimaryContainer);
+    final TextStyle greenStyle =
+        style.copyWith(color: Colors.lightGreen.shade400);
+    final TextStyle blackStyle =
+        style.copyWith(color: Theme.of(context).colorScheme.onPrimaryContainer);
     final TextStyle redStyle = style.copyWith(color: Colors.orange);
 
     return Container(
@@ -28,7 +30,9 @@ class MatchedArtifact extends StatelessWidget {
       width: 18,
       decoration: BoxDecoration(
         border: Border.all(
-          color: firstChar == secondChar ? Theme.of(context).colorScheme.onSurface.withOpacity(0.5) : Colors.orange,
+          color: firstChar == secondChar
+              ? Theme.of(context).colorScheme.onSurface.withOpacity(0.5)
+              : Colors.orange,
           width: 1.0,
         ),
         borderRadius: BorderRadius.circular(8.0),

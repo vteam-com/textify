@@ -16,7 +16,9 @@ class Textify {
   List<Artifact> list = [];
   String textFound = '';
 
-  Future<bool> init({final String pathToAssetsDefinition = 'packages/textify/assets/matrices.json'}) async {
+  Future<bool> init({
+    final String pathToAssetsDefinition = 'packages/textify/assets/matrices.json',
+  }) async {
     await characterDefinitions.loadDefinitions(pathToAssetsDefinition);
     return true;
   }

@@ -47,7 +47,8 @@ Future<ui.Image> binarizeImage(
   double threshold = 190,
 }) async {
   // Get the bytes from the input image
-  final ByteData? byteData = await inputImage.toByteData(format: ui.ImageByteFormat.rawRgba);
+  final ByteData? byteData =
+      await inputImage.toByteData(format: ui.ImageByteFormat.rawRgba);
   if (byteData == null) {
     throw Exception('Failed to get image data');
   }
@@ -84,7 +85,8 @@ Future<ui.Image> binarizeImage(
   }
 
   // Create a new ui.Image from the modified pixels
-  final ui.ImmutableBuffer buffer = await ui.ImmutableBuffer.fromUint8List(outputPixels);
+  final ui.ImmutableBuffer buffer =
+      await ui.ImmutableBuffer.fromUint8List(outputPixels);
   final ui.ImageDescriptor descriptor = ui.ImageDescriptor.raw(
     buffer,
     width: width,
@@ -101,6 +103,7 @@ Future<Uint8List> imageToUint8List(final ui.Image? image) async {
   if (image == null) {
     return Uint8List(0);
   }
-  final ByteData? data = await image.toByteData(format: ui.ImageByteFormat.rawRgba);
+  final ByteData? data =
+      await image.toByteData(format: ui.ImageByteFormat.rawRgba);
   return data?.buffer.asUint8List() ?? Uint8List(0);
 }

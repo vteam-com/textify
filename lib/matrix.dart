@@ -45,7 +45,8 @@ class Matrix {
     matrix.cols = width;
 
     for (int y = 0; y < matrix.rows; y++) {
-      matrix.data.add(inputList.sublist(y * matrix.cols, (y + 1) * matrix.cols));
+      matrix.data
+          .add(inputList.sublist(y * matrix.cols, (y + 1) * matrix.cols));
     }
     return matrix;
   }
@@ -116,10 +117,12 @@ class Matrix {
 
     // Calculate aspect ratios
     double inputAspectRatio = inputBoundingBox.width / inputBoundingBox.height;
-    double templateAspectRatio = templateBoundingBox.width / templateBoundingBox.height;
+    double templateAspectRatio =
+        templateBoundingBox.width / templateBoundingBox.height;
 
     // Calculate the difference in aspect ratios
-    double aspectRatioDifference = (inputAspectRatio - templateAspectRatio).abs();
+    double aspectRatioDifference =
+        (inputAspectRatio - templateAspectRatio).abs();
 
     // Normalize the penalty based on the aspect ratios
     return aspectRatioDifference;
@@ -164,11 +167,13 @@ class Matrix {
     Rect templateBoundingBox = Matrix.getBoundingBox(templateGrid);
 
     // Calculate the difference in areas of the bounding boxes
-    double areaDifference = (inputBoundingBox.area() - templateBoundingBox.area()).abs();
+    double areaDifference =
+        (inputBoundingBox.area() - templateBoundingBox.area()).abs();
 
     // Normalize the penalty based on bounding box area
-    double maxArea =
-        (inputBoundingBox.area() > templateBoundingBox.area()) ? inputBoundingBox.area() : templateBoundingBox.area();
+    double maxArea = (inputBoundingBox.area() > templateBoundingBox.area())
+        ? inputBoundingBox.area()
+        : templateBoundingBox.area();
 
     return areaDifference / maxArea;
   }
@@ -372,7 +377,8 @@ class Matrix {
           }
 
           // Set the resized grid value based on average
-          resizedGrid.data[y][x] = blackCount * 2 > totalCount; // Threshold: more than half black pixels
+          resizedGrid.data[y][x] = blackCount * 2 >
+              totalCount; // Threshold: more than half black pixels
         }
       }
     }

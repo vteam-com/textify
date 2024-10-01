@@ -57,7 +57,8 @@ class MatchedArtifacts extends StatelessWidget {
         children: [
           SizedBox(
             width: 100,
-            child: OutlinedButton(onPressed: () => fix(), child: const Text('Fix')),
+            child: OutlinedButton(
+                onPressed: () => fix(), child: const Text('Fix')),
           ),
           gap(),
           SizedBox(
@@ -66,7 +67,8 @@ class MatchedArtifacts extends StatelessWidget {
               child: const Text('Copy'),
               onPressed: () {
                 Clipboard.setData(
-                  ClipboardData(text: textify.characterDefinitions.toJsonString()),
+                  ClipboardData(
+                      text: textify.characterDefinitions.toJsonString()),
                 );
               },
             ),
@@ -103,12 +105,15 @@ class MatchedArtifacts extends StatelessWidget {
         children: [
           ...List.generate(charactersExpected.length, (index) {
             final String characterExpected = charactersExpected[index];
-            final String characterFound = index < textify.textFound.length ? textify.textFound[index] : '!';
+            final String characterFound = index < textify.textFound.length
+                ? textify.textFound[index]
+                : '!';
             return InkWell(
               onTap: () {
                 final discountSpacesForIndexPositionInArtifactFound =
                     countSpaces(charactersExpected.substring(0, index));
-                final Artifact artifactToUse = textify.list[index - discountSpacesForIndexPositionInArtifactFound];
+                final Artifact artifactToUse = textify.list[
+                    index - discountSpacesForIndexPositionInArtifactFound];
 
                 Navigator.push(
                   context,

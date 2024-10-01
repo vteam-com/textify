@@ -392,7 +392,16 @@ Future<ui.Image> createColorImageUsingTextPainter({
   final int maxWidthLine3 = text2.length * (fontSize + letterSpacing);
 
   const int padding = 20;
-  final int imageWidth = padding + max(1, max(max(maxWidthLine1, maxWidthLine2), maxWidthLine3));
+  final int imageWidth = padding +
+      max(
+          1,
+          max(
+            max(
+              maxWidthLine1,
+              maxWidthLine2,
+            ),
+            maxWidthLine3,
+          ));
   final int imageHeight = padding + (5 * fontSize);
 
   newCanvas.drawRect(

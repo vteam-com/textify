@@ -135,7 +135,8 @@ class _ImageSourceSamplesState extends State<ImageSourceSamples> {
   }
 
   void _loadCurrentImage() async {
-    final ui.Image image = await getUiImageFromAsset(getSampleAssetName(_currentIndex));
+    final ui.Image image =
+        await getUiImageFromAsset(getSampleAssetName(_currentIndex));
 
     widget.onImageChanged(image, getSampeExpectedText(_currentIndex));
   }

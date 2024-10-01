@@ -74,7 +74,8 @@ class DisplayArtifacts extends CustomPainter {
     canvas.drawRect(bandRect, paintRect);
   }
 
-  void drawText(Canvas canvas, double x, double y, String text, [double fontSize = 10]) {
+  void drawText(Canvas canvas, double x, double y, String text,
+      [double fontSize = 10]) {
     // Draw information about the band
     final textSpan = TextSpan(
       text: text,
@@ -326,12 +327,14 @@ class DisplayArtifacts extends CustomPainter {
         final double xPos = startX + x.toDouble();
         if (data[y][x]) {
           canvas.drawRect(
-            Rect.fromLTWH(xPos + gapForOn, yPos + gapForOn, sizeForOn, sizeForOn),
+            Rect.fromLTWH(
+                xPos + gapForOn, yPos + gapForOn, sizeForOn, sizeForOn),
             paintForeground,
           );
         } else {
           canvas.drawRect(
-            Rect.fromLTWH(xPos + gapForOff, yPos + gapForOff, sizeForOff, sizeForOff),
+            Rect.fromLTWH(
+                xPos + gapForOff, yPos + gapForOff, sizeForOff, sizeForOff),
             paintBackground,
           );
         }
