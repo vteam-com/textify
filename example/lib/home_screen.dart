@@ -314,7 +314,7 @@ class _HomeScreenState extends State<HomeScreen> {
     // Convert color image source to a grid of on=ink/off=paper
     final ImagePipeline interimImages = await ImagePipeline.apply(_imageSource);
 
-    _textify.getTextFromBinaryImage(
+    _textify.getTextFromMatrix(
       imageAsBinary: interimImages.imageBinary,
     );
 

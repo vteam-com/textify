@@ -2,6 +2,7 @@
 
 ## 0.0.5
 
+* 2024-09-30 new top level API "String getTextFromImage(IMAGE)"
 * 2024-09-30 dart format .
 
 ## 0.0.4

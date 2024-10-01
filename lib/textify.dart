@@ -1,28 +1,49 @@
 import 'dart:math';
-
+import 'dart:ui' as ui;
 import 'package:flutter/widgets.dart';
 import 'package:textify/artifact.dart';
 import 'package:textify/band.dart';
 import 'package:textify/character_definitions.dart';
+import 'package:textify/image_pipeline.dart';
 import 'package:textify/matrix.dart';
 
 export 'package:textify/artifact.dart';
 export 'package:textify/character_definitions.dart';
 export 'package:textify/matrix.dart';
 
+/// Textify is a class designed to extract text from clean digital images.
+///
+/// This class provides functionality to process binary images, identify text artifacts,
+/// organize them into bands, and extract the text content. It is optimized for
+/// clean computer-generated documents with standard fonts and good contrast.
 class Textify {
-  CharacterDefinitions characterDefinitions = CharacterDefinitions();
+  /// Stores definitions of characters for matching.
+  final CharacterDefinitions characterDefinitions = CharacterDefinitions();
+
+  /// List of text bands identified in the image.
   List<Band> bands = [];
-  List<Artifact> list = [];
+
+  /// List of artifacts (potential characters) identified in the image.
+  final List<Artifact> list = [];
+
+  /// The extracted text from the image.
   String textFound = '';
 
-  Future<bool> init({
-    final String pathToAssetsDefinition = 'packages/textify/assets/matrices.json',
+  /// Initializes the Textify instance by loading character definitions.
+  ///
+  /// [pathToAssetsDefinition] is the path to the JSON file containing character definitions.
+  /// Returns a [Future<bool>] indicating whether the initialization was successful.
+  Future<Textify> init({
+    final String pathToAssetsDefinition =
+        'packages/textify/assets/matrices.json',
   }) async {
     await characterDefinitions.loadDefinitions(pathToAssetsDefinition);
-    return true;
+    return this;
   }
 
+  /// Returns a list of artifacts belonging to a specific band.
+  ///
+  /// [bandIndex] is the index of the band to retrieve artifacts from.
   List<Artifact> artifactsInBand(final int bandIndex) {
     return list
         .where(
@@ -31,6 +52,7 @@ class Textify {
         .toList();
   }
 
+  /// Clears all stored data, resetting the Textify instance.
   void clear() {
     list.clear();
     bands.clear();
@@ -39,10 +61,11 @@ class Textify {
 
   int get count => list.length;
 
-  Artifact get(final int index) {
-    return list[index];
-  }
-
+  /// Finds matching character scores for a given artifact.
+  ///
+  /// [artifact] is the artifact to find matches for.
+  /// [supportedCharacters] is an optional string of characters to limit the search to.
+  /// Returns a list of [ScoreMatch] objects sorted by descending score.
   List<ScoreMatch> getMatchingScores(
     final Artifact artifact, [
     final String supportedCharacters = '',
@@ -53,21 +76,18 @@ class Textify {
     final bool hasVerticalLineOnTheRightSide = matrix.verticalLineRight;
     final bool punctuation = matrix.isPunctuation();
 
-    const double percentageNeeded = 0.3; // Adjust this value as needed
-    const int totalChecks = 4; // Total number of checks we perform
+    const double percentageNeeded = 0.3;
+    const int totalChecks = 4;
 
-    final List<CharacterDefinition> qualifiedTemplates =
-        characterDefinitions.definitions.where((CharacterDefinition template) {
-      //
-      // The caller has a restricted set of possible characters to match
-      //
-      if (supportedCharacters.isNotEmpty && !supportedCharacters.contains(template.character)) {
+    final List<CharacterDefinition> qualifiedTemplates = characterDefinitions
+        .definitions
+        .where((final CharacterDefinition template) {
+      if (supportedCharacters.isNotEmpty &&
+          !supportedCharacters.contains(template.character)) {
         return false;
       }
 
       int matchingChecks = 0;
-
-      // Count matching characteristics
       if (numberOfEnclosure == template.enclosers) {
         matchingChecks++;
       }
@@ -89,17 +109,64 @@ class Textify {
     }).toList();
 
     // Use _getDistanceScores to calculate the final scores
-    final List<ScoreMatch> scores = _getDistanceScores(qualifiedTemplates, matrix);
+    final List<ScoreMatch> scores =
+        _getDistanceScores(qualifiedTemplates, matrix);
 
     // Sort scores in descending order (higher score is better)
     scores.sort((a, b) => b.score.compareTo(a.score));
     return scores;
   }
 
-  String getTextFromBinaryImage({
+  /// Extracts text from a given image.
+  ///
+  /// This method processes the input image through an [ImagePipeline] to prepare it
+  /// for text extraction, then uses the [getTextFromMatrix] method to perform
+  /// the actual text recognition.
+  ///
+  /// Parameters:
+  /// - [image]: A [ui.Image] object representing the image from which to extract text.
+  ///   This parameter is required.
+  /// - [supportedCharacters]: An optional string containing the set of characters
+  ///   to be recognized. If provided, the text extraction will be limited to these
+  ///   characters. Default is an empty string, which means all supported characters
+  ///   will be considered.
+  ///
+  /// Returns:
+  /// A [Future<String>] that resolves to the extracted text from the image.
+  ///
+  /// Throws:
+  /// May throw exceptions related to image processing or text extraction failures.
+  ///
+  /// Usage:
+  /// ```dart
+  /// final ui.Image myImage = // ... obtain image
+  /// final String extractedText = await getTextFromImage(image: myImage);
+  /// print(extractedText);
+  /// ```
+  Future<String> getTextFromImage({
+    required final ui.Image image,
+    final String supportedCharacters = '',
+  }) async {
+    final ImagePipeline interimImages = await ImagePipeline.apply(image);
+    return getTextFromMatrix(
+      imageAsBinary: interimImages.imageBinary,
+      supportedCharacters: supportedCharacters,
+    );
+  }
+
+  /// Extracts text from a binary image.
+  ///
+  /// [imageAsBinary] is the binary representation of the image.
+  /// [supportedCharacters] is an optional string of characters to limit the recognition to.
+  /// Returns the extracted text as a string.
+  String getTextFromMatrix({
     required final Matrix imageAsBinary,
     final String supportedCharacters = '',
   }) {
+    assert(
+      characterDefinitions.count > 0,
+      'No character definitions loaded, did you forget to call Init()',
+    );
     _findArtifacts(imageAsBinary);
 
     // merge disconnected parts of artifacts found
@@ -108,12 +175,7 @@ class Textify {
     return _getTextFromArtifacts(supportedCharacters: supportedCharacters);
   }
 
-  static String getTextFromBinaryImageStatic({
-    required final Matrix imageAsBinary,
-  }) {
-    return Textify().getTextFromBinaryImage(imageAsBinary: imageAsBinary);
-  }
-
+  /// Adjusts the height of artifacts to match their respective band heights.
   void _adjustArtifactsToBandHeight() {
     for (final Artifact artifact in list) {
       if (artifact.bandId >= 0 && artifact.bandId < bands.length) {
@@ -180,9 +242,9 @@ class Textify {
 
     // Phase 3: Adjust artifacts to match band height
     _adjustArtifactsToBandHeight();
+
     for (int bandId = 0; bandId < bands.length; bandId++) {
       bands[bandId].artifacts = artifactsInBand(bandId);
-      // this.bands[bandId].sortLeftToRight();
     }
 
     _identifySpacesInBands();
@@ -227,17 +289,14 @@ class Textify {
 
   /// Checks if two rectangles overlap horizontally.
   ///
-  /// This function determines whether two rectangles have any horizontal overlap,
-  /// regardless of their vertical positions.
-  ///
-  /// Parameters:
-  /// - rectangleA: The first rectangle to check.
-  /// - rectangleB: The second rectangle to check.
-  ///
-  /// Returns:
-  /// true if the rectangles overlap horizontally, false otherwise.
-  bool _doRectanglesOverlapHorizontally(Rect rectangleA, Rect rectangleB) {
-    return rectangleA.left < rectangleB.right && rectangleB.left < rectangleA.right;
+  /// [rectangleA] and [rectangleB] are the rectangles to check.
+  /// Returns true if the rectangles overlap horizontally, false otherwise.
+  bool _doRectanglesOverlapHorizontally(
+    final Rect rectangleA,
+    final Rect rectangleB,
+  ) {
+    return rectangleA.left < rectangleB.right &&
+        rectangleB.left < rectangleA.right;
   }
 
   /// Extracts an artifact from a binary image based on a list of connected points.
@@ -403,7 +462,8 @@ class Textify {
     final Artifact artifact, [
     final String supportedCharacters = '',
   ]) {
-    final List<ScoreMatch> scores = getMatchingScores(artifact, supportedCharacters);
+    final List<ScoreMatch> scores =
+        getMatchingScores(artifact, supportedCharacters);
 
     return scores.isNotEmpty ? scores.first.character : '';
   }
@@ -479,7 +539,8 @@ class Textify {
           templateBaseDimensionWidth,
           templateBaseDimensionHeight,
         );
-        String characterFound = _getCharacterFromArtifacts(artifact, supportedCharacters);
+        String characterFound =
+            _getCharacterFromArtifacts(artifact, supportedCharacters);
         line += characterFound;
       }
       linesFound.add(line);
@@ -542,11 +603,14 @@ class Textify {
     final double averageGap = band.averageGap;
     final double exceeding = averageGap * 1.8;
 
-    for (int indexOfArtifact = 0; indexOfArtifact < band.artifacts.length; indexOfArtifact++) {
+    for (int indexOfArtifact = 0;
+        indexOfArtifact < band.artifacts.length;
+        indexOfArtifact++) {
       if (indexOfArtifact > 0) {
         final Artifact artifactLeft = band.artifacts[indexOfArtifact - 1];
         final Artifact artifactRight = band.artifacts[indexOfArtifact];
-        final double gap = (artifactRight.rectangle.left - artifactLeft.rectangle.right);
+        final double gap =
+            (artifactRight.rectangle.left - artifactLeft.rectangle.right);
 
         if (gap > exceeding) {
           // insert Artifact for Space
@@ -631,9 +695,11 @@ class Textify {
       }
 
       final Rect currentRowRect = _createRectToFitArtifacts(currentRow);
-      final double horizontalDistance = artifact.rectangle.left - currentRowRect.right;
+      final double horizontalDistance =
+          artifact.rectangle.left - currentRowRect.right;
       final double verticalDistance =
-          (artifact.rectangle.top + artifact.rectangle.bottom) / 2 - (currentRowRect.top + currentRowRect.bottom) / 2;
+          (artifact.rectangle.top + artifact.rectangle.bottom) / 2 -
+              (currentRowRect.top + currentRowRect.bottom) / 2;
 
       bool isHorizontallyClose = horizontalDistance <= horizontalTolerance;
       bool isVerticallyClose = verticalDistance.abs() <= verticalTolerance;
@@ -732,7 +798,8 @@ class Textify {
       for (var artifactA in artifactsInRect) {
         for (var artifactB in artifactsInRect) {
           if (artifactA != artifactB) {
-            if (!toRemove.contains(artifactA) && !toRemove.contains(artifactB)) {
+            if (!toRemove.contains(artifactA) &&
+                !toRemove.contains(artifactB)) {
               if (_doRectanglesOverlapHorizontally(
                 artifactA.rectangle,
                 artifactB.rectangle,

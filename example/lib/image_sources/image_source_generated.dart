@@ -10,7 +10,8 @@ import 'panel_content.dart';
 
 ImageGeneratorInput imageSettings = ImageGeneratorInput.empty();
 
-ImageGeneratorInput lastImageSettingsUseForImageSource = ImageGeneratorInput.empty();
+ImageGeneratorInput lastImageSettingsUseForImageSource =
+    ImageGeneratorInput.empty();
 
 /// This widget is responsible for displaying and managing the settings of the application.
 /// It includes controls for font size and font selection, as well as a preview of the text.
@@ -241,9 +242,12 @@ class _ImageSourceGeneratedState extends State<ImageSourceGenerated> {
 
   Future<void> loadSavedText() async {
     final prefs = await SharedPreferences.getInstance();
-    final textLine1 = prefs.getString('textLine1') ?? imageSettings.defaultTextLine1;
-    final textLine2 = prefs.getString('textLine2') ?? imageSettings.defaultTextLine2;
-    final textLine3 = prefs.getString('textLine3') ?? imageSettings.defaultTextLine2;
+    final textLine1 =
+        prefs.getString('textLine1') ?? imageSettings.defaultTextLine1;
+    final textLine2 =
+        prefs.getString('textLine2') ?? imageSettings.defaultTextLine2;
+    final textLine3 =
+        prefs.getString('textLine3') ?? imageSettings.defaultTextLine2;
     setState(() {
       _textControllerLine1.text = textLine1;
       _textControllerLine2.text = textLine2;

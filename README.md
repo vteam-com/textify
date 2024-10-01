@@ -55,16 +55,19 @@ flutter pub get
 Here's a basic example of how to use Textify:
 
 ```dart
+import 'dart:ui' as ui;
 import 'package:textify/textify.dart';
 
 void main() async {
-  final textify = Textify();
-  await textify.init();
+  // Instentiate Textify
+  final Textify textify = await Textify().init();
 
-  final image = // Load your image here
-  final extractedText = await textify.getTextFromImage(image);
+  // Use your image as source
+  final ui.image imageSource = < standard images >
 
-  print(extractedText);
+  final String text = await textify.getTextFromImage(image: imageSource);
+
+  print(text);
 }
 ```
 
