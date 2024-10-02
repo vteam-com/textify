@@ -3,21 +3,57 @@ import 'dart:ui' as ui;
 
 import 'package:textify/matrix.dart';
 
+/// Represents a pipeline for processing images through various stages.
+///
+/// This class handles the transformation of a source image into high-contrast
+/// and binary representations. It provides access to all stages of the
+/// processed image.
 class ImagePipeline {
+  /// Constructs an [ImagePipeline] with optional source and high-contrast images,
+  /// and a required binary image.
+  ///
+  /// [imageSource] The original source image, if available.
+  /// [imageHighContrast] The high-contrast version of the image, if available.
+  /// [imageBinary] The binary (black and white) representation of the image as a [Matrix].
   ImagePipeline({
     this.imageSource,
     this.imageHighContrast,
     required this.imageBinary,
   });
 
+  /// Creates an empty [ImagePipeline] with only an empty binary [Matrix].
+  ///
+  /// This is useful for initializing an [ImagePipeline] when no image data is available.
+  ///
+  /// Returns an [ImagePipeline] instance with an empty [Matrix] as [imageBinary].
   factory ImagePipeline.empty() => ImagePipeline(
         imageBinary: Matrix(),
       );
 
+  /// The binary representation of the image as a [Matrix].
   final Matrix imageBinary;
+
+  /// The high-contrast version of the image.
+  ///
+  /// This may be null if high-contrast processing hasn't been performed.
   final ui.Image? imageHighContrast;
+
+  /// The original source image.
+  ///
+  /// This may be null if no source image was provided.
   final ui.Image? imageSource;
 
+  /// Processes a color image through the pipeline stages.
+  ///
+  /// This method takes a color image, increases its contrast, and converts it
+  /// to a binary representation. It returns a new [ImagePipeline] instance
+  /// containing all stages of the processed image.
+  ///
+  /// [imageSourceInColor] The source color image to process. Can be null.
+  ///
+  /// Returns a [Future] that completes with a new [ImagePipeline] instance
+  /// containing the processed image data. If [imageSourceInColor] is null,
+  /// returns an empty [ImagePipeline].
   static Future<ImagePipeline> apply(
     final ui.Image? imageSourceInColor,
   ) async {

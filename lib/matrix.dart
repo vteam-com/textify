@@ -112,11 +112,16 @@ class Matrix {
   /// The number of rows in the matrix.
   int rows = 0;
 
+  /// The number of enclosure found
   int _enclosures = -1;
 
+  /// The number of vertical left lines found
   bool? _verticalLineLeft;
+
+  /// The number of vertical right lines found
   bool? _verticalLineRight;
 
+  /// Area size of the matrix
   int get area => cols * rows;
 
   /// Calculates the aspect ratio of the content within the matrix.

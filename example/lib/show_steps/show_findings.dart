@@ -100,7 +100,7 @@ class DisplayArtifacts extends CustomPainter {
   String getBandTitle(final bandNumber) {
     final Band band = textify.bands[bandNumber];
 
-    return '${bandNumber + 1}: found ${band.artifacts.length}   AW:${band.averageWidth.toStringAsFixed(1)}   AG:${band.averageGap.toStringAsFixed(1)} S:${band.spaces}';
+    return '${bandNumber + 1}: found ${band.artifacts.length}   AW:${band.averageWidth.toStringAsFixed(1)}   AG:${band.averageGap.toStringAsFixed(1)} S:${band.spacesCount}';
   }
 
   Size getRectSizeFromArtifacts(

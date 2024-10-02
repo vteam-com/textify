@@ -23,9 +23,11 @@ class Artifact {
   /// A normalized version of the matrix representation.
   final Matrix _matrixNormalized = Matrix();
 
+  /// Returns:
+  /// A string representation ths artifact.
   @override
   String toString() {
-    return '${rectangle.toString()} length $area}';
+    return '"$characterMatched" Band:$bandId Rect:${rectangle.toString()} Area: $area}';
   }
 
   /// The area of the artifact, calculated from its matrix representation.
@@ -120,17 +122,17 @@ class Artifact {
   /// Resizes the artifact to the specified width and height.
   ///
   /// Parameters:
-  /// - w: The target width.
-  /// - h: The target height.
+  /// - width: The target width.
+  /// - height: The target height.
   ///
   /// Returns:
   /// The resized matrix.
-  Matrix resize(int w, int h) {
+  Matrix resize(int width, int height) {
     _matrixNormalized.setGrid(
       matrixOriginal
           .createNormalizeMatrix(
-            w,
-            h,
+            width,
+            height,
           )
           .data,
     );

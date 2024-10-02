@@ -17,8 +17,10 @@ class Band {
   /// The rectangular area that defines the boundaries of this band.
   Rect rectangle;
 
-  // Private fields to store calculated averages
+  // Private fields to store calculated average of space between earh artifacts
   double _averageGap = -1;
+
+  // Private fields to store calculated average of artifact width
   double _averageWidth = -1;
 
   /// Gets the average gap between adjacent artifacts in the band.
@@ -88,7 +90,7 @@ class Band {
   ///
   /// Returns:
   /// The number of artifacts that match a space character.
-  int get spaces => artifacts.fold(
+  int get spacesCount => artifacts.fold(
         0,
         (count, a) => a.characterMatched == ' ' ? count + 1 : count,
       );

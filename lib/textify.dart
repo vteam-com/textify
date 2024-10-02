@@ -55,9 +55,33 @@ class Textify {
     textFound = '';
   }
 
+  /// The width of the character template used for recognition.
+  ///
+  /// This getter returns the standard width of the template used to define
+  /// characters in the recognition process. It's derived from the
+  /// [CharacterDefinition] class.
+  ///
+  /// Returns:
+  ///   An [int] representing the width of the character template in pixels.
   int get templateWidth => CharacterDefinition.templateWidth;
+
+  /// The height of the character template used for recognition.
+  ///
+  /// This getter returns the standard height of the template used to define
+  /// characters in the recognition process. It's derived from the
+  /// [CharacterDefinition] class.
+  ///
+  /// Returns:
+  ///   An [int] representing the height of the character template in pixels.
   int get templateHeight => CharacterDefinition.templateHeight;
 
+  /// The number of items in the list.
+  ///
+  /// This getter returns the current count of items in the list. It's a
+  /// convenient way to access the length property of the underlying list.
+  ///
+  /// Returns:
+  ///   An [int] representing the number of items in the list.
   int get count => list.length;
 
   /// Finds matching character scores for a given artifact.
@@ -175,6 +199,24 @@ class Textify {
     return _getTextFromArtifacts(supportedCharacters: supportedCharacters);
   }
 
+// Processes a binary image to find, merge, and categorize artifacts.
+  ///
+  /// This method takes a binary image represented as a [Matrix] and performs
+  /// a series of operations to identify and process artifacts within the image.
+  ///
+  /// The process involves three main steps:
+  /// 1. Finding individual artifacts in the image.
+  /// 2. Merging disconnected parts of artifacts that likely belong together.
+  /// 3. Creating bands based on the positions of the merged artifacts.
+  ///
+  /// Parameters:
+  ///   [imageAsBinary] - A [Matrix] representing the binary image to be processed.
+  ///
+  /// The method does not return a value, but updates internal state to reflect
+  /// the found artifacts and bands.
+  ///
+  /// Note: This method assumes that the input [Matrix] is a valid binary image.
+  /// Behavior may be undefined for non-binary input.
   void findArtifactsFromBinaryImage(Matrix imageAsBinary) {
     _findArtifacts(imageAsBinary);
 
