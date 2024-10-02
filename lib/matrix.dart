@@ -1,9 +1,8 @@
+import 'dart:collection';
 import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
-import 'package:textify/matrix_enclosures.dart';
-import 'package:textify/matrix_lines.dart';
 
 extension RectArea on Rect {
   double area() => width * height;
@@ -801,5 +800,277 @@ class Matrix {
   bool get verticalLineRight {
     _verticalLineRight ??= hasVerticalLineRight(this);
     return _verticalLineRight!;
+  }
+
+  int countEnclosedRegion(Matrix grid) {
+    int rows = grid.rows;
+    int cols = grid.cols;
+
+    Matrix visited = Matrix(cols, rows);
+
+    int loopCount = 0;
+    int minRegionSize = 3; // Minimum size for a region to be considered a loop
+
+    for (int y = 0; y < rows; y++) {
+      for (int x = 0; x < cols; x++) {
+        if (!grid.data[y][x] && !visited.data[y][x]) {
+          int regionSize = exploreRegion(grid, visited, x, y);
+          if (regionSize >= minRegionSize &&
+              isEnclosedRegion(grid, x, y, regionSize)) {
+            loopCount++;
+          }
+        }
+      }
+    }
+
+    return loopCount;
+  }
+
+  int exploreRegion(
+    Matrix grid,
+    Matrix visited,
+    int startX,
+    int startY,
+  ) {
+    int rows = grid.rows;
+    int cols = grid.cols;
+    Queue<List<int>> queue = Queue();
+    queue.add([startX, startY]);
+    visited.data[startY][startX] = true;
+    int regionSize = 0;
+
+    while (queue.isNotEmpty) {
+      List<int> current = queue.removeFirst();
+      int x = current[0], y = current[1];
+      regionSize++;
+
+      for (var dir in [
+        [-1, 0],
+        [1, 0],
+        [0, -1],
+        [0, 1],
+      ]) {
+        int newX = x + dir[0], newY = y + dir[1];
+
+        if (newX >= 0 &&
+            newX < cols &&
+            newY >= 0 &&
+            newY < rows &&
+            !grid.data[newY][newX] &&
+            !visited.data[newY][newX]) {
+          queue.add([newX, newY]);
+          visited.data[newY][newX] = true;
+        }
+      }
+    }
+
+    return regionSize;
+  }
+
+  bool isEnclosedRegion(
+    Matrix grid,
+    int startX,
+    int startY,
+    int regionSize,
+  ) {
+    int rows = grid.rows;
+    int cols = grid.cols;
+    Queue<List<int>> queue = Queue();
+    Set<String> visited = {};
+    queue.add([startX, startY]);
+    visited.add('$startX,$startY');
+    bool isEnclosed = true;
+
+    while (queue.isNotEmpty) {
+      List<int> current = queue.removeFirst();
+      int x = current[0], y = current[1];
+
+      for (var dir in [
+        [-1, 0],
+        [1, 0],
+        [0, -1],
+        [0, 1],
+      ]) {
+        int newX = x + dir[0], newY = y + dir[1];
+
+        if (newX < 0 || newX >= cols || newY < 0 || newY >= rows) {
+          isEnclosed = false;
+          continue;
+        }
+
+        String key = '$newX,$newY';
+        if (!grid.data[newY][newX] && !visited.contains(key)) {
+          queue.add([newX, newY]);
+          visited.add(key);
+        }
+      }
+    }
+
+    // Check if the region is too small compared to the grid size
+    int gridArea = rows * cols;
+    double regionPercentage = regionSize / gridArea;
+    if (regionPercentage < 0.01) {
+      // Adjust this threshold as needed
+      isEnclosed = false;
+    }
+
+    return isEnclosed;
+  }
+
+  double thresholdLinePercentage = 0.7;
+
+  bool hasVerticalLineLeft(Matrix matrix) {
+    Matrix visited = Matrix(matrix.cols, matrix.rows);
+
+    // We only consider lines that are more than 40% of the character's height
+    int minVerticalLine = (matrix.rows * thresholdLinePercentage).toInt();
+
+    for (int x = 0; x < matrix.cols; x++) {
+      for (int y = 0; y < matrix.rows; y++) {
+        if (matrix.data[y][x] && !visited.data[y][x]) {
+          if (isValidVerticalLineLeft(
+            minVerticalLine,
+            matrix,
+            x,
+            y,
+            visited,
+          )) {
+            return true;
+          }
+        }
+      }
+    }
+
+    return false;
+  }
+
+  bool hasVerticalLineRight(Matrix matrix) {
+    Matrix visited = Matrix(matrix.cols, matrix.rows);
+
+    // We only consider lines that are more than 40% of the character's height
+    int minVerticalLine = (matrix.rows * thresholdLinePercentage).toInt();
+
+    for (int x = matrix.cols - 1; x >= 0; x--) {
+      for (int y = 0; y < matrix.rows; y++) {
+        if (matrix.data[y][x] && !visited.data[y][x]) {
+          if (isValidVerticalLineRight(
+            minVerticalLine,
+            matrix,
+            x,
+            y,
+            visited,
+          )) {
+            return true;
+          }
+        }
+      }
+    }
+
+    return false;
+  }
+
+  /// Checks if the segment starting at (x, y) is a valid vertical line.
+  /// Only considers it a vertical line if there are no filled pixels to the left
+  /// at any point in the line.
+  bool isValidVerticalLineLeft(
+    int minVerticalLine,
+    Matrix matrix,
+    int x,
+    int y,
+    Matrix visited,
+  ) {
+    int rows = matrix.rows;
+    int lineLength = 0;
+
+    // Ensure no filled pixels on the immediate left side at any point
+    while (y < rows && matrix.data[y][x]) {
+      visited.data[y][x] = true;
+      lineLength++;
+
+      // If there's a filled pixel to the left of any point in the line, it's invalid
+      if (!validLeftSideLeft(matrix, x, y)) {
+        lineLength = 0; // reset
+      }
+      if (lineLength >= minVerticalLine) {
+        return true;
+      }
+      y++;
+    }
+
+    // Only count if the line length is sufficient
+    return false;
+  }
+
+  bool isValidVerticalLineRight(
+    int minVerticalLine,
+    Matrix matrix,
+    int x,
+    int y,
+    Matrix visited,
+  ) {
+    int rows = matrix.rows;
+    int lineLength = 0;
+
+    // Ensure no filled pixels on the immediate left side at any point
+    while (y < rows && matrix.data[y][x]) {
+      visited.data[y][x] = true;
+      lineLength++;
+
+      // If there's a filled pixel to the left of any point in the line, it's invalid
+      if (!validLeftSideRight(matrix, x, y)) {
+        lineLength = 0; // reset
+      }
+      if (lineLength >= minVerticalLine) {
+        return true;
+      }
+      y++;
+    }
+
+    // Only count if the line length is sufficient
+    return false;
+  }
+
+// accept some tolerance
+  bool validLeftSideLeft(
+    Matrix m,
+    int x,
+    int y,
+  ) {
+    if (x - 1 < 0) {
+      return true;
+    }
+
+    if (m.cellGet(x - 1, y) == false) {
+      return true;
+    }
+    // if (m.cellGet(x - 2, y) == false) {
+    //   return true;
+    // }
+    // if (m.cellGet(x - 3, y) == false) {
+    //   return true;
+    // }
+    return false;
+  }
+
+// accept some tolerance
+  bool validLeftSideRight(
+    Matrix m,
+    int x,
+    int y,
+  ) {
+    if (x + 1 >= m.cols) {
+      return true;
+    }
+
+    if (m.cellGet(x + 1, y) == false) {
+      return true;
+    }
+    // if (m.cellGet(x - 2, y) == false) {
+    //   return true;
+    // }
+    // if (m.cellGet(x - 3, y) == false) {
+    //   return true;
+    // }
+    return false;
   }
 }
