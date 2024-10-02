@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.0.8
+
+* 2024-10-01 Document public API - Artifact, Band, CharacterDefinitions
+
 ## 0.0.7
 
 * 2024-10-01 Support characters  $  ;  \

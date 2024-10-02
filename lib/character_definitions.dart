@@ -4,29 +4,46 @@ import 'package:textify/character_definition.dart';
 import 'package:textify/matrix.dart';
 export 'package:textify/character_definition.dart';
 
+/// Manages a collection of character definitions used for text processing.
+///
+/// This class provides methods to load, manipulate, and retrieve character
+/// definitions, which are used to represent the visual appearance of characters
+/// in different fonts or styles.
 class CharacterDefinitions {
+  /// The list of character definitions.
   List<CharacterDefinition> _definitions = [];
 
+  /// Returns the number of character definitions.
   int get count => _definitions.length;
 
-  // Add a new template
+  /// Adds a new character definition to the collection.
+  ///
+  /// [definition] The character definition to add.
   void addDefinition(CharacterDefinition definition) {
     _definitions.add(definition);
   }
 
-  // Get all templates
+  /// Returns an unmodifiable list of all character definitions.
   List<CharacterDefinition> get definitions {
     return List.unmodifiable(_definitions);
   }
 
-  void fromJSonString(String jsonString) {
+  /// Parses character definitions from a JSON string.
+  ///
+  /// [jsonString] A JSON string containing character definitions.
+  void fromJsonString(String jsonString) {
     final dynamic jsonObject = jsonDecode(jsonString);
     final List<dynamic> jsonList = jsonObject['templates'];
     _definitions =
         jsonList.map((json) => CharacterDefinition.fromJson(json)).toList();
   }
 
-  // Get a specific template
+  /// Retrieves a specific character definition.
+  ///
+  /// [character] The character to find the definition for.
+  ///
+  /// Returns the [CharacterDefinition] for the specified character,
+  /// or null if not found.
   CharacterDefinition? getDefinition(final String character) {
     try {
       return _definitions.firstWhere((t) => t.character == character);
@@ -35,6 +52,7 @@ class CharacterDefinitions {
     }
   }
 
+  /// Returns a sorted list of all supported characters.
   List<String> getSupportedCharacters() {
     final List<String> list =
         _definitions.map((entry) => entry.character).toList();
@@ -42,6 +60,14 @@ class CharacterDefinitions {
     return list;
   }
 
+  /// Retrieves the template as a list of strings for a given character.
+  ///
+  /// [character] The character to get the template for.
+  ///
+  /// Returns a list of strings representing the character's template.
+  /// For space character, returns a predefined template.
+  ///
+  /// Throws an [ArgumentError] if no template is found for the character.
   List<String> getTemplateAsString(final String character) {
     if (character == ' ') {
       return List.generate(
@@ -50,37 +76,57 @@ class CharacterDefinitions {
       );
     }
 
-    return getDefinition(character)!.matrices.first.gridToStrings();
+    final definition = getDefinition(character);
+    if (definition == null || definition.matrices.isEmpty) {
+      throw ArgumentError('No template found for character: $character');
+    }
+
+    return definition.matrices.first.gridToStrings();
   }
 
+  /// Loads character definitions from a JSON file.
+  ///
+  /// [pathToAssetsDefinition] The path to the JSON file containing definitions.
+  ///
+  /// Returns a Future<CharacterDefinitions> once loading is complete.
+  ///
+  /// Throws an exception if loading fails.
   Future<CharacterDefinitions> loadDefinitions([
     final String pathToAssetsDefinition =
         'packages/textify/assets/matrices.json',
   ]) async {
-    // Load the JSON file from the assets
-    String jsonString = await rootBundle.loadString(pathToAssetsDefinition);
-    fromJSonString(jsonString);
-    return this;
+    try {
+      String jsonString = await rootBundle.loadString(pathToAssetsDefinition);
+      fromJsonString(jsonString);
+      return this;
+    } catch (e) {
+      throw Exception('Failed to load character definitions: $e');
+    }
   }
 
+  /// Sorts character definitions alphabetically by character.
   void sortDefinitions() {
     _definitions.sort((a, b) => a.character.compareTo(b.character));
   }
 
+  /// Converts character definitions to a JSON string.
+  ///
+  /// Returns a JSON string representation of all character definitions.
   String toJsonString() {
     sortDefinitions();
 
-    // Convert the matrices data to a Map
     Map<String, dynamic> matricesMap = {
       'templates': definitions.map((template) => template.toJson()).toList(),
-      // Add other properties of Matrices class if any
     };
 
-    // Convert the Map to a JSON string
     return jsonEncode(matricesMap);
   }
 
-  // Update an existing template
+  /// Updates an existing character definition.
+  ///
+  /// [template] The updated character definition.
+  ///
+  /// Throws an [ArgumentError] if the character definition is not found.
   void updateDefinition(CharacterDefinition template) {
     final index =
         _definitions.indexWhere((t) => t.character == template.character);
@@ -95,21 +141,12 @@ class CharacterDefinitions {
 
   /// Updates or inserts a template matrix for a given character and font.
   ///
-  /// This method either adds a new [CharacterDefinition] or updates an existing one.
-  /// If a matrix for the given character and font already exists, it is replaced.
-  /// Otherwise, a new matrix is added to the existing character definition or
-  /// a new character definition is created.
+  /// If a definition for the character doesn't exist, a new one is created.
+  /// If a matrix for the given font already exists, it is updated; otherwise, it's added.
   ///
-  /// Parameters:
-  /// - [font]: The font name for the matrix.
-  /// - [character]: The character this matrix represents.
-  /// - [matrix]: The [Matrix] object containing the character's pixel data.
-  ///
-  /// The method performs the following steps:
-  /// 1. Checks if a [CharacterDefinition] exists for the given character.
-  /// 2. If no definition exists, creates a new one with the given matrix.
-  /// 3. If a definition exists, checks for an existing matrix with the same font.
-  /// 4. Replaces the existing matrix if found, or adds a new one if not found.
+  /// [font] The font name for the matrix.
+  /// [character] The character this matrix represents.
+  /// [matrix] The Matrix object containing the character's pixel data.
   void upsertTemplate(
     final String font,
     final String character,
@@ -118,22 +155,18 @@ class CharacterDefinitions {
     matrix.font = font;
     final CharacterDefinition? found = getDefinition(character);
     if (found == null) {
-      // Create a new CharacterDefinition and add it to the collection
       final CharacterDefinition newDefinition = CharacterDefinition(
         character: character,
         matrices: [matrix],
       );
       _definitions.add(newDefinition);
     } else {
-      // Check if a matrix with the same font already exists
       final existingMatrixIndex =
           found.matrices.indexWhere((m) => m.font == font);
 
       if (existingMatrixIndex == -1) {
-        // Add the new matrix if no matrix with the same font exists
         found.matrices.add(matrix);
       } else {
-        // Replace the existing matrix if it has the same font
         found.matrices[existingMatrixIndex] = matrix;
       }
     }

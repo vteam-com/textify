@@ -3,12 +3,24 @@ import 'dart:ui';
 
 import 'package:textify/matrix.dart';
 
+/// Represents an artifact in the text processing system.
+///
+/// An artifact contains information about a specific character or group of characters,
+/// including its position, size, and matrix representation.
 class Artifact {
+  /// Unique identifier for the band this artifact belongs to.
   int bandId = 0;
+
+  /// The character that this artifact matches.
   String characterMatched = '';
+
+  /// The rectangular area that this artifact occupies.
   Rect rectangle = const Rect.fromLTRB(0, 0, 0, 0);
 
+  /// The original matrix representation of the artifact.
   final Matrix _matrix = Matrix();
+
+  /// A normalized version of the matrix representation.
   final Matrix _matrixNormalized = Matrix();
 
   @override
@@ -16,6 +28,7 @@ class Artifact {
     return '${rectangle.toString()} length $area}';
   }
 
+  /// The area of the artifact, calculated from its matrix representation.
   int get area => _matrix.area;
 
   /// Adjusts the artifact's height to fit within a given rectangle while maintaining its relative position.
@@ -26,53 +39,22 @@ class Artifact {
   ///
   /// Parameters:
   /// - targetRect: The rectangle representing the area the artifact should fit into.
-  ///
-  /// The method performs the following steps:
-  /// 1. Checks if resizing is necessary.
-  /// 2. Calculates the new dimensions and relative position.
-  /// 3. Creates a new grid, either by cropping or adding padding as needed.
-  /// 4. Updates the internal matrix representation with the new grid.
-  /// 5. Adjusts the artifact's rectangle to reflect its new position and size.
-  ///
-  /// Note: This method assumes that the width of the artifact remains unchanged.
   void fitToRectangleHeight(Rect targetRect) {
     final int newHeight = targetRect.height.toInt();
 
     if (rectangle.height == newHeight) {
-      return; // No change needed
+      return; // Early return if no change needed
     }
 
-    int currentWidth = matrixOriginal.cols;
-    List<List<bool>> originalData = matrixOriginal.data;
+    final List<List<bool>> originalData = matrixOriginal.data;
+    final int currentWidth = matrixOriginal.cols;
 
     // Calculate the relative position of the artifact within the target rectangle
-    double relativeTop = (rectangle.top - targetRect.top) / targetRect.height;
+    final double relativeTop =
+        (rectangle.top - targetRect.top) / targetRect.height;
 
-    late final List<List<bool>> newGrid;
-
-    if (originalData.length > newHeight) {
-      // If original data is taller, crop it
-      int startRow = (relativeTop * originalData.length).round();
-      startRow = startRow.clamp(0, originalData.length - newHeight);
-      newGrid = originalData.sublist(startRow, startRow + newHeight);
-    } else {
-      // If original data is shorter or equal, add padding
-      int topPadding = (relativeTop * newHeight).round();
-      int bottomPadding = newHeight - originalData.length - topPadding;
-
-      // Ensure non-negative padding
-      topPadding = topPadding.clamp(0, newHeight);
-      bottomPadding = bottomPadding.clamp(0, newHeight);
-
-      newGrid = [
-        ...List.generate(topPadding, (_) => List.filled(currentWidth, false)),
-        ...originalData,
-        ...List.generate(
-          bottomPadding,
-          (_) => List.filled(currentWidth, false),
-        ),
-      ];
-    }
+    final List<List<bool>> newGrid =
+        _createNewGrid(originalData, newHeight, relativeTop, currentWidth);
 
     // Update the matrix with the new grid
     _matrix.setGrid(newGrid);
@@ -86,6 +68,16 @@ class Artifact {
     );
   }
 
+  /// Returns a string representation of the resized artifact.
+  ///
+  /// Parameters:
+  /// - w: The target width for resizing.
+  /// - h: The target height for resizing.
+  /// - onChar: The character to use for 'on' pixels (default: '#').
+  /// - forCode: Whether the output is intended for code representation (default: false).
+  ///
+  /// Returns:
+  /// A string representation of the resized artifact.
   String getResizedString({
     required final int w,
     required final int h,
@@ -102,24 +94,37 @@ class Artifact {
     );
   }
 
+  /// Checks if the artifact is empty (contains no 'on' pixels).
   bool get isEmpty {
     return _matrix.isEmpty;
   }
 
+  /// Checks if the artifact is not empty (contains at least one 'on' pixel).
   bool get isNotEmpty {
     return !isEmpty;
   }
 
+  /// Gets the original matrix representation of the artifact.
   Matrix get matrixOriginal => _matrix;
 
+  /// Sets the original matrix representation of the artifact.
   set matrixOriginal(final Matrix value) {
     _matrix.data = value.data;
     _matrix.cols = value.cols;
     _matrix.rows = value.rows;
   }
 
+  /// Gets the normalized matrix representation of the artifact.
   Matrix get matrixNormalized => _matrixNormalized;
 
+  /// Resizes the artifact to the specified width and height.
+  ///
+  /// Parameters:
+  /// - w: The target width.
+  /// - h: The target height.
+  ///
+  /// Returns:
+  /// The resized matrix.
   Matrix resize(int w, int h) {
     _matrixNormalized.setGrid(
       matrixOriginal
@@ -132,6 +137,14 @@ class Artifact {
     return _matrixNormalized;
   }
 
+  /// Converts the artifact to a text representation.
+  ///
+  /// Parameters:
+  /// - onChar: The character to use for 'on' pixels (default: '#').
+  /// - forCode: Whether the output is intended for code representation (default: false).
+  ///
+  /// Returns:
+  /// A string representation of the artifact.
   String toText({
     String onChar = '#',
     bool forCode = false,
@@ -140,5 +153,76 @@ class Artifact {
       forCode: forCode,
       onChar: onChar,
     );
+  }
+
+  /// Creates a new grid based on the original data and the new height.
+  ///
+  /// This method decides whether to crop or pad the grid based on the new height.
+  ///
+  /// Parameters:
+  /// - originalData: The original boolean matrix data.
+  /// - newHeight: The target height for the new grid.
+  /// - relativeTop: The relative top position of the artifact within the target rectangle.
+  /// - currentWidth: The current width of the grid.
+  ///
+  /// Returns:
+  /// A new List<List<bool>> representing the adjusted grid.
+  List<List<bool>> _createNewGrid(
+    List<List<bool>> originalData,
+    int newHeight,
+    double relativeTop,
+    int currentWidth,
+  ) {
+    if (originalData.length > newHeight) {
+      return _cropGrid(originalData, newHeight, relativeTop);
+    } else {
+      return _padGrid(originalData, newHeight, relativeTop, currentWidth);
+    }
+  }
+
+  /// Crops the original grid to fit the new height.
+  ///
+  /// Parameters:
+  /// - originalData: The original boolean matrix data.
+  /// - newHeight: The target height for the new grid.
+  /// - relativeTop: The relative top position of the artifact within the target rectangle.
+  ///
+  /// Returns:
+  /// A new List<List<bool>> representing the cropped grid.
+  List<List<bool>> _cropGrid(
+    List<List<bool>> originalData,
+    int newHeight,
+    double relativeTop,
+  ) {
+    int startRow = (relativeTop * originalData.length).round();
+    startRow = startRow.clamp(0, originalData.length - newHeight);
+    return originalData.sublist(startRow, startRow + newHeight);
+  }
+
+  /// Pads the original grid to fit the new height.
+  ///
+  /// Parameters:
+  /// - originalData: The original boolean matrix data.
+  /// - newHeight: The target height for the new grid.
+  /// - relativeTop: The relative top position of the artifact within the target rectangle.
+  /// - currentWidth: The current width of the grid.
+  ///
+  /// Returns:
+  /// A new List<List<bool>> representing the padded grid.
+  List<List<bool>> _padGrid(
+    List<List<bool>> originalData,
+    int newHeight,
+    double relativeTop,
+    int currentWidth,
+  ) {
+    int topPadding = (relativeTop * newHeight).round().clamp(0, newHeight);
+    int bottomPadding =
+        (newHeight - originalData.length - topPadding).clamp(0, newHeight);
+
+    return [
+      ...List.generate(topPadding, (_) => List.filled(currentWidth, false)),
+      ...originalData,
+      ...List.generate(bottomPadding, (_) => List.filled(currentWidth, false)),
+    ];
   }
 }

@@ -42,12 +42,12 @@ class CharacterDefinition {
       jsonDecode(jsonString) as Map<String, dynamic>,
     );
   }
-  static int templateWidth = 40;
+
   static int templateHeight = 60;
+  static int templateWidth = 40;
 
   final String character;
   final int enclosers;
-
   bool isAmount;
   bool isDate;
   bool isDigit;
