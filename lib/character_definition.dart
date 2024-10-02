@@ -2,7 +2,11 @@ import 'dart:convert';
 
 import 'package:textify/matrix.dart';
 
+/// Represents the definition and properties of a single character.
 class CharacterDefinition {
+  /// Creates a new [CharacterDefinition] instance.
+  ///
+  /// [character] is required. All other parameters are optional and have default values.
   CharacterDefinition({
     required this.character,
     this.enclosers = 0,
@@ -16,9 +20,9 @@ class CharacterDefinition {
     this.matrices = const [],
   });
 
-  // Add this factory method for JSON deserialization
+  /// Creates a [CharacterDefinition] from a JSON map.
   factory CharacterDefinition.fromJson(Map<String, dynamic> json) {
-    final CharacterDefinition definition = CharacterDefinition(
+    return CharacterDefinition(
       character: json['character'] as String,
       enclosers: json['enclosers'] as int,
       lineLeft: json['lineLeft'] as bool,
@@ -32,32 +36,52 @@ class CharacterDefinition {
           .map((m) => Matrix.fromJson(m as Map<String, dynamic>))
           .toList(),
     );
-
-    return definition;
   }
 
-  // Add this factory method to create an object from a JSON string
+  /// Creates a [CharacterDefinition] from a JSON string.
   factory CharacterDefinition.fromJsonString(String jsonString) {
     return CharacterDefinition.fromJson(
       jsonDecode(jsonString) as Map<String, dynamic>,
     );
   }
 
+  /// The height of the character template.
   static int templateHeight = 60;
+
+  /// The width of the character template.
   static int templateWidth = 40;
 
+  /// The character being defined.
   final String character;
+
+  /// The number of enclosers for this character.
   final int enclosers;
+
+  /// Indicates if this character is used in amounts.
   bool isAmount;
+
+  /// Indicates if this character is used in dates.
   bool isDate;
+
+  /// Indicates if this character is a digit.
   bool isDigit;
+
+  /// Indicates if this character is a letter.
   bool isLetter;
+
+  /// Indicates if this character is a punctuation mark.
   bool isPunctuation;
+
+  /// Indicates if the character has a left vertical line as part of its shape.
   bool lineLeft;
+
+  /// Indicates if the character has a right vertical line as part of its shape.
   bool lineRight;
+
+  /// List of matrices representing this character.
   List<Matrix> matrices;
 
-  // Add this method for JSON serialization
+  /// Converts this [CharacterDefinition] to a JSON map.
   Map<String, dynamic> toJson() {
     return {
       'character': character,
@@ -73,10 +97,11 @@ class CharacterDefinition {
     };
   }
 
-  // Add this method to convert the object to a JSON string
+  /// Converts this [CharacterDefinition] to a JSON string.
   String toJsonString() => jsonEncode(toJson());
 }
 
+/// List of all digit characters.
 const List<String> allDigits = [
   '0',
   '1',
@@ -90,6 +115,7 @@ const List<String> allDigits = [
   '9',
 ];
 
+/// List of characters typically used in representing amounts.
 const List<String> charactersForAmount = [
   ...allDigits,
   '-',
@@ -99,6 +125,7 @@ const List<String> charactersForAmount = [
   ',',
 ];
 
+/// List of characters typically used in date formats.
 const List<String> charactersForDate = [
   ...allDigits,
   '-',
