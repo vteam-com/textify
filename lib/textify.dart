@@ -218,136 +218,113 @@ class Textify {
   /// Note: This method assumes that the input [Matrix] is a valid binary image.
   /// Behavior may be undefined for non-binary input.
   void findArtifactsFromBinaryImage(Matrix imageAsBinary) {
+    // (1) Find artifact using flood fill
     _findArtifacts(imageAsBinary);
 
-    // merge disconnected parts of artifacts found
-    _globalMergeOfArtifacts();
+    // (2) merge overlaping artifact
+    _mergeOverlappingArtifacts();
 
-    _createBandsFromArtifactsPositions();
-  }
+    // // (3) merge proximity artifact for cases like  [i j ; :]
+    _mergeConnectedArtifacts(verticalThreshold: 20, horizontalThreshold: 4);
 
-  /// Adjusts the height of artifacts to match their respective band heights.
-  void _adjustArtifactsToBandHeight() {
-    for (final Artifact artifact in list) {
-      if (artifact.bandId >= 0 && artifact.bandId < bands.length) {
-        final Rect bandRect = bands[artifact.bandId].rectangle;
-        artifact.fitToRectangleHeight(bandRect);
-      }
+    // (4) create band based on proxymity of artifacts
+    _groupArtifactsIntoBands();
+
+    // (5)
+    for (final Band band in bands) {
+      band.sortLeftToRight();
+      band.identifySpacesInBand();
+      band.packArtifactLeftToRight();
     }
   }
 
-  /// Creates and organizes text bands from artifact positions in the image.
+  /// Merges connected artifacts based on specified thresholds.
   ///
-  /// This method processes the artifacts (typically individual characters or words)
-  /// detected in an image and organizes them into coherent text bands. It operates
-  /// in four distinct phases:
-  ///
-  /// 1. Identify Text Bands:
-  ///    Analyzes the spatial distribution of artifacts to determine potential
-  ///    text bands (rows of text) in the image.
-  ///
-  /// 2. Merge Artifacts:
-  ///    Combines overlapping or closely positioned artifacts within each band.
-  ///    This step helps to consolidate fragmented characters or words.
-  ///
-  /// 3. Adjust Artifact Heights:
-  ///    Normalizes the height of artifacts within each band to ensure consistency.
-  ///    This step is crucial for maintaining a uniform appearance of text lines.
-  ///
-  /// 4. Sort Artifacts:
-  ///    Arranges the artifacts within each band in reading order (typically
-  ///    left-to-right for most languages).
-  ///
-  /// After execution, the artifacts will be organized into bands, with each band
-  /// containing properly merged, height-adjusted, and sorted artifacts. This
-  /// structured representation of the text layout is essential for further
-  /// processing steps such as OCR or document layout analysis.
-  ///
-  /// Note: This method modifies the internal state of the object, updating the
-  /// artifact list and band information. It does not return a value.
-  ///
-  /// Throws:
-  ///   May throw exceptions if there are issues with artifact processing or
-  ///   if the input data is invalid or corrupted.
-  ///
-  /// Example usage:
-  /// ```dart
-  /// TextProcessor processor = TextProcessor();
-  /// processor.loadArtifacts(imageData);
-  /// processor.createBandsFromArtifactsPositions();
-  /// List<TextBand> bands = processor.getTextBands();
-  /// ```
-  ///
-  /// See also:
-  ///   * [Artifact], for the definition of individual text elements.
-  ///   * [TextBand], for the structure representing a line of text.
-  void _createBandsFromArtifactsPositions() {
-    // Phase 1: Determine bands
-    _identifyTextBands();
-
-    // Phase 2: Merge overlapping artifacts
-    _mergeArtifactsWithinBands();
-
-    // Phase 4: Sort artifacts in reading order
-    _sortArtifactsInReadingOrder();
-
-    // Phase 3: Adjust artifacts to match band height
-    _adjustArtifactsToBandHeight();
-
-    for (int bandId = 0; bandId < bands.length; bandId++) {
-      bands[bandId].artifacts = artifactsInBand(bandId);
-    }
-
-    _identifySpacesInBands();
-  }
-
-  /// Creates a rectangle that encompasses all artifacts in a given row.
-  ///
-  /// This method takes a list of [Artifact] objects representing a single row of text
-  /// and calculates a [Rect] that fully contains all the artifacts in that row.
-  ///
-  /// The algorithm works as follows:
-  /// 1. If the input list is empty, it returns [Rect.zero].
-  /// 2. Starting with the rectangle of the first artifact, it iteratively expands
-  ///    the rectangle to include each subsequent artifact's rectangle.
-  ///
-  /// This approach ensures that the resulting rectangle:
-  /// - Has a left edge aligned with the leftmost artifact in the row.
-  /// - Has a top edge aligned with the highest artifact in the row.
-  /// - Has a right edge aligned with the rightmost artifact in the row.
-  /// - Has a bottom edge aligned with the lowest artifact in the row.
+  /// This method iterates through the list of artifacts and merges those that are
+  /// considered connected based on vertical and horizontal thresholds.
   ///
   /// Parameters:
-  ///   [rowArtifacts] - A list of [Artifact] objects representing a single row of text.
+  ///   [verticalThreshold]: The maximum vertical distance between artifacts to be considered connected.
+  ///   [horizontalThreshold]: The maximum horizontal distance between artifacts to be considered connected.
   ///
   /// Returns:
-  ///   A [Rect] that encompasses all artifacts in the given row.
-  ///   Returns [Rect.zero] if the input list is empty.
-  ///
-  /// Example:
-  ///   final rowRect = _createRowRect(rowArtifacts);
-  ///   // rowRect now contains the bounding rectangle for all artifacts in the row
-  Rect _createRectToFitArtifacts(final List<Artifact> rowArtifacts) {
-    if (rowArtifacts.isEmpty) {
-      return Rect.zero;
+  ///   A list of [Artifact] objects after merging connected artifacts.
+  List<Artifact> _mergeConnectedArtifacts({
+    required double verticalThreshold,
+    required double horizontalThreshold,
+  }) {
+    List<Artifact> mergedArtifacts = [];
+
+    for (int i = 0; i < list.length; i++) {
+      Artifact current = list[i];
+
+      for (int j = i + 1; j < list.length; j++) {
+        Artifact next = list[j];
+
+        if (_areArtifactsConnected(
+          current.rectangleOrinal,
+          next.rectangleOrinal,
+          verticalThreshold,
+          horizontalThreshold,
+        )) {
+          current.mergeArtifact(next);
+          list.removeAt(j);
+          j--; // Adjust index since we removed an artifact
+        }
+      }
+
+      mergedArtifacts.add(current);
     }
 
-    return rowArtifacts.fold(
-      rowArtifacts.first.rectangle,
-      (Rect acc, Artifact artifact) => acc.expandToInclude(artifact.rectangle),
-    );
+    return mergedArtifacts;
   }
 
-  /// Checks if two rectangles overlap horizontally.
+  /// Determines if two artifacts are connected based on their rectangles and thresholds.
   ///
-  /// [rectangleA] and [rectangleB] are the rectangles to check.
-  /// Returns true if the rectangles overlap horizontally, false otherwise.
-  bool _doRectanglesOverlapHorizontally(
-    final Rect rectangleA,
-    final Rect rectangleB,
+  /// This method checks both horizontal and vertical proximity of the rectangles.
+  ///
+  /// Parameters:
+  ///   [rect1]: The rectangle of the first artifact.
+  ///   [rect2]: The rectangle of the second artifact.
+  ///   [verticalThreshold]: The maximum vertical distance to be considered connected.
+  ///   [horizontalThreshold]: The maximum horizontal distance to be considered connected.
+  ///
+  /// Returns:
+  ///   true if the artifacts are considered connected, false otherwise.
+  bool _areArtifactsConnected(
+    Rect rect1,
+    Rect rect2,
+    double verticalThreshold,
+    double horizontalThreshold,
   ) {
-    return rectangleA.left < rectangleB.right &&
-        rectangleB.left < rectangleA.right;
+    // Calculate the center X of each rectangle
+    double centerX1 = (rect1.left + rect1.right) / 2;
+    double centerX2 = (rect2.left + rect2.right) / 2;
+
+    // Check horizontal connection using the center X values
+    bool horizontallyConnected =
+        (centerX1 - centerX2).abs() <= horizontalThreshold;
+
+    // Check vertical connection as before
+    bool verticallyConnected = (rect1.bottom + verticalThreshold >= rect2.top &&
+        rect1.top - verticalThreshold <= rect2.bottom);
+
+    return horizontallyConnected && verticallyConnected;
+  }
+
+  Rect mergeRectangles(Rect rect1, Rect rect2) {
+    return Rect.fromLTRB(
+      rect1.left < rect2.left
+          ? rect1.left
+          : rect2.left, // Use the leftmost edge
+      rect1.top < rect2.top ? rect1.top : rect2.top, // Use the topmost edge
+      rect1.right > rect2.right
+          ? rect1.right
+          : rect2.right, // Use the rightmost edge
+      rect1.bottom > rect2.bottom
+          ? rect1.bottom
+          : rect2.bottom, // Use the bottommost edge
+    );
   }
 
   /// Extracts an artifact from a binary image based on a list of connected points.
@@ -414,10 +391,67 @@ class Textify {
 
     // Create and return the Artifact object
     final Artifact artifact = Artifact();
-    artifact.rectangle = rectangle;
+    artifact.rectangleOrinal = rectangle;
+    artifact.rectangleAdjusted = rectangle;
     artifact.matrixOriginal = subGrid;
 
     return artifact;
+  }
+
+  /// Groups artifacts into horizontal bands based on their vertical positions.
+  ///
+  /// This method organizes artifacts into bands, which are horizontal groupings
+  /// of artifacts that are vertically close to each other. The process involves:
+  /// 1. Sorting artifacts by their top y-position.
+  /// 2. Iterating through sorted artifacts and assigning them to existing bands
+  ///    or creating new bands as necessary.
+  ///
+  /// The method uses a vertical tolerance to determine if an artifact belongs
+  /// to an existing band.
+  void _groupArtifactsIntoBands() {
+    double verticalTolerance = 10;
+    // Sort artifacts by the top y-position of their rectangles
+    this.list.sort(
+          (a, b) => a.rectangleOrinal.top.compareTo(b.rectangleOrinal.top),
+        );
+
+    this.bands.clear();
+
+    for (final artifact in this.list) {
+      bool foundBand = false;
+
+      for (Band band in bands) {
+        Rect boundingBox = Band.getBoundingBox(band.artifacts);
+        if (isOverlappingVertically(
+          artifact.rectangleOrinal,
+          boundingBox,
+          verticalTolerance,
+        )) {
+          artifact.bandId = bands.length;
+          band.addArtifact(artifact);
+          foundBand = true;
+          break;
+        }
+      }
+
+      if (!foundBand) {
+        Band newBand = Band();
+        newBand.id = bands.length;
+        newBand.addArtifact(artifact);
+        bands.add(newBand);
+      }
+    }
+  }
+
+  // New function to check if an artifact fits within the vertical tolerance of a band's bounding box
+  bool isOverlappingVertically(
+    Rect bandBoundingBox,
+    Rect artifactRectangle,
+    double verticalTolerance,
+  ) {
+    return (artifactRectangle.bottom >=
+            bandBoundingBox.top - verticalTolerance &&
+        artifactRectangle.top <= bandBoundingBox.bottom + verticalTolerance);
   }
 
   /// Identifies and extracts artifacts from a binary image.
@@ -472,6 +506,25 @@ class Textify {
     }
   }
 
+  /// Performs a flood fill algorithm on a binary image matrix.
+  ///
+  /// This method implements a depth-first search flood fill algorithm to find
+  /// all connected points starting from a given point in a binary image.
+  ///
+  /// Parameters:
+  ///   [binaryPixels]: A Matrix representing the binary image where true values
+  ///                   indicate filled pixels.
+  ///   [visited]: A Matrix of the same size as [binaryPixels] to keep track of
+  ///              visited pixels.
+  ///   [startX]: The starting X coordinate for the flood fill.
+  ///   [startY]: The starting Y coordinate for the flood fill.
+  ///
+  /// Returns:
+  ///   A List of Point objects representing all connected points found during
+  ///   the flood fill process.
+  ///
+  /// Throws:
+  ///   An assertion error if the areas of [binaryPixels] and [visited] are not equal.
   List<Point> _floodFill(
     final Matrix binaryPixels,
     final Matrix visited,
@@ -509,6 +562,26 @@ class Textify {
     return connectedPoints;
   }
 
+  /// Determines the most likely character represented by an artifact.
+  ///
+  /// This method analyzes the given artifact and attempts to match it against
+  /// a set of supported characters, returning the best match.
+  ///
+  /// Parameters:
+  ///   [artifact]: The Artifact object to be analyzed. This typically represents
+  ///               a segment of an image that potentially contains a character.
+  ///   [supportedCharacters]: An optional string containing all the characters
+  ///                          that should be considered in the matching process.
+  ///                          If empty, all possible characters are considered.
+  ///
+  /// Returns:
+  ///   A String containing the best matching character. If no match is found
+  ///   or if the scores list is empty, an empty string is returned.
+  ///
+  /// Note:
+  ///   This method relies on the `getMatchingScores` function to perform the
+  ///   actual character matching and scoring. The implementation of
+  ///   `getMatchingScores` is crucial for the accuracy of this method.
   String _getCharacterFromArtifacts(
     final Artifact artifact, [
     final String supportedCharacters = '',
@@ -652,7 +725,7 @@ class Textify {
   /// The algorithm works as follows:
   /// 1. Iterate through all pairs of artifacts.
   /// 2. If two artifacts overlap and haven't been marked for removal:
-  ///    - Merge them using the [_mergeArtifacts] method.
+  ///    - Merge them using the [_mergeArtifact] method.
   ///    - Mark the second artifact for removal.
   /// 3. Remove all marked artifacts from the list.
   ///
@@ -660,7 +733,7 @@ class Textify {
   /// Space Complexity: O(n) in the worst case, for the removal set.
   ///
   /// Note: This method modifies the original list of artifacts.
-  void _globalMergeOfArtifacts() {
+  void _mergeOverlappingArtifacts() {
     final int n = list.length;
 
     final Set<Artifact> toRemove = {};
@@ -679,8 +752,8 @@ class Textify {
           continue;
         }
 
-        if (artifactA.rectangle.overlaps(artifactB.rectangle)) {
-          artifactA.matrixOriginal = _mergeArtifacts(artifactA, artifactB);
+        if (artifactA.rectangleAdjusted.overlaps(artifactB.rectangleAdjusted)) {
+          artifactA.mergeArtifact(artifactB);
           toRemove.add(artifactB);
         }
       }
@@ -688,249 +761,9 @@ class Textify {
 
     list.removeWhere((artifact) => toRemove.contains(artifact));
   }
-
-  void _identifySpacesInBand(final Band band) {
-    band.sortLeftToRight();
-    band.calculateAverages();
-
-    final double averageWidth = band.averageWidth;
-    final double averageGap = band.averageGap;
-    final double exceeding = averageGap * 1.8;
-
-    for (int indexOfArtifact = 0;
-        indexOfArtifact < band.artifacts.length;
-        indexOfArtifact++) {
-      if (indexOfArtifact > 0) {
-        final Artifact artifactLeft = band.artifacts[indexOfArtifact - 1];
-        final Artifact artifactRight = band.artifacts[indexOfArtifact];
-        final double gap =
-            (artifactRight.rectangle.left - artifactLeft.rectangle.right);
-
-        if (gap > exceeding) {
-          // insert Artifact for Space
-          final Artifact artifactSpace = Artifact();
-
-          artifactSpace.bandId = artifactRight.bandId;
-
-          artifactSpace.rectangle = Rect.fromLTWH(
-            artifactLeft.rectangle.right,
-            artifactLeft.rectangle.top,
-            averageWidth,
-            artifactLeft.rectangle.height,
-          );
-
-          artifactSpace.matrixOriginal = Matrix(
-            artifactSpace.rectangle.width.toInt(),
-            artifactSpace.rectangle.height.toInt(),
-          );
-
-          artifactSpace.characterMatched = ' ';
-
-          {
-            final indexToInsertAt = band.artifacts.indexOf(artifactRight);
-            band.artifacts.insert(indexToInsertAt, artifactSpace);
-            indexOfArtifact++; // skip to next one on the right
-          }
-          {
-            // final indexToInsertAt = this.list.indexOf(artifactRight);
-            list.add(artifactSpace);
-          }
-        }
-      }
-    }
-  }
-
-  void _identifySpacesInBands() {
-    for (final Band band in bands) {
-      _identifySpacesInBand(band);
-    }
-  }
-
-  /// Groups artifacts into text rows based on their spatial relationships.
-  ///
-  /// This method analyzes the list of artifacts (presumably characters or words)
-  /// and groups them into rows of text. It prioritizes left-to-right ordering
-  /// first, then top-to-bottom progression.
-  ///
-  /// The algorithm works as follows:
-  /// 1. Sort artifacts primarily by x-coordinate, then by y-coordinate.
-  /// 2. Calculate the average character width and find the largest width from all artifacts.
-  /// 3. Iterate through the sorted artifacts, grouping them into rows.
-  /// 4. For each artifact, check if it's within horizontal and vertical tolerances of the current row.
-  /// 5. If within tolerances, add to the current row; otherwise, start a new row.
-  /// 6. Assign each artifact a row number corresponding to its position.
-  ///
-  /// Returns:
-  ///   A List<Rect> where each Rect represents a row of text. The rectangles
-  ///   encompass all artifacts in their respective rows.
-  void _identifyTextBands() {
-    if (list.isEmpty) {
-      return;
-    }
-
-    List<Band> bands = [];
-    List<Artifact> currentRow = [];
-
-    // Calculate average width and find the largest width
-    double totalWidth = 0.0;
-
-    double totalHeight = 0.0;
-    for (var artifact in list) {
-      totalWidth += artifact.rectangle.width;
-      totalHeight += artifact.rectangle.height;
-    }
-    double averageCharWidth = totalWidth / list.length;
-    double averageCharHeight = totalHeight / list.length;
-    double horizontalTolerance = averageCharWidth * 1.5; // 50% variation
-    double verticalTolerance = averageCharHeight * 0.5; // 50% of average height
-
-    for (final Artifact artifact in list) {
-      if (currentRow.isEmpty) {
-        currentRow.add(artifact);
-        continue;
-      }
-
-      final Rect currentRowRect = _createRectToFitArtifacts(currentRow);
-      final double horizontalDistance =
-          artifact.rectangle.left - currentRowRect.right;
-      final double verticalDistance =
-          (artifact.rectangle.top + artifact.rectangle.bottom) / 2 -
-              (currentRowRect.top + currentRowRect.bottom) / 2;
-
-      bool isHorizontallyClose = horizontalDistance <= horizontalTolerance;
-      bool isVerticallyClose = verticalDistance.abs() <= verticalTolerance;
-
-      if (isHorizontallyClose && isVerticallyClose) {
-        // This artifact is close enough to be part of the current row
-        currentRow.add(artifact);
-      } else if (!isVerticallyClose) {
-        // Start a new row if the gap is too large horizontally or vertically
-        bands.add(Band(currentRowRect));
-        currentRow = [artifact];
-      } else {
-        // This artifact is vertically close but not horizontally close
-        // We still consider it part of the current row
-        currentRow.add(artifact);
-      }
-
-      artifact.bandId = bands.length;
-    }
-
-    // Add the last row
-    if (currentRow.isNotEmpty) {
-      bands.add(Band(_createRectToFitArtifacts(currentRow)));
-    }
-    this.bands = bands;
-  }
-
-  /// Merges two artifacts by combining their matrices into a single, larger matrix.
-  ///
-  /// This function creates a new matrix that encompasses the area of both input artifacts.
-  /// The original matrices of both artifacts are copied onto this new, larger matrix,
-  /// preserving their relative positions.
-  ///
-  /// Parameters:
-  ///   a1: The first artifact to be merged.
-  ///   a2: The second artifact to be merged.
-  ///
-  /// Returns:
-  ///   A new Matrix object representing the merged result of both artifacts.
-  ///
-  /// The merging process involves these steps:
-  /// 1. Create a new rectangle that encompasses both artifacts' rectangles.
-  /// 2. Initialize a new matrix with the dimensions of this encompassing rectangle.
-  /// 3. Copy the matrix data from both artifacts onto the new matrix, adjusting
-  ///    their positions relative to the new, larger rectangle.
-  ///
-  /// Note: This function does not modify the original artifacts; it creates and
-  /// returns a new matrix containing the merged data.
-  Matrix _mergeArtifacts(final Artifact a1, final Artifact a2) {
-    // Create a new rectangle that encompasses both artifacts
-    final Rect newRect = Rect.fromLTRB(
-      min(a1.rectangle.left, a2.rectangle.left),
-      min(a1.rectangle.top, a2.rectangle.top),
-      max(a1.rectangle.right, a2.rectangle.right),
-      max(a1.rectangle.bottom, a2.rectangle.bottom),
-    );
-
-    // Merge the grids
-    final Matrix newGrid = Matrix(newRect.width, newRect.height);
-
-    // Copy both grids onto the new grid
-    Matrix.copyGrid(
-      a1.matrixOriginal,
-      newGrid,
-      (a1.rectangle.left - newRect.left).toInt(),
-      (a1.rectangle.top - newRect.top).toInt(),
-    );
-
-    Matrix.copyGrid(
-      a2.matrixOriginal,
-      newGrid,
-      (a2.rectangle.left - newRect.left).toInt(),
-      (a2.rectangle.top - newRect.top).toInt(),
-    );
-    return newGrid;
-  }
-
-  /// Finds artifacts within a band that overlap horizontally.
-  ///
-  /// This function takes a list of artifacts and a band (represented as a Rect),
-  /// and returns a list of lists, where each inner list contains artifacts that
-  /// overlap horizontally within the given band.
-  ///
-  /// Parameters:
-  /// - artifacts: The list of all artifacts to process.
-  /// - band: The band (Rect) within which to find overlapping artifacts.
-  ///
-  /// Returns:
-  /// A list of lists, where each inner list contains horizontally overlapping artifacts.
-  void _mergeArtifactsWithinBands() {
-    List<Artifact> toRemove = [];
-
-    for (int index = 0; index < bands.length; index++) {
-      final List<Artifact> artifactsInRect = artifactsInBand(index);
-
-      for (var artifactA in artifactsInRect) {
-        for (var artifactB in artifactsInRect) {
-          if (artifactA != artifactB) {
-            if (!toRemove.contains(artifactA) &&
-                !toRemove.contains(artifactB)) {
-              if (_doRectanglesOverlapHorizontally(
-                artifactA.rectangle,
-                artifactB.rectangle,
-              )) {
-                artifactA.matrixOriginal =
-                    _mergeArtifacts(artifactA, artifactB);
-                toRemove.add(artifactB);
-              }
-            }
-          }
-        }
-      }
-    }
-
-    // clean up
-    for (final a in toRemove) {
-      list.remove(a);
-    }
-  }
-
-  void _sortArtifactsInReadingOrder() {
-    list.sort((a, b) {
-      // First, sort by vertical position using the bottom and top comparison
-      if (a.rectangle.bottom <= b.rectangle.top) {
-        return -1;
-      } else if (b.rectangle.bottom <= a.rectangle.top) {
-        return 1;
-      } else {
-        // If rectangles overlap vertically, sort by left (x-coordinate)
-        return a.rectangle.left.compareTo(b.rectangle.left);
-      }
-    });
-  }
 }
 
+/// Keep track of evaluation score of Artiface against templates
 class ScoreMatch {
   // Factory method for creating an empty ScoreMatch
   factory ScoreMatch.empty() {

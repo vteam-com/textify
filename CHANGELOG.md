@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.0.9
+
+* 2024-10-02 Refactor to handle Bands and detect spaces
+
 ## 0.0.8
 
 * 2024-10-01 Document public API - Artifact, Band, CharacterDefinitions

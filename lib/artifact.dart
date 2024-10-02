@@ -1,4 +1,5 @@
 // Imports
+import 'dart:math';
 import 'dart:ui';
 
 import 'package:textify/matrix.dart';
@@ -15,7 +16,10 @@ class Artifact {
   String characterMatched = '';
 
   /// The rectangular area that this artifact occupies.
-  Rect rectangle = const Rect.fromLTRB(0, 0, 0, 0);
+  Rect rectangleOrinal = Rect.zero;
+
+  /// The rectangular area that this artifact occupies.
+  Rect rectangleAdjusted = Rect.zero;
 
   /// The original matrix representation of the artifact.
   final Matrix _matrix = Matrix();
@@ -27,7 +31,7 @@ class Artifact {
   /// A string representation ths artifact.
   @override
   String toString() {
-    return '"$characterMatched" Band:$bandId Rect:${rectangle.toString()} Area: $area}';
+    return '"$characterMatched" Band:$bandId Rect:${rectangleAdjusted.toString()} Area: $area}';
   }
 
   /// The area of the artifact, calculated from its matrix representation.
@@ -44,7 +48,7 @@ class Artifact {
   void fitToRectangleHeight(Rect targetRect) {
     final int newHeight = targetRect.height.toInt();
 
-    if (rectangle.height == newHeight) {
+    if (rectangleAdjusted.height == newHeight) {
       return; // Early return if no change needed
     }
 
@@ -53,7 +57,7 @@ class Artifact {
 
     // Calculate the relative position of the artifact within the target rectangle
     final double relativeTop =
-        (rectangle.top - targetRect.top) / targetRect.height;
+        (rectangleAdjusted.top - targetRect.top) / targetRect.height;
 
     final List<List<bool>> newGrid =
         _createNewGrid(originalData, newHeight, relativeTop, currentWidth);
@@ -62,10 +66,10 @@ class Artifact {
     _matrix.setGrid(newGrid);
 
     // Adjust the rectangle to maintain relative position within the target rectangle
-    rectangle = Rect.fromLTWH(
-      rectangle.left,
+    rectangleAdjusted = Rect.fromLTWH(
+      rectangleAdjusted.left,
       targetRect.top,
-      rectangle.width,
+      rectangleAdjusted.width,
       targetRect.height,
     );
   }
@@ -226,5 +230,51 @@ class Artifact {
       ...originalData,
       ...List.generate(bottomPadding, (_) => List.filled(currentWidth, false)),
     ];
+  }
+
+  /// Merges the current artifact with another artifact.
+  ///
+  /// This method combines the current artifact with the provided artifact,
+  /// creating a new, larger artifact that encompasses both.
+  ///
+  /// Parameters:
+  /// - [toMerge]: The Artifact to be merged with the current artifact.
+  ///
+  /// The merging process involves:
+  /// 1. Creating a new rectangle that encompasses both artifacts.
+  /// 2. Creating a new matrix (grid) large enough to contain both artifacts' data.
+  /// 3. Copying the data from both artifacts into the new matrix.
+  /// 4. Updating the current artifact's matrix and rectangle to reflect the merged state.
+  ///
+  /// Note: This method modifies the current artifact in-place.
+  void mergeArtifact(final Artifact toMerge) {
+    // Create a new rectangle that encompasses both artifacts
+    final Rect newRect = Rect.fromLTRB(
+      min(this.rectangleAdjusted.left, toMerge.rectangleAdjusted.left),
+      min(this.rectangleAdjusted.top, toMerge.rectangleAdjusted.top),
+      max(this.rectangleAdjusted.right, toMerge.rectangleAdjusted.right),
+      max(this.rectangleAdjusted.bottom, toMerge.rectangleAdjusted.bottom),
+    );
+
+    // Merge the grids
+    final Matrix newGrid = Matrix(newRect.width, newRect.height);
+
+    // Copy both grids onto the new grid
+    Matrix.copyGrid(
+      this.matrixOriginal,
+      newGrid,
+      (this.rectangleAdjusted.left - newRect.left).toInt(),
+      (this.rectangleAdjusted.top - newRect.top).toInt(),
+    );
+
+    Matrix.copyGrid(
+      toMerge.matrixOriginal,
+      newGrid,
+      (toMerge.rectangleAdjusted.left - newRect.left).toInt(),
+      (toMerge.rectangleAdjusted.top - newRect.top).toInt(),
+    );
+    this.matrixOriginal = newGrid;
+    this.rectangleOrinal =
+        this.rectangleOrinal.expandToInclude(toMerge.rectangleOrinal);
   }
 }

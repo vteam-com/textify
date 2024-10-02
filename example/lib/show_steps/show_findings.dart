@@ -24,8 +24,10 @@ class ShowFindings extends StatelessWidget {
     double maxWidth = 0;
     double maxHeight = 0;
     for (final Band band in textify.bands) {
-      maxWidth = max(maxWidth, band.rectangle.right + offsetX);
-      maxHeight = max(maxHeight, band.rectangle.bottom + offsetY);
+      if (band.artifacts.isNotEmpty) {
+        maxWidth = max(maxWidth, band.rectangle.right + offsetX);
+        maxHeight = max(maxHeight, band.rectangle.bottom + offsetY);
+      }
     }
 
     return SizedBox(
@@ -50,16 +52,16 @@ class DisplayArtifacts extends CustomPainter {
 
   final Textify textify;
   final bool applyPacking;
-  final int characterSpacing = 2;
 
   int p = 9;
 
   @override
   void paint(Canvas canvas, Size size) {
     if (applyPacking) {
-      paintAsRows(canvas, size);
+      _paintAsRows(canvas, size);
     } else {
-      paintAsIs(canvas, size);
+      // Paints the bands and artifacts on the canvas in their original positions.
+      _paintArtifactsExactlyWhereTheyAreFound(canvas, textify.list);
     }
   }
 
@@ -97,38 +99,20 @@ class DisplayArtifacts extends CustomPainter {
     );
   }
 
-  String getBandTitle(final bandNumber) {
-    final Band band = textify.bands[bandNumber];
+  String getBandTitle(final Band band) {
+    int id = textify.bands.indexOf(band) + 1;
 
-    return '${bandNumber + 1}: found ${band.artifacts.length}   AW:${band.averageWidth.toStringAsFixed(1)}   AG:${band.averageGap.toStringAsFixed(1)} S:${band.spacesCount}';
+    return '$id: found ${band.artifacts.length}   AW:${band.averageWidth.toStringAsFixed(1)}   AG:${band.averageGap.toStringAsFixed(1)} S:${band.spacesCount}';
   }
 
-  Size getRectSizeFromArtifacts(
-    final List<Artifact> artifactsInTheRect,
-  ) {
-    double w = 0;
-    double maxH = 0;
-    for (final artifact in artifactsInTheRect) {
-      w += artifact.rectangle.width;
-      w += characterSpacing;
-      maxH = max(maxH, artifact.rectangle.height);
-    }
-    // remove the last spacing
-    w -= characterSpacing;
-    return Size(w, maxH);
-  }
-
-  void paintArtifactsInRow({
+  void _paintArtifactsInRow({
     required final Canvas canvas,
     required final List<Artifact> artifactsInTheBand,
-    required final Rect bandRect,
   }) {
     List<Color> colors = [
       Colors.blue.shade300,
       Colors.green.shade300,
     ];
-
-    double x = bandRect.left;
 
     // artifact in that band
     int id = 1;
@@ -136,21 +120,19 @@ class DisplayArtifacts extends CustomPainter {
       paintSmallGrid(
         canvas,
         colors[textify.list.indexOf(artifact) % colors.length],
-        x.toInt(),
-        bandRect.top.toInt(),
+        artifact.rectangleAdjusted.left.toInt(),
+        artifact.rectangleAdjusted.top.toInt(),
         artifact.matrixOriginal,
       );
-      drawText(canvas, x, bandRect.top, id.toString(), 8);
+      drawText(canvas, artifact.rectangleAdjusted.left,
+          artifact.rectangleAdjusted.top, id.toString(), 8);
       id++;
-      // next horizontal position
-      x += artifact.rectangle.width;
-      x += characterSpacing; // space between each characters
     }
   }
 
-  void paintArtifactsWhereTheyFound(
-    List<Artifact> artifactsInTheBand,
+  void _paintArtifactsExactlyWhereTheyAreFound(
     Canvas canvas,
+    List<Artifact> artifactsInTheBand,
   ) {
     // Rainbow colors
     List<Color> colors = [
@@ -168,42 +150,9 @@ class DisplayArtifacts extends CustomPainter {
       paintSmallGrid(
         canvas,
         colors[textify.list.indexOf(artifact) % colors.length],
-        artifact.rectangle.left.toInt(),
-        artifact.rectangle.top.toInt(),
+        artifact.rectangleOrinal.left.toInt(),
+        artifact.rectangleOrinal.top.toInt(),
         artifact.matrixOriginal,
-      );
-    }
-  }
-
-  /// Paints the bands and artifacts on the canvas in their original positions.
-  ///
-  /// This method iterates through all bands in the artifacts collection and
-  /// paints each band along with its associated artifacts on the canvas.
-  ///
-  /// @param canvas The Canvas object to paint on.
-  /// @param size The Size of the canvas (not used in this method, but may be useful for future modifications).
-  void paintAsIs(Canvas canvas, Size size) {
-    // Iterate through all bands in the artifacts collection
-    for (int bandIndex = 0; bandIndex < textify.bands.length; bandIndex++) {
-      // Get the current band's rectangle
-      final Rect ar = textify.bands[bandIndex].rectangle;
-
-      // Create a new rectangle with offset applied
-      // This adjusts the position of the band on the canvas
-      final Rect rect = Rect.fromLTWH(
-        ar.left,
-        ar.top,
-        ar.width,
-        ar.height,
-      );
-
-      // Paint the band and its artifacts
-      paintBandAndArtifacts(
-        canvas,
-        // The adjusted rectangle for the band
-        rect,
-        // Get artifacts for this band
-        textify.artifactsInBand(bandIndex),
       );
     }
   }
@@ -226,66 +175,26 @@ class DisplayArtifacts extends CustomPainter {
   ///
   /// Note: This method assumes that the `list` property contains the artifacts to be
   /// packed, and it will update the `bands` property with the new band data.
-  void paintAsRows(Canvas canvas, Size size) {
-    // // Sort artifacts by band and then by left position within each band
-    // artifacts.list.sort((a, b) {
-    //   if (a.bandId != b.bandId) {
-    //     return a.bandId.compareTo(b.bandId);
-    //   }
-    //   return a.rectangle.left.compareTo(b.rectangle.left);
-    // });
-
-    double currentY = 10;
-
-    for (int bandIndex = 0; bandIndex < textify.bands.length; bandIndex++) {
-      final Band band = textify.bands[bandIndex];
-
-      final Size rectSize = getRectSizeFromArtifacts(band.artifacts);
-
-      final Rect rectangle = Rect.fromLTWH(
-        0,
-        currentY,
-        rectSize.width,
-        rectSize.height,
-      );
-
-      paintBandAndLabel(
-        canvas: canvas,
-        caption: getBandTitle(bandIndex),
-        bandRect: rectangle,
-        background: Colors.black.withAlpha(200),
-      );
-
-      paintArtifactsInRow(
-        canvas: canvas,
-        artifactsInTheBand: band.artifacts,
-        bandRect: rectangle,
-      );
-
-      currentY += band.rectangle.height + offsetY;
+  void _paintAsRows(Canvas canvas, Size size) {
+    for (final Band band in textify.bands) {
+      _paintBand(canvas: canvas, band: band);
+      _paintArtifactsInRow(canvas: canvas, artifactsInTheBand: band.artifacts);
     }
   }
 
-  void paintBandAndArtifacts(
-    Canvas canvas,
-    Rect bandRect,
-    List<Artifact> artifactsInTheBand,
-  ) {
-    // main regsion in blue
-    drawRectangle(canvas, bandRect, Colors.black.withAlpha(100));
-
-    // artifact in that band
-    paintArtifactsWhereTheyFound(artifactsInTheBand, canvas);
-  }
-
-  void paintBandAndLabel({
+  void _paintBand({
     required final Canvas canvas,
-    required final String caption,
-    required final Rect bandRect,
-    required final Color background,
+    required final Band band,
   }) {
+    final caption = getBandTitle(band);
+    final bandRect = Band.getBoundingBox(band.artifacts);
+
     // main regsion in blue
-    drawRectangle(canvas, bandRect, background);
+    drawRectangle(
+      canvas,
+      bandRect,
+      Colors.black.withAlpha(200),
+    );
 
     // information about the band
     if (caption.isNotEmpty) {

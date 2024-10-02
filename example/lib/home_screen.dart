@@ -106,11 +106,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
 
                 //
-                // Artifact found
+                // Bands of Artifact
                 //
                 _buildExpansionPanel(
-                  titleLeft: 'Artifacts found',
-                  titleCenter: _textify.count.toString(),
+                  titleLeft: '${_textify.bands.length} Bands',
+                  titleCenter: '${_textify.count} Artifacts',
                   titleRight: '',
                   isExpanded: _isExpandedArtifactFound,
                   content: _buildArtifactFound(

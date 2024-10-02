@@ -333,6 +333,36 @@ class Matrix {
     return resizedGrid;
   }
 
+  /// Adds padding to the top and bottom of the matrix.
+  ///
+  /// This method inserts blank lines at the top and bottom of the matrix data,
+  /// effectively adding padding to the matrix.
+  ///
+  /// Parameters:
+  /// - [paddingTop]: The number of blank lines to add at the top of the matrix.
+  /// - [paddingBottom]: The number of blank lines to add at the bottom of the matrix.
+  ///
+  /// The method modifies the matrix in place by:
+  /// 1. Creating blank lines (rows filled with `false` values).
+  /// 2. Inserting the specified number of blank lines at the top of the matrix.
+  /// 3. Appending the specified number of blank lines at the bottom of the matrix.
+  /// 4. Updating the total number of rows in the matrix.
+  void paddTopBottom({
+    required int paddingTop,
+    required int paddingBottom,
+  }) {
+    final blankLine = List.filled(cols, false);
+
+    for (var add = 0; add < paddingTop; add++) {
+      data.insert(0, blankLine);
+    }
+
+    for (var add = 0; add < paddingBottom; add++) {
+      data.add(blankLine);
+    }
+    rows = data.length;
+  }
+
   Matrix createWrapGridWithFalse() {
     if (isEmpty) {
       return Matrix.fromBoolMatrix([

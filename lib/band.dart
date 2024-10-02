@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:textify/artifact.dart';
+import 'package:textify/matrix.dart';
 
 /// Represents a horizontal band or strip in an image or document.
 ///
@@ -8,14 +9,11 @@ import 'package:textify/artifact.dart';
 class Band {
   /// Creates a new Band with the specified rectangle.
   ///
-  /// The [rectangle] parameter defines the boundaries of the band.
-  Band(this.rectangle);
+  Band();
+  int id = 0;
 
   /// List of artifacts contained within this band.
   List<Artifact> artifacts = [];
-
-  /// The rectangular area that defines the boundaries of this band.
-  Rect rectangle;
 
   // Private fields to store calculated average of space between earh artifacts
   double _averageGap = -1;
@@ -35,6 +33,8 @@ class Band {
     }
     return _averageGap;
   }
+
+  static int characterSpacing = 4;
 
   /// Gets the average width of artifacts in the band.
   ///
@@ -70,12 +70,35 @@ class Band {
 
     for (int i = 1; i < artifacts.length; i++) {
       final artifact = artifacts[i];
-      double gap = artifact.rectangle.left - artifacts[i - 1].rectangle.right;
+      double gap = artifact.rectangleAdjusted.left -
+          artifacts[i - 1].rectangleAdjusted.right;
       totalGap += gap;
-      totalWidth += artifact.rectangle.width;
+      totalWidth += artifact.rectangleAdjusted.width;
     }
     _averageWidth = totalWidth / count;
     _averageGap = totalGap / count;
+  }
+
+  /// Adds an artifact to the collection and resets the cached rectangle.
+  ///
+  /// This method performs two main actions:
+  /// 1. Resets the cached rectangle to zero.
+  /// 2. Adds the provided artifact to the collection.
+  ///
+  /// Parameters:
+  /// - [artifact]: The Artifact object to be added to the collection.
+  ///
+  /// The method modifies the internal state by:
+  /// - Setting the [_rectangle] to [Rect.zero], invalidating any previously cached rectangle.
+  /// - Adding the new [artifact] to the [artifacts] collection.
+  ///
+  /// Note: This method should be called whenever a new artifact needs to be added to the collection.
+  /// It ensures that the cached rectangle is properly invalidated, which may be important for
+  /// subsequent calculations or rendering operations.
+  void addArtifact(final Artifact artifact) {
+    // reset the cached rectangle each time an artifact is added or removed
+    _rectangle = Rect.zero;
+    this.artifacts.add(artifact);
   }
 
   /// Sorts the artifacts in this band from left to right.
@@ -83,7 +106,173 @@ class Band {
   /// This method orders the artifacts based on their left edge position,
   /// ensuring they are in the correct sequence as they appear in the band.
   void sortLeftToRight() {
-    artifacts.sort((a, b) => a.rectangle.left.compareTo(b.rectangle.left));
+    artifacts.sort(
+      (a, b) => a.rectangleAdjusted.left.compareTo(b.rectangleAdjusted.left),
+    );
+  }
+
+  /// Identifies and inserts space artifacts between existing artifacts in the band.
+  ///
+  /// This method analyzes the gaps between artifacts and inserts space artifacts
+  /// where the gap exceeds a certain threshold.
+  ///
+  /// The process involves:
+  /// 1. Calculating a threshold gap size based on the average width.
+  /// 2. Iterating through artifacts to identify gaps exceeding the threshold.
+  /// 3. Creating a list of artifacts that need spaces inserted before them.
+  /// 4. Inserting space artifacts at the appropriate positions.
+  ///
+  /// The threshold is set at 65% of the average width of artifacts in the band.
+  void identifySpacesInBand() {
+    final double exceeding = this.averageWidth * 0.65; //%
+
+    List<Artifact> insertInFrontOfTheseArtifacts = [];
+
+    for (int indexOfArtifact = 0;
+        indexOfArtifact < this.artifacts.length;
+        indexOfArtifact++) {
+      if (indexOfArtifact > 0) {
+        // Left
+        final Artifact artifactLeft = this.artifacts[indexOfArtifact - 1];
+        var x1 = artifactLeft.rectangleOrinal.right;
+        // Right
+        final Artifact artifactRight = this.artifacts[indexOfArtifact];
+        var x2 = artifactRight.rectangleOrinal.left;
+
+        final double gap = x2 - x1;
+
+        if (gap > exceeding) {
+          // insert Artifact for Space
+          insertInFrontOfTheseArtifacts.add(artifactRight);
+        }
+      }
+    }
+
+    for (final artifactOnTheRightSide in insertInFrontOfTheseArtifacts) {
+      final indexOfArtifact = this.artifacts.indexOf(artifactOnTheRightSide);
+      insetArtifactForSpace(
+        indexOfArtifact,
+        artifactOnTheRightSide.rectangleOrinal.left - averageWidth - averageGap,
+        artifactOnTheRightSide.rectangleOrinal.left - averageGap,
+      );
+    }
+  }
+
+  /// Inserts a space artifact at a specified position in the artifacts list.
+  ///
+  /// This method creates a new Artifact representing a space and inserts it
+  /// into the artifacts list at the specified index.
+  ///
+  /// Parameters:
+  /// - [indexOfArtifact]: The index at which to insert the space artifact.
+  /// - [x1]: The left x-coordinate of the space artifact.
+  /// - [x2]: The right x-coordinate of the space artifact.
+  ///
+  /// The created space artifact has the following properties:
+  /// - Character matched is a space (' ').
+  /// - Band ID is set to the current band's ID.
+  /// - Rectangle is set based on the provided x-coordinates and the band's top and bottom.
+  /// - A matrix is created based on the dimensions of the rectangle.
+  void insetArtifactForSpace(
+    int indexOfArtifact,
+    double x1,
+    double x2,
+  ) {
+    final Artifact artifactSpace = Artifact();
+    artifactSpace.characterMatched = ' ';
+    artifactSpace.bandId = this.id;
+
+    artifactSpace.rectangleOrinal = Rect.fromLTRB(
+      x1,
+      rectangle.top,
+      x2,
+      rectangle.bottom,
+    );
+    artifactSpace.rectangleAdjusted = artifactSpace.rectangleOrinal;
+
+    artifactSpace.matrixOriginal = Matrix(
+      artifactSpace.rectangleOrinal.width.toInt(),
+      artifactSpace.rectangleOrinal.height.toInt(),
+    );
+    this.artifacts.insert(indexOfArtifact, artifactSpace);
+  }
+
+  /// Adjusts the positions of artifacts to pack them from left to right.
+  ///
+  /// This method repositions all artifacts in the band, aligning them
+  /// from left to right with proper spacing. It performs the following steps:
+  ///
+  /// 1. Adds top and bottom padding to each artifact's matrix.
+  /// 2. Shifts each artifact horizontally to align with the left edge of the band.
+  /// 3. Adjusts the vertical position of each artifact to align with the band's top.
+  /// 4. Updates the artifact's rectangle positions.
+  /// 5. Increments the left position for the next artifact, including character spacing.
+  ///
+  /// This method modifies the positions of all artifacts in the band to create
+  /// a left-aligned, properly spaced arrangement.
+  void packArtifactLeftToRight() {
+    double left = this.rectangle.left;
+
+    for (final Artifact artifact in artifacts) {
+      artifact.matrixOriginal.paddTopBottom(
+        paddingTop: (artifact.rectangleOrinal.top - rectangle.top).toInt(),
+        paddingBottom:
+            (rectangle.bottom - artifact.rectangleOrinal.bottom).toInt(),
+      );
+
+      double dx = left - artifact.rectangleOrinal.left;
+      double dy = rectangle.top - artifact.rectangleOrinal.top;
+      artifact.rectangleAdjusted =
+          artifact.rectangleOrinal.shift(Offset(dx, dy));
+      artifact.rectangleOrinal = artifact.rectangleAdjusted;
+      left += artifact.rectangleAdjusted.width;
+      left += characterSpacing;
+    }
+  }
+
+  /// The cached bounding rectangle of this object.
+  ///
+  /// This is lazily initialized and cached for performance reasons.
+  Rect _rectangle = Rect.zero;
+
+  /// Gets the bounding rectangle of this object.
+  ///
+  /// This getter uses lazy initialization to compute the bounding box
+  /// only when first accessed, and then caches the result for subsequent calls.
+  ///
+  /// Returns:
+  ///   A [Rect] representing the bounding box of this object.
+  ///
+  /// Note: If the object's dimensions or position can change, this cached
+  /// value may become outdated. In such cases, consider adding a method
+  /// to invalidate the cache when necessary.
+  Rect get rectangle {
+    if (_rectangle == Rect.zero) {
+      _rectangle = getBoundingBox(this.artifacts);
+    }
+    return _rectangle;
+  }
+
+  // Return the unified bounding box for all artifacts in the band
+  static Rect getBoundingBox(List<Artifact> artifacts) {
+    if (artifacts.isEmpty) {
+      return Rect.zero;
+    }
+
+    double minX = artifacts
+        .map((a) => a.rectangleAdjusted.left)
+        .reduce((a, b) => a < b ? a : b);
+    double minY = artifacts
+        .map((a) => a.rectangleAdjusted.top)
+        .reduce((a, b) => a < b ? a : b);
+    double maxX = artifacts
+        .map((a) => a.rectangleAdjusted.right)
+        .reduce((a, b) => a > b ? a : b);
+    double maxY = artifacts
+        .map((a) => a.rectangleAdjusted.bottom)
+        .reduce((a, b) => a > b ? a : b);
+
+    return Rect.fromLTRB(minX, minY, maxX, maxY);
   }
 
   /// Counts the number of space characters among the artifacts in this band.
