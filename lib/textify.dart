@@ -120,15 +120,7 @@ class Textify {
     return scores;
   }
 
-  List<Artifact> getAlCharacterFoundFromBands() {
-    List<Artifact> artifacts = [];
-    for (final band in bands) {
-      artifacts.addAll(band.artifacts);
-    }
-    return artifacts;
-  }
-
-  /// Extracts text from a given image.
+  /// Extracts text from an image.
   ///
   /// This method processes the input image through an [ImagePipeline] to prepare it
   /// for text extraction, then uses the [getTextFromMatrix] method to perform
