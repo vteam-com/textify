@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 0.1.0
+
+* 2024-10-03 Remove unused function
+* 2024-10-03 Made functions private
+* 2024-10-03 Document code
+  
 ## 0.0.9
 
 * 2024-10-02 Refactor to handle Bands and detect spaces

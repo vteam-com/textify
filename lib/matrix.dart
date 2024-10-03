@@ -4,10 +4,6 @@ import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 
-extension RectArea on Rect {
-  double area() => width * height;
-}
-
 /// Represents a 2D grid of boolean values, primarily used for image processing
 /// and pattern recognition tasks.
 ///
@@ -257,13 +253,13 @@ class Matrix {
     // help resizing by ensuring there's a border
     if (isPunctuation()) {
       // do not crop and center
-      return createWrapGridWithFalse().createResizedGrid(
+      return _createWrapGridWithFalse().createResizedGrid(
         desiredWidth,
         desiredHeight,
       );
     } else {
       // Resize
-      return trim().createWrapGridWithFalse().createResizedGrid(
+      return trim()._createWrapGridWithFalse().createResizedGrid(
             desiredWidth,
             desiredHeight,
           );
@@ -363,7 +359,27 @@ class Matrix {
     rows = data.length;
   }
 
-  Matrix createWrapGridWithFalse() {
+  /// Creates a new Matrix with a false border wrapping around the original matrix.
+  ///
+  /// This function generates a new Matrix that is larger than the original by adding
+  /// a border of 'false' values around all sides. If the original matrix is empty,
+  /// it returns a predefined 3x2 matrix of 'false' values.
+  ///
+  /// The process:
+  /// 1. If the original matrix is empty, return a predefined 3x2 matrix of 'false' values.
+  /// 2. Create a new matrix with dimensions increased by 2 in both rows and columns,
+  ///    initialized with 'false' values.
+  /// 3. Copy the original matrix data into the center of the new matrix, leaving
+  ///    the outer border as 'false'.
+  ///
+  /// Returns:
+  /// - If the original matrix is empty: A new 3x2 Matrix filled with 'false' values.
+  /// - Otherwise: A new Matrix with dimensions (rows + 2) x (cols + 2), where the
+  ///   original matrix data is centered and surrounded by a border of 'false' values.
+  ///
+  /// This function is useful for operations that require considering the edges of a matrix,
+  /// such as cellular automata or image processing algorithms.
+  Matrix _createWrapGridWithFalse() {
     if (isEmpty) {
       return Matrix.fromBoolMatrix([
         [false, false],
@@ -407,7 +423,7 @@ class Matrix {
   /// imported from another file.
   int get enclosures {
     if (_enclosures == -1) {
-      _enclosures = countEnclosedRegion(this);
+      _enclosures = _countEnclosedRegion(this);
     }
     return _enclosures;
   }
@@ -816,6 +832,30 @@ class Matrix {
     );
   }
 
+  /// Converts the Matrix object to a JSON-serializable Map.
+  ///
+  /// This method creates a Map representation of the Matrix object that can be
+  /// easily serialized to JSON. The resulting Map contains the following keys:
+  ///
+  /// - 'font': The font used in the Matrix (type depends on how 'font' is defined in the class).
+  /// - 'rows': The number of rows in the Matrix.
+  /// - 'cols': The number of columns in the Matrix.
+  /// - 'data': A List of Strings, where each String represents a row in the Matrix.
+  ///           In these Strings, '#' represents true (or filled) cells, and '.'
+  ///           represents false (or empty) cells.
+  ///
+  /// The 'data' field is created by transforming the 2D boolean array into a more
+  /// compact string representation, where each row is converted to a string of
+  /// '#' and '.' characters.
+  ///
+  /// Returns:
+  ///   A Map<String, dynamic> that can be serialized to JSON, representing the
+  ///   current state of the Matrix object.
+  ///
+  /// Example usage:
+  ///   Matrix matrix = Matrix(...);
+  ///   Map<String, dynamic> jsonMap = matrix.toJson();
+  ///   String jsonString = jsonEncode(jsonMap);
   Map<String, dynamic> toJson() {
     return {
       'font': font,
@@ -827,17 +867,67 @@ class Matrix {
     };
   }
 
+  /// Determines if there's a vertical line on the left side of the matrix.
+  ///
+  /// This getter lazily evaluates and caches the result of checking for a vertical
+  /// line on the left side of the matrix. It uses the [_hasVerticalLineLeft] method
+  /// to perform the actual check.
+  ///
+  /// Returns:
+  ///   A boolean value:
+  ///   - true if a vertical line is present on the left side
+  ///   - false otherwise
+  ///
+  /// The result is cached after the first call for efficiency in subsequent accesses.
   bool get verticalLineLeft {
-    _verticalLineLeft ??= hasVerticalLineLeft(this);
+    _verticalLineLeft ??= _hasVerticalLineLeft(this);
     return _verticalLineLeft!;
   }
 
+  /// Determines if there's a vertical line on the right side of the matrix.
+  ///
+  /// This getter lazily evaluates and caches the result of checking for a vertical
+  /// line on the right side of the matrix. It uses the [_hasVerticalLineRight] method
+  /// to perform the actual check.
+  ///
+  /// Returns:
+  ///   A boolean value:
+  ///   - true if a vertical line is present on the right side
+  ///   - false otherwise
+  ///
+  /// The result is cached after the first call for efficiency in subsequent accesses.
   bool get verticalLineRight {
-    _verticalLineRight ??= hasVerticalLineRight(this);
+    _verticalLineRight ??= _hasVerticalLineRight(this);
     return _verticalLineRight!;
   }
 
-  int countEnclosedRegion(Matrix grid) {
+  /// Counts the number of enclosed regions in a given grid.
+  ///
+  /// This function analyzes a binary grid represented by [Matrix] to identify and count
+  /// enclosed regions that meet specific criteria.
+  ///
+  /// Parameters:
+  /// - [grid]: A [Matrix] object representing the binary grid to analyze.
+  ///
+  /// Returns:
+  /// An integer representing the count of enclosed regions that meet the criteria.
+  ///
+  /// Algorithm:
+  /// 1. Initializes a 'visited' matrix to keep track of explored cells.
+  /// 2. Iterates through each cell in the grid.
+  /// 3. For each unvisited 'false' cell (representing a potential region):
+  ///    a. Explores the connected region using [_exploreRegion].
+  ///    b. If the region size is at least [minRegionSize] (3 in this case) and
+  ///       it's confirmed as enclosed by [_isEnclosedRegion], increments the loop count.
+  ///
+  /// Note:
+  /// - The function assumes the existence of helper methods [_exploreRegion] and [_isEnclosedRegion].
+  /// - A region must have at least 3 cells to be considered a potential loop.
+  /// - The function uses a depth-first search approach to explore regions.
+  ///
+  /// Time Complexity: O(rows * cols), where each cell is visited at most once.
+  /// Space Complexity: O(rows * cols) for the 'visited' matrix.
+  int _countEnclosedRegion(Matrix grid) {
     int rows = grid.rows;
     int cols = grid.cols;
 
@@ -849,9 +939,9 @@ class Matrix {
     for (int y = 0; y < rows; y++) {
       for (int x = 0; x < cols; x++) {
         if (!grid.data[y][x] && !visited.data[y][x]) {
-          int regionSize = exploreRegion(grid, visited, x, y);
+          int regionSize = _exploreRegion(grid, visited, x, y);
           if (regionSize >= minRegionSize &&
-              isEnclosedRegion(grid, x, y, regionSize)) {
+              _isEnclosedRegion(grid, x, y, regionSize)) {
             loopCount++;
           }
         }
@@ -861,7 +951,7 @@ class Matrix {
     return loopCount;
   }
 
-  int exploreRegion(
+  int _exploreRegion(
     Matrix grid,
     Matrix visited,
     int startX,
@@ -902,7 +992,7 @@ class Matrix {
     return regionSize;
   }
 
-  bool isEnclosedRegion(
+  bool _isEnclosedRegion(
     Matrix grid,
     int startX,
     int startY,
@@ -952,18 +1042,18 @@ class Matrix {
     return isEnclosed;
   }
 
-  double thresholdLinePercentage = 0.7;
+  final double _thresholdLinePercentage = 0.7;
 
-  bool hasVerticalLineLeft(Matrix matrix) {
+  bool _hasVerticalLineLeft(Matrix matrix) {
     Matrix visited = Matrix(matrix.cols, matrix.rows);
 
     // We only consider lines that are more than 40% of the character's height
-    int minVerticalLine = (matrix.rows * thresholdLinePercentage).toInt();
+    int minVerticalLine = (matrix.rows * _thresholdLinePercentage).toInt();
 
     for (int x = 0; x < matrix.cols; x++) {
       for (int y = 0; y < matrix.rows; y++) {
         if (matrix.data[y][x] && !visited.data[y][x]) {
-          if (isValidVerticalLineLeft(
+          if (_isValidVerticalLineLeft(
             minVerticalLine,
             matrix,
             x,
@@ -979,16 +1069,16 @@ class Matrix {
     return false;
   }
 
-  bool hasVerticalLineRight(Matrix matrix) {
+  bool _hasVerticalLineRight(Matrix matrix) {
     Matrix visited = Matrix(matrix.cols, matrix.rows);
 
     // We only consider lines that are more than 40% of the character's height
-    int minVerticalLine = (matrix.rows * thresholdLinePercentage).toInt();
+    int minVerticalLine = (matrix.rows * _thresholdLinePercentage).toInt();
 
     for (int x = matrix.cols - 1; x >= 0; x--) {
       for (int y = 0; y < matrix.rows; y++) {
         if (matrix.data[y][x] && !visited.data[y][x]) {
-          if (isValidVerticalLineRight(
+          if (_isValidVerticalLineRight(
             minVerticalLine,
             matrix,
             x,
@@ -1007,7 +1097,7 @@ class Matrix {
   /// Checks if the segment starting at (x, y) is a valid vertical line.
   /// Only considers it a vertical line if there are no filled pixels to the left
   /// at any point in the line.
-  bool isValidVerticalLineLeft(
+  bool _isValidVerticalLineLeft(
     int minVerticalLine,
     Matrix matrix,
     int x,
@@ -1023,7 +1113,7 @@ class Matrix {
       lineLength++;
 
       // If there's a filled pixel to the left of any point in the line, it's invalid
-      if (!validLeftSideLeft(matrix, x, y)) {
+      if (!_validLeftSideLeft(matrix, x, y)) {
         lineLength = 0; // reset
       }
       if (lineLength >= minVerticalLine) {
@@ -1036,7 +1126,7 @@ class Matrix {
     return false;
   }
 
-  bool isValidVerticalLineRight(
+  bool _isValidVerticalLineRight(
     int minVerticalLine,
     Matrix matrix,
     int x,
@@ -1052,7 +1142,7 @@ class Matrix {
       lineLength++;
 
       // If there's a filled pixel to the left of any point in the line, it's invalid
-      if (!validLeftSideRight(matrix, x, y)) {
+      if (!_validLeftSideRight(matrix, x, y)) {
         lineLength = 0; // reset
       }
       if (lineLength >= minVerticalLine) {
@@ -1065,8 +1155,8 @@ class Matrix {
     return false;
   }
 
-// accept some tolerance
-  bool validLeftSideLeft(
+  /// inspection left side with some tolerance
+  bool _validLeftSideLeft(
     Matrix m,
     int x,
     int y,
@@ -1087,8 +1177,8 @@ class Matrix {
     return false;
   }
 
-// accept some tolerance
-  bool validLeftSideRight(
+  /// inspection right side with some tolerance
+  bool _validLeftSideRight(
     Matrix m,
     int x,
     int y,

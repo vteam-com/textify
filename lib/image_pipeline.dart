@@ -78,6 +78,21 @@ class ImagePipeline {
   }
 }
 
+/// Binarizes an input image by converting it to black and white based on a brightness threshold.
+///
+/// This function takes an input [ui.Image] and converts it to a black and white image
+/// where pixels brighter than the specified [threshold] become white, and those below become black.
+///
+/// Parameters:
+/// - [inputImage]: The source image to be binarized.
+/// - [threshold]: Optional. The brightness threshold used to determine black or white pixels.
+///   Defaults to 190. Range is 0-255.
+///
+/// Returns:
+/// A [Future] that resolves to a new [ui.Image] containing the binarized version of the input image.
+///
+/// Throws:
+/// An [Exception] if it fails to get image data from the input image.
 Future<ui.Image> binarizeImage(
   ui.Image inputImage, {
   double threshold = 190,
@@ -135,6 +150,17 @@ Future<ui.Image> binarizeImage(
   return frameInfo.image;
 }
 
+/// Converts a [ui.Image] to a [Uint8List] representation.
+///
+/// This function takes a [ui.Image] and converts it to a [Uint8List] containing
+/// the raw RGBA data of the image.
+///
+/// Parameters:
+/// - [image]: The source image to be converted. Can be null.
+///
+/// Returns:
+/// A [Future] that resolves to a [Uint8List] containing the raw RGBA data of the image.
+/// If the input [image] is null or conversion fails, returns an empty [Uint8List].
 Future<Uint8List> imageToUint8List(final ui.Image? image) async {
   if (image == null) {
     return Uint8List(0);

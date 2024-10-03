@@ -105,7 +105,7 @@ class CharacterDefinitions {
   }
 
   /// Sorts character definitions alphabetically by character.
-  void sortDefinitions() {
+  void _sortDefinitions() {
     _definitions.sort((a, b) => a.character.compareTo(b.character));
   }
 
@@ -113,30 +113,13 @@ class CharacterDefinitions {
   ///
   /// Returns a JSON string representation of all character definitions.
   String toJsonString() {
-    sortDefinitions();
+    _sortDefinitions();
 
     Map<String, dynamic> matricesMap = {
       'templates': definitions.map((template) => template.toJson()).toList(),
     };
 
     return jsonEncode(matricesMap);
-  }
-
-  /// Updates an existing character definition.
-  ///
-  /// [template] The updated character definition.
-  ///
-  /// Throws an [ArgumentError] if the character definition is not found.
-  void updateDefinition(CharacterDefinition template) {
-    final index =
-        _definitions.indexWhere((t) => t.character == template.character);
-    if (index != -1) {
-      _definitions[index] = template;
-    } else {
-      throw ArgumentError(
-        'Template not found for character: ${template.character}',
-      );
-    }
   }
 
   /// Updates or inserts a template matrix for a given character and font.

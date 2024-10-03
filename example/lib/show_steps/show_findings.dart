@@ -61,7 +61,7 @@ class DisplayArtifacts extends CustomPainter {
       _paintAsRows(canvas, size);
     } else {
       // Paints the bands and artifacts on the canvas in their original positions.
-      _paintArtifactsExactlyWhereTheyAreFound(canvas, textify.list);
+      _paintArtifactsExactlyWhereTheyAreFound(canvas, textify.artifacts);
     }
   }
 
@@ -119,7 +119,7 @@ class DisplayArtifacts extends CustomPainter {
     for (final Artifact artifact in artifactsInTheBand) {
       paintSmallGrid(
         canvas,
-        colors[textify.list.indexOf(artifact) % colors.length],
+        colors[textify.artifacts.indexOf(artifact) % colors.length],
         artifact.rectangleAdjusted.left.toInt(),
         artifact.rectangleAdjusted.top.toInt(),
         artifact.matrixOriginal,
@@ -149,7 +149,7 @@ class DisplayArtifacts extends CustomPainter {
     for (Artifact artifact in artifactsInTheBand) {
       paintSmallGrid(
         canvas,
-        colors[textify.list.indexOf(artifact) % colors.length],
+        colors[textify.artifacts.indexOf(artifact) % colors.length],
         artifact.rectangleOrinal.left.toInt(),
         artifact.rectangleOrinal.top.toInt(),
         artifact.matrixOriginal,

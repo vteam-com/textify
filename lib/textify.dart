@@ -20,7 +20,7 @@ class Textify {
   List<Band> bands = [];
 
   /// List of artifacts (potential characters) identified in the image.
-  final List<Artifact> list = [];
+  final List<Artifact> artifacts = [];
 
   /// The extracted text from the image.
   String textFound = '';
@@ -41,7 +41,7 @@ class Textify {
   ///
   /// [bandIndex] is the index of the band to retrieve artifacts from.
   List<Artifact> artifactsInBand(final int bandIndex) {
-    return list
+    return artifacts
         .where(
           (final Artifact artifact) => artifact.bandId == bandIndex,
         )
@@ -50,7 +50,7 @@ class Textify {
 
   /// Clears all stored data, resetting the Textify instance.
   void clear() {
-    list.clear();
+    artifacts.clear();
     bands.clear();
     textFound = '';
   }
@@ -82,7 +82,7 @@ class Textify {
   ///
   /// Returns:
   ///   An [int] representing the number of items in the list.
-  int get count => list.length;
+  int get count => artifacts.length;
 
   /// Finds matching character scores for a given artifact.
   ///
@@ -199,7 +199,7 @@ class Textify {
     return _getTextFromArtifacts(supportedCharacters: supportedCharacters);
   }
 
-// Processes a binary image to find, merge, and categorize artifacts.
+  /// Processes a binary image to find, merge, and categorize artifacts.
   ///
   /// This method takes a binary image represented as a [Matrix] and performs
   /// a series of operations to identify and process artifacts within the image.
@@ -255,11 +255,11 @@ class Textify {
   }) {
     List<Artifact> mergedArtifacts = [];
 
-    for (int i = 0; i < list.length; i++) {
-      Artifact current = list[i];
+    for (int i = 0; i < artifacts.length; i++) {
+      Artifact current = artifacts[i];
 
-      for (int j = i + 1; j < list.length; j++) {
-        Artifact next = list[j];
+      for (int j = i + 1; j < artifacts.length; j++) {
+        Artifact next = artifacts[j];
 
         if (_areArtifactsConnected(
           current.rectangleOrinal,
@@ -268,7 +268,7 @@ class Textify {
           horizontalThreshold,
         )) {
           current.mergeArtifact(next);
-          list.removeAt(j);
+          artifacts.removeAt(j);
           j--; // Adjust index since we removed an artifact
         }
       }
@@ -310,21 +310,6 @@ class Textify {
         rect1.top - verticalThreshold <= rect2.bottom);
 
     return horizontallyConnected && verticallyConnected;
-  }
-
-  Rect mergeRectangles(Rect rect1, Rect rect2) {
-    return Rect.fromLTRB(
-      rect1.left < rect2.left
-          ? rect1.left
-          : rect2.left, // Use the leftmost edge
-      rect1.top < rect2.top ? rect1.top : rect2.top, // Use the topmost edge
-      rect1.right > rect2.right
-          ? rect1.right
-          : rect2.right, // Use the rightmost edge
-      rect1.bottom > rect2.bottom
-          ? rect1.bottom
-          : rect2.bottom, // Use the bottommost edge
-    );
   }
 
   /// Extracts an artifact from a binary image based on a list of connected points.
@@ -411,18 +396,18 @@ class Textify {
   void _groupArtifactsIntoBands() {
     double verticalTolerance = 10;
     // Sort artifacts by the top y-position of their rectangles
-    this.list.sort(
+    this.artifacts.sort(
           (a, b) => a.rectangleOrinal.top.compareTo(b.rectangleOrinal.top),
         );
 
     this.bands.clear();
 
-    for (final artifact in this.list) {
+    for (final artifact in this.artifacts) {
       bool foundBand = false;
 
       for (Band band in bands) {
         Rect boundingBox = Band.getBoundingBox(band.artifacts);
-        if (isOverlappingVertically(
+        if (_isOverlappingVertically(
           artifact.rectangleOrinal,
           boundingBox,
           verticalTolerance,
@@ -443,8 +428,28 @@ class Textify {
     }
   }
 
-  // New function to check if an artifact fits within the vertical tolerance of a band's bounding box
-  bool isOverlappingVertically(
+  /// Determines if two rectangles overlap vertically within a specified tolerance.
+  ///
+  /// This function checks if the [artifactRectangle] overlaps vertically with the
+  /// [bandBoundingBox], considering a [verticalTolerance] to allow for small gaps
+  /// or slight overlaps.
+  ///
+  /// Parameters:
+  ///   - bandBoundingBox: The bounding box of the band (usually a larger area).
+  ///   - artifactRectangle: The rectangle of the artifact to check for overlap.
+  ///   - verticalTolerance: A tolerance value to allow for small gaps or overlaps.
+  ///     This value extends the effective vertical range of the bandBoundingBox.
+  ///
+  /// Returns:
+  ///   true if the rectangles overlap vertically within the specified tolerance,
+  ///   false otherwise.
+  ///
+  /// The overlap condition is met if:
+  ///   1. The bottom of the artifact is at or below the top of the band
+  ///      (considering the tolerance), AND
+  ///   2. The top of the artifact is at or above the bottom of the band
+  ///      (considering the tolerance).
+  bool _isOverlappingVertically(
     Rect bandBoundingBox,
     Rect artifactRectangle,
     double verticalTolerance,
@@ -499,7 +504,7 @@ class Textify {
             // discard lines
           } else {
             // Add the found artifact to the list
-            list.add(artifactFound);
+            artifacts.add(artifactFound);
           }
         }
       }
@@ -734,19 +739,19 @@ class Textify {
   ///
   /// Note: This method modifies the original list of artifacts.
   void _mergeOverlappingArtifacts() {
-    final int n = list.length;
+    final int n = artifacts.length;
 
     final Set<Artifact> toRemove = {};
 
     for (int i = 0; i < n; i++) {
-      final artifactA = list[i];
+      final artifactA = artifacts[i];
       if (toRemove.contains(artifactA)) {
         // already merged
         continue;
       }
 
       for (int j = i + 1; j < n; j++) {
-        final artifactB = list[j];
+        final artifactB = artifacts[j];
         if (toRemove.contains(artifactB)) {
           // already merged
           continue;
@@ -759,7 +764,7 @@ class Textify {
       }
     }
 
-    list.removeWhere((artifact) => toRemove.contains(artifact));
+    artifacts.removeWhere((artifact) => toRemove.contains(artifact));
   }
 }
 

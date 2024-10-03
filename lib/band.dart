@@ -10,6 +10,8 @@ class Band {
   /// Creates a new Band with the specified rectangle.
   ///
   Band();
+
+  // unique Band id
   int id = 0;
 
   /// List of artifacts contained within this band.
@@ -34,6 +36,7 @@ class Band {
     return _averageGap;
   }
 
+  /// gap between aach artifact when applying packing
   static int characterSpacing = 4;
 
   /// Gets the average width of artifacts in the band.
