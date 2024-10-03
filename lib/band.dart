@@ -2,7 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:textify/artifact.dart';
 import 'package:textify/matrix.dart';
 
-/// Represents a horizontal band or strip in an image or document.
+/// Represents a horizontal band (aka strip) in an image/document.
 ///
 /// A Band contains multiple [Artifact] objects and provides methods for
 /// analyzing their layout and characteristics.
@@ -11,33 +11,33 @@ class Band {
   ///
   Band();
 
-  // unique Band id
+  /// unique Band id
   int id = 0;
 
   /// List of artifacts contained within this band.
   List<Artifact> artifacts = [];
 
-  // Private fields to store calculated average of space between earh artifacts
-  double _averageGap = -1;
+  /// Private fields to store calculated average of space between earh artifacts
+  double _averageKerning = -1;
 
-  // Private fields to store calculated average of artifact width
+  /// Private fields to store calculated average of artifact width
   double _averageWidth = -1;
 
-  /// Gets the average gap between adjacent artifacts in the band.
+  /// Gets the average kerning between adjacent artifacts in the band.
   ///
   /// Triggers calculation if not previously computed.
   ///
   /// Returns:
-  /// The average gap as a double, or -1 if there are fewer than 2 artifacts.
-  double get averageGap {
-    if ((_averageGap == -1 || _averageWidth == -1)) {
-      calculateAverages();
+  /// The average kerning as a double, or -1 if there are fewer than 2 artifacts.
+  double get averageKerning {
+    if ((_averageKerning == -1 || _averageWidth == -1)) {
+      _updateStatistics();
     }
-    return _averageGap;
+    return _averageKerning;
   }
 
-  /// gap between aach artifact when applying packing
-  static int characterSpacing = 4;
+  /// Kerning between each artifact when applying packing
+  static int kerningWidth = 4;
 
   /// Gets the average width of artifacts in the band.
   ///
@@ -46,13 +46,13 @@ class Band {
   /// Returns:
   /// The average width as a double, or -1 if there are fewer than 2 artifacts.
   double get averageWidth {
-    if ((_averageGap == -1 || _averageWidth == -1)) {
-      calculateAverages();
+    if ((_averageKerning == -1 || _averageWidth == -1)) {
+      _updateStatistics();
     }
     return _averageWidth;
   }
 
-  /// Calculates the average gap between adjacent artifacts and their average width.
+  /// Calculates the average Kerning between adjacent artifacts and their average width.
   ///
   /// This method computes the mean horizontal distance between the right edge of
   /// one artifact and the left edge of the next artifact in the list. It also
@@ -60,26 +60,26 @@ class Band {
   /// to be sorted from left to right.
   ///
   /// If there are fewer than 2 artifacts, both averages are set to -1.
-  void calculateAverages() {
+  void _updateStatistics() {
     if (artifacts.length < 2) {
-      _averageGap = -1;
+      _averageKerning = -1;
       _averageWidth = -1;
       return;
     }
 
     double totalWidth = 0;
-    double totalGap = 0;
+    double totalKerning = 0;
     int count = artifacts.length;
 
     for (int i = 1; i < artifacts.length; i++) {
       final artifact = artifacts[i];
-      double gap = artifact.rectangleAdjusted.left -
+      final double kerning = artifact.rectangleAdjusted.left -
           artifacts[i - 1].rectangleAdjusted.right;
-      totalGap += gap;
+      totalKerning += kerning;
       totalWidth += artifact.rectangleAdjusted.width;
     }
     _averageWidth = totalWidth / count;
-    _averageGap = totalGap / count;
+    _averageKerning = totalKerning / count;
   }
 
   /// Adds an artifact to the collection and resets the cached rectangle.
@@ -116,12 +116,12 @@ class Band {
 
   /// Identifies and inserts space artifacts between existing artifacts in the band.
   ///
-  /// This method analyzes the gaps between artifacts and inserts space artifacts
-  /// where the gap exceeds a certain threshold.
+  /// This method analyzes the Kernings between artifacts and inserts space artifacts
+  /// where the Kerning exceeds a certain threshold.
   ///
   /// The process involves:
-  /// 1. Calculating a threshold gap size based on the average width.
-  /// 2. Iterating through artifacts to identify gaps exceeding the threshold.
+  /// 1. Calculating a threshold Kerning size based on the average width.
+  /// 2. Iterating through artifacts to identify Kernings exceeding the threshold.
   /// 3. Creating a list of artifacts that need spaces inserted before them.
   /// 4. Inserting space artifacts at the appropriate positions.
   ///
@@ -142,9 +142,9 @@ class Band {
         final Artifact artifactRight = this.artifacts[indexOfArtifact];
         var x2 = artifactRight.rectangleOrinal.left;
 
-        final double gap = x2 - x1;
+        final double kerning = x2 - x1;
 
-        if (gap > exceeding) {
+        if (kerning > exceeding) {
           // insert Artifact for Space
           insertInFrontOfTheseArtifacts.add(artifactRight);
         }
@@ -155,8 +155,10 @@ class Band {
       final indexOfArtifact = this.artifacts.indexOf(artifactOnTheRightSide);
       insetArtifactForSpace(
         indexOfArtifact,
-        artifactOnTheRightSide.rectangleOrinal.left - averageWidth - averageGap,
-        artifactOnTheRightSide.rectangleOrinal.left - averageGap,
+        artifactOnTheRightSide.rectangleOrinal.left -
+            averageWidth -
+            averageKerning,
+        artifactOnTheRightSide.rectangleOrinal.left - averageKerning,
       );
     }
   }
@@ -229,7 +231,7 @@ class Band {
           artifact.rectangleOrinal.shift(Offset(dx, dy));
       artifact.rectangleOrinal = artifact.rectangleAdjusted;
       left += artifact.rectangleAdjusted.width;
-      left += characterSpacing;
+      left += kerningWidth;
     }
   }
 
