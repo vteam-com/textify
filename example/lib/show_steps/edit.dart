@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:textify/artifact.dart';
 import 'package:textify/character_definitions.dart';
 import 'package:textify/matrix.dart';
+import 'package:textify/score_match.dart';
 
 import 'package:textify/textify.dart';
 

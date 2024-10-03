@@ -40,4 +40,5 @@
     "explorer.fileNesting.patterns": {
         "pubspec.yaml": "changelog.md, readme.md, privacy.html, license, .metadata, pubspec.lock, analysis_options.yaml, devtools_options.yaml, graph.dot, graph.svg, cSpell.json, .gitignore",
     },
+    "java.compile.nullAnalysis.mode": "disabled",
 }

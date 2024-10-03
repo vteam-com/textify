@@ -6,6 +6,7 @@ import 'package:textify/band.dart';
 import 'package:textify/character_definitions.dart';
 import 'package:textify/image_pipeline.dart';
 import 'package:textify/matrix.dart';
+import 'package:textify/score_match.dart';
 
 /// Textify is a class designed to extract text from clean digital images.
 ///
@@ -766,28 +767,4 @@ class Textify {
 
     artifacts.removeWhere((artifact) => toRemove.contains(artifact));
   }
-}
-
-/// Keep track of evaluation score of Artiface against templates
-class ScoreMatch {
-  // Factory method for creating an empty ScoreMatch
-  factory ScoreMatch.empty() {
-    return ScoreMatch(
-      character: '',
-      matrixIndex: -1,
-      score: 0.0,
-    );
-  }
-  ScoreMatch({
-    required this.character,
-    required this.matrixIndex,
-    required this.score,
-  });
-
-  String character;
-  int matrixIndex;
-  double score;
-
-  // Optional: Method to check if the ScoreMatch is empty
-  bool get isEmpty => character.isEmpty && matrixIndex == -1 && score == 0.0;
 }

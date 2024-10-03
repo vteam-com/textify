@@ -149,7 +149,7 @@ class Matrix {
   ///
   /// Returns false if the coordinates are out of bounds.
   bool cellGet(final int x, final int y) {
-    if (isValidXY(x, y)) {
+    if (_isValidXY(x, y)) {
       return data[y][x];
     }
     return false;
@@ -159,7 +159,7 @@ class Matrix {
   ///
   /// Does nothing if the coordinates are out of bounds.
   void cellSet(final int x, final int y, bool value) {
-    if (isValidXY(x, y)) {
+    if (_isValidXY(x, y)) {
       data[y][x] = value;
     }
   }
@@ -740,8 +740,10 @@ class Matrix {
     return false;
   }
 
+  /// The grid contains one ore more True values
   bool get isEmpty => data.isEmpty;
 
+  /// All entries in the grid are false
   bool get isNotEmpty => data.isEmpty == false;
 
   /// smaller (~30%) in height artifacts will be considered punctuation
@@ -758,7 +760,8 @@ class Matrix {
     return size.height < (rows * 0.40);
   }
 
-  bool isValidXY(final int x, final int y) {
+  /// Ensure that x & y are in the boundary of the grid
+  bool _isValidXY(final int x, final int y) {
     return (x >= 0 && x < cols) && (y >= 0 && y < rows);
   }
 
