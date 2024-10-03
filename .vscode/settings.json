@@ -1,11 +1,6 @@
 {
     "editor.wordWrap": "off",
-    "editor.wordWrapColumn": 120,
     "editor.overviewRulerBorder": false,
-    "editor.rulers": [
-        120
-    ],
-    "yaml.format.printWidth": 120,
     "dart.renameFilesWithClasses": "always",
     "[dart]": {
         "editor.defaultFormatter": "Dart-Code.dart-code"
@@ -17,12 +12,10 @@
         "binarize",
         "binarized",
         "grayscale",
-        "jpdup",
         "LTRB",
         "LTWH",
         "prefs",
         "Rgba",
-        "Suen",
         "textify",
         "Upscaling",
         "vsync",
@@ -43,4 +36,8 @@
         "web": true,
     },
     "cSpell.enabled": true,
+    "cmake.ignoreCMakeListsMissing": true,
+    "explorer.fileNesting.patterns": {
+        "pubspec.yaml": "changelog.md, readme.md, privacy.html, license, .metadata, pubspec.lock, analysis_options.yaml, devtools_options.yaml, graph.dot, graph.svg, cSpell.json, .gitignore",
+    },
 }
