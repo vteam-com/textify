@@ -124,25 +124,8 @@ class Matrix {
   ///
   /// Returns the height-to-width ratio of the bounding box containing all true cells.
   double aspectRatioOfContent() {
-    int minX = cols;
-    int maxX = 0;
-    int minY = rows;
-    int maxY = 0;
-
-    for (int y = 0; y < rows; y++) {
-      for (int x = 0; x < cols; x++) {
-        if (data[y][x]) {
-          minX = min(minX, x);
-          maxX = max(maxX, x);
-          minY = min(minY, y);
-          maxY = max(maxY, y);
-        }
-      }
-    }
-    int width = maxX - minX;
-    int height = maxY - minY;
-
-    return height / width.toDouble(); // Aspect ratio
+    final Size size = _getContentSize();
+    return size.height / size.width; // Aspect ratio
   }
 
   /// Retrieves the value of a cell at the specified coordinates.
@@ -264,6 +247,13 @@ class Matrix {
             desiredHeight,
           );
     }
+  }
+
+  /// Simpler view of the instance
+  @override
+  String toString() {
+    final Size size = _getContentSize();
+    return 'W:$cols H:$rows CW:${size.width} CH:${size.height} isEmpty:$isEmpty E:$enclosures LL:$verticalLineLeft LR:$verticalLineRight';
   }
 
   /// Creates a resized version of the current matrix.
@@ -488,10 +478,12 @@ class Matrix {
   ///   compatible with Flutter's Size class.
   /// - This method is a convenient way to get the dimensions of the content
   ///   without needing the full Rect information.
-  Size getContentSize() {
-    Rect contentRect = getContentRect();
-    return contentRect.size;
+  Size _getContentSize() {
+    return getContentRect().size;
   }
+
+  /// cache the content rect
+  Rect _contentRect = Rect.zero;
 
   /// Calculates the bounding rectangle of the content in the matrix.
   ///
@@ -512,36 +504,40 @@ class Matrix {
   ///   the cell just after the last true cell in each direction).
   Rect getContentRect() {
     if (data.isEmpty || data[0].isEmpty) {
-      return Rect.zero;
+      _contentRect = Rect.zero;
+      return _contentRect;
     }
 
-    int minX = cols;
-    int maxX = -1;
-    int minY = rows;
-    int maxY = -1;
+    if (_contentRect == Rect.zero) {
+      int minX = cols;
+      int maxX = -1;
+      int minY = rows;
+      int maxY = -1;
 
-    for (int y = 0; y < rows; y++) {
-      for (int x = 0; x < cols; x++) {
-        if (data[y][x]) {
-          minX = min(minX, x);
-          maxX = max(maxX, x);
-          minY = min(minY, y);
-          maxY = max(maxY, y);
+      for (int y = 0; y < rows; y++) {
+        for (int x = 0; x < cols; x++) {
+          if (data[y][x]) {
+            minX = min(minX, x);
+            maxX = max(maxX, x);
+            minY = min(minY, y);
+            maxY = max(maxY, y);
+          }
         }
       }
-    }
 
-    // If no content found, return Rect.zero
-    if (maxX == -1 || maxY == -1) {
-      return Rect.zero;
+      // If no content found, return Rect.zero
+      if (maxX == -1 || maxY == -1) {
+        _contentRect = Rect.zero;
+      } else {
+        _contentRect = Rect.fromLTRB(
+          minX.toDouble(),
+          minY.toDouble(),
+          (maxX + 1).toDouble(),
+          (maxY + 1).toDouble(),
+        );
+      }
     }
-
-    return Rect.fromLTRB(
-      minX.toDouble(),
-      minY.toDouble(),
-      (maxX + 1).toDouble(),
-      (maxY + 1).toDouble(),
-    );
+    return _contentRect;
   }
 
   /// Creates a string representation of two overlaid matrices.
@@ -733,30 +729,30 @@ class Matrix {
   /// This method is useful in image processing or OCR tasks where distinguishing
   /// between line-like structures and other shapes is important.
   bool isConsideredLine() {
-    var ar = aspectRatioOfContent();
-    if (ar < 0.25 || ar > 50) {
+    final double ar = aspectRatioOfContent();
+    if (ar < 0.1 || ar > 50) {
       return true;
     }
     return false;
   }
 
-  /// The grid contains one ore more True values
-  bool get isEmpty => data.isEmpty;
+  /// The grid contains one or more True values
+  bool get isEmpty => _getContentSize().isEmpty;
 
   /// All entries in the grid are false
-  bool get isNotEmpty => data.isEmpty == false;
+  bool get isNotEmpty => !isEmpty;
 
   /// smaller (~30%) in height artifacts will be considered punctuation
   bool isPunctuation() {
     // Calculate the height of the content
-    final Size size = getContentSize();
+    final Size size = _getContentSize();
 
     // If there's no content, it's not punctuation
     if (size == Size.zero) {
       return false;
     }
 
-    // Check if the content height is less than 20% of the total height
+    // Check if the content height is less than 40% of the total height
     return size.height < (rows * 0.40);
   }
 

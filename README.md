@@ -5,7 +5,7 @@ Textify is a Flutter package designed to extract text from clean digital images 
 ## Features
 
 - Extracts text from clean digital images
-- Supports standard fonts like Arial, Helvetica, Times New Roman, and Courier
+- Supports standard fonts like [Arial, Courier, Helvetica, Times New Roman]
 - Fully cross-platform
 - Pure Dart and Flutter implementation
 - Offline functionality

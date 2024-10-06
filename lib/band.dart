@@ -125,9 +125,9 @@ class Band {
   /// 3. Creating a list of artifacts that need spaces inserted before them.
   /// 4. Inserting space artifacts at the appropriate positions.
   ///
-  /// The threshold is set at 65% of the average width of artifacts in the band.
+  /// The threshold is set at 75% of the average width of artifacts in the band.
   void identifySpacesInBand() {
-    final double exceeding = this.averageWidth * 0.65; //%
+    final double exceeding = this.averageWidth * 0.75; //%
 
     List<Artifact> insertInFrontOfTheseArtifacts = [];
 
@@ -144,7 +144,7 @@ class Band {
 
         final double kerning = x2 - x1;
 
-        if (kerning > exceeding) {
+        if (kerning >= exceeding) {
           // insert Artifact for Space
           insertInFrontOfTheseArtifacts.add(artifactRight);
         }

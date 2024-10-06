@@ -26,6 +26,9 @@ class Textify {
   /// The extracted text from the image.
   String textFound = '';
 
+  /// Should textify attempt to detect the Space ' ' character
+  bool includeSpaceDetections = true;
+
   /// Initializes the Textify instance by loading character definitions.
   ///
   /// [pathToAssetsDefinition] is the path to the JSON file containing character definitions.
@@ -225,16 +228,18 @@ class Textify {
     // (2) merge overlaping artifact
     _mergeOverlappingArtifacts();
 
-    // // (3) merge proximity artifact for cases like  [i j ; :]
+    // (3) merge proximity artifact for cases like  [i j ; :]
     _mergeConnectedArtifacts(verticalThreshold: 20, horizontalThreshold: 4);
 
     // (4) create band based on proxymity of artifacts
     _groupArtifactsIntoBands();
 
-    // (5)
+    // (5) post-process each band for addition clean up of the artifacts in each band
     for (final Band band in bands) {
       band.sortLeftToRight();
-      band.identifySpacesInBand();
+      if (this.includeSpaceDetections) {
+        band.identifySpacesInBand();
+      }
       band.packArtifactLeftToRight();
     }
   }

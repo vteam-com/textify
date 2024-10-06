@@ -235,11 +235,16 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildImageSourceSelector() {
     return ImageSourceSelector(
       transformationController: _transformationController,
-      onSourceChanged: (final ui.Image? newImage,
-          final List<String> expectedText, final String fontName) {
+      onSourceChanged: (
+        final ui.Image? newImage,
+        final List<String> expectedText,
+        final String fontName,
+        final bool includeSpaceDetection,
+      ) {
         _imageSource = newImage;
         _charactersExpectedToBeFoundInTheImage = expectedText;
         _fontName = fontName;
+        _textify.includeSpaceDetections = includeSpaceDetection;
         _triggetTextifyConvertion();
       },
     );

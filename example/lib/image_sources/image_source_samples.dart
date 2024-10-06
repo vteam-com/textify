@@ -13,7 +13,11 @@ class ImageSourceSamples extends StatefulWidget {
     required this.onImageChanged,
   });
 
-  final Function(ui.Image?, List<String> expectedStrings) onImageChanged;
+  final Function(
+    ui.Image?,
+    List<String> expectedStrings,
+    bool includeSpaceDetection,
+  ) onImageChanged;
   final TransformationController transformationController;
 
   @override
@@ -138,7 +142,7 @@ class _ImageSourceSamplesState extends State<ImageSourceSamples> {
     final ui.Image image =
         await getUiImageFromAsset(getSampleAssetName(_currentIndex));
 
-    widget.onImageChanged(image, getSampeExpectedText(_currentIndex));
+    widget.onImageChanged(image, getSampeExpectedText(_currentIndex), true);
   }
 
   Future<void> _loadLastIndex() async {

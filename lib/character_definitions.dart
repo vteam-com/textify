@@ -130,7 +130,7 @@ class CharacterDefinitions {
   /// [font] The font name for the matrix.
   /// [character] The character this matrix represents.
   /// [matrix] The Matrix object containing the character's pixel data.
-  void upsertTemplate(
+  bool upsertTemplate(
     final String font,
     final String character,
     Matrix matrix,
@@ -143,6 +143,7 @@ class CharacterDefinitions {
         matrices: [matrix],
       );
       _definitions.add(newDefinition);
+      return true;
     } else {
       final existingMatrixIndex =
           found.matrices.indexWhere((m) => m.font == font);
@@ -152,6 +153,7 @@ class CharacterDefinitions {
       } else {
         found.matrices[existingMatrixIndex] = matrix;
       }
+      return false;
     }
   }
 }

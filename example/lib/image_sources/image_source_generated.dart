@@ -1,10 +1,8 @@
 import 'dart:math';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:textify/image_pipeline.dart';
-import 'package:textify/textify.dart';
+import 'package:textify_dashoard/image_sources/update_character_definitions.dart';
 
 import '../../widgets/gap.dart';
 import 'debouce.dart';
@@ -34,8 +32,12 @@ class ImageSourceGenerated extends StatefulWidget {
   });
 
   final Function(
-          ui.Image? image, List<String> expectedCharacters, String fontName)
-      onImageChanged;
+    ui.Image? image,
+    List<String> expectedCharacters,
+    String fontName,
+    bool includeSpaceDetections,
+  ) onImageChanged;
+
   final TransformationController transformationController;
 
   @override
@@ -46,9 +48,9 @@ class _ImageSourceGeneratedState extends State<ImageSourceGenerated> {
   // The list of available fonts
   List<String> availableFonts = [
     'Arial',
+    'Courier',
     'Helvetica',
     'Times New Roman',
-    'CourierPrime',
   ];
 
   Debouncer debouncer = Debouncer(const Duration(milliseconds: 700));
@@ -264,21 +266,33 @@ class _ImageSourceGeneratedState extends State<ImageSourceGenerated> {
     });
   }
 
+  bool containsSpaces(List<String> linesOfText) {
+    for (final line in linesOfText) {
+      if (line.contains(' ')) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   void notify() {
+    final expectedLinesOfText = [
+      _textControllerLine1.text,
+      _textControllerLine2.text,
+      _textControllerLine3.text,
+    ];
+
     debouncer.run(() {
       widget.onImageChanged(
         _imageGenerated,
-        [
-          _textControllerLine1.text,
-          _textControllerLine2.text,
-          _textControllerLine3.text,
-        ],
+        expectedLinesOfText,
         imageSettings.selectedFont,
+        containsSpaces(expectedLinesOfText),
       );
     });
   }
 
-  void resetSettings() async {
+  void resetContent() async {
     setState(() {
       imageSettings = ImageGeneratorInput.empty();
       _textControllerLine1.text = imageSettings.defaultTextLine1;
@@ -291,7 +305,7 @@ class _ImageSourceGeneratedState extends State<ImageSourceGenerated> {
     saveText('textLine2', imageSettings.defaultTextLine2);
     saveText('textLine3', imageSettings.defaultTextLine3);
 
-    // Trigger image regeneration
+    // Let the parent know Trigger image regeneration
     debouncer.run(() {
       widget.onImageChanged(
         _imageGenerated,
@@ -301,46 +315,22 @@ class _ImageSourceGeneratedState extends State<ImageSourceGenerated> {
           _textControllerLine3.text
         ],
         imageSettings.selectedFont,
+        false,
       );
     });
+  }
 
-    final textify = await Textify().init();
-
-    final List<String> allCharacters = (imageSettings.defaultTextLine1 +
-            imageSettings.defaultTextLine2 +
-            imageSettings.defaultTextLine3)
-        .split('');
-
-    for (final fontName in availableFonts) {
-      for (final String char in allCharacters) {
-        final ui.Image newImageSource = await createColorImageSingleCharacter(
-          imageWidth: 40 * 6,
-          imageHeight: 60,
-          character: 'A|$char|W',
-          fontFamily: fontName,
-          fontSize: imageSettings.fontSize.toInt(),
-        );
-
-        final ImagePipeline interimImages =
-            await ImagePipeline.apply(newImageSource);
-
-        textify.findArtifactsFromBinaryImage(interimImages.imageBinary);
-        if (textify.bands.length == 1) {
-          final targetArtifact =
-              textify.bands.first.artifacts[2]; // second character from "A|?|W"
-
-          textify.characterDefinitions.upsertTemplate(
-            fontName,
-            char,
-            targetArtifact.matrixOriginal
-                .createNormalizeMatrix(40, 60), // the second artifact
-          );
-        }
-      }
-    }
-
-    Clipboard.setData(
-      ClipboardData(text: textify.characterDefinitions.toJsonString()),
+  void switchToRegenerateTemplatesScreen() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CharacterGenerationScreen(
+          availableFonts: availableFonts,
+          onComplete: () {
+            resetContent();
+          },
+        ),
+      ),
     );
   }
 
@@ -368,13 +358,22 @@ class _ImageSourceGeneratedState extends State<ImageSourceGenerated> {
   Widget _buildActionButtons() {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: Wrap(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           SizedBox(
-            width: 100,
+            width: 150,
             child: OutlinedButton(
-              onPressed: resetSettings,
+              onPressed: resetContent,
               child: const Text('Reset'),
+            ),
+          ),
+          gap(),
+          SizedBox(
+            width: 150,
+            child: OutlinedButton(
+              onPressed: switchToRegenerateTemplatesScreen,
+              child: const Text('Regenerate'),
             ),
           ),
         ],

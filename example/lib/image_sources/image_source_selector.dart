@@ -14,9 +14,8 @@ class ImageSourceSelector extends StatefulWidget {
     required this.onSourceChanged,
   });
 
-  final Function(
-          ui.Image? imageSelected, List<String> expectedText, String fontName)
-      onSourceChanged;
+  final Function(ui.Image? imageSelected, List<String> expectedText,
+      String fontName, bool includeSpaceDetection) onSourceChanged;
   final TransformationController transformationController;
 
   @override
@@ -34,6 +33,7 @@ class ImageSourceSelectorState extends State<ImageSourceSelector>
 
   List<String> _expectedText = [];
   String _fontName = 'Font???';
+  bool _includeSpaceDetection = true;
 
   // Keep track of user choices
   ui.Image? _imageSelected;
@@ -66,7 +66,11 @@ class ImageSourceSelectorState extends State<ImageSourceSelector>
                 _tabController.animateTo(index);
                 _saveLastTab(index);
                 widget.onSourceChanged(
-                    _imageSelected, _expectedText, _fontName);
+                  _imageSelected,
+                  _expectedText,
+                  _fontName,
+                  _includeSpaceDetection,
+                );
               },
             ),
             IntrinsicHeight(
@@ -84,14 +88,22 @@ class ImageSourceSelectorState extends State<ImageSourceSelector>
       case 1:
         return ImageSourceSamples(
           transformationController: widget.transformationController,
-          onImageChanged:
-              (final ui.Image? image, final List<String> expectedText) async {
+          onImageChanged: (
+            final ui.Image? image,
+            final List<String> expectedText,
+            bool includeSpaceDetection,
+          ) async {
             _imageSelected = image;
             _expectedText = expectedText;
+            _includeSpaceDetection = true;
             if (mounted) {
               setState(() {
                 widget.onSourceChanged(
-                    _imageSelected, _expectedText, _fontName);
+                  _imageSelected,
+                  _expectedText,
+                  _fontName,
+                  _includeSpaceDetection,
+                );
               });
             }
           },
@@ -104,10 +116,15 @@ class ImageSourceSelectorState extends State<ImageSourceSelector>
           onImageChanged: (final ui.Image? newImage) {
             _imageSelected = newImage;
             _expectedText = [];
+            _includeSpaceDetection = true;
             if (mounted) {
               setState(() {
                 widget.onSourceChanged(
-                    _imageSelected, _expectedText, _fontName);
+                  _imageSelected,
+                  _expectedText,
+                  _fontName,
+                  _includeSpaceDetection,
+                );
               });
             }
           },
@@ -118,15 +135,24 @@ class ImageSourceSelectorState extends State<ImageSourceSelector>
       default:
         return ImageSourceGenerated(
           transformationController: widget.transformationController,
-          onImageChanged: (final ui.Image? newImage,
-              final List<String> expectedText, final String fontName) {
+          onImageChanged: (
+            final ui.Image? newImage,
+            final List<String> expectedText,
+            final String fontName,
+            final bool includeSpaceDetections,
+          ) {
             _imageSelected = newImage;
             _expectedText = expectedText;
             _fontName = fontName;
+            _includeSpaceDetection = includeSpaceDetections;
             if (mounted) {
               setState(() {
                 widget.onSourceChanged(
-                    _imageSelected, _expectedText, _fontName);
+                  _imageSelected,
+                  _expectedText,
+                  _fontName,
+                  _includeSpaceDetection,
+                );
               });
             }
           },

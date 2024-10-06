@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.1.1
+
+* 2024-10-06 Use embedded fonts for generating template [Arial, Courier, Helvetica, Times New Roman]
+
 ## 0.1.0
 
 * 2024-10-03 Remove unused function

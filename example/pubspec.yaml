@@ -1,7 +1,7 @@
 name: textify_dashoard
 description: "Explore the Textify pacakage."
 publish_to: "none"
-version: 1.0.0+1
+version: 1.0.2
 
 environment:
   sdk: ^3.5.3
@@ -27,9 +27,18 @@ flutter:
     - assets/samples/
     - assets/samples/
   fonts:
-    - family: CourierPrime
+    - family: Arial
       fonts:
-        - asset: assets/fonts/CourierPrime-Regular.ttf
+        - asset: assets/fonts/arial.ttf
+    - family: Courier
+      fonts:
+        - asset: assets/fonts/courier_new.ttf
+    - family: Helvetica
+      fonts:
+        - asset: assets/fonts/helvetica.ttf
+    - family: Times New Roman
+      fonts:
+        - asset: assets/fonts/times_new_roman.ttf
 
 # dart run flutter_launcher_icons
 flutter_launcher_icons:

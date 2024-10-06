@@ -51,7 +51,7 @@ class _EditScreenState extends State<EditScreen> {
     return RichText(
       text: TextSpan(
         style: const TextStyle(
-          fontFamily: 'CourierPrime',
+          fontFamily: 'Courier',
           fontSize: 8,
         ),
         children: multiLineText.split('\n').expand((line) {
@@ -210,7 +210,7 @@ class _EditScreenState extends State<EditScreen> {
                 title,
                 style: const TextStyle(
                   fontSize: 14,
-                  fontFamily: 'CourierPrime',
+                  fontFamily: 'Courier',
                 ),
               ),
             ),

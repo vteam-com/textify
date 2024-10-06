@@ -16,7 +16,7 @@ class MatchedArtifact extends StatelessWidget {
   Widget build(BuildContext context) {
     const TextStyle style = TextStyle(
       fontSize: 20,
-      fontFamily: 'CourierPrime',
+      fontFamily: 'Courier',
     );
 
     final TextStyle greenStyle =
