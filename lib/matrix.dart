@@ -615,26 +615,37 @@ class Matrix {
   ///
   /// Returns:
   /// A string representation of the matrix. If [forCode] is true, the string
-  /// is formatted as a multi-line Dart string literal.
+  /// is formatted as a multi-line Dart string literal. Otherwise, it's a
+  /// simple string with newline characters separating rows.
   ///
   /// Example:
-  /// If [forCode] is false:
-  /// "#.#\n.#.\n#.#"
+  /// ```dart
+  /// final matrix = Matrix(/* ... */);
   ///
-  /// If [forCode] is true:
-  /// "\"#.#\",\n\".#.\",\n\"#.#\""
+  /// // For display (forCode = false):
+  /// print(matrix.gridToString());
+  /// // Output:
+  /// // #.#
+  /// // .#.
+  /// // #.#
+  ///
+  /// // For code (forCode = true):
+  /// print(matrix.gridToString(forCode: true));
+  /// // Output:
+  /// // "#.#",
+  /// // ".#.",
+  /// // "#.#"
+  /// ```
+  ///
+  /// Note: This method uses [gridToStrings] internally to generate the list
+  /// of strings representing each row of the matrix.
   String gridToString({
     bool forCode = false,
     String onChar = '#',
     String offChar = '.',
   }) {
     final List<String> list = gridToStrings(onChar: onChar, offChar: offChar);
-
-    if (forCode) {
-      String listAsText = list.join('",\n"');
-      return '"$listAsText"';
-    }
-    return list.join('\n');
+    return forCode ? '"${list.join('",\n"')}"' : list.join('\n');
   }
 
   /// Converts the matrix to a list of strings.
@@ -649,7 +660,9 @@ class Matrix {
   /// A List<String> where each string represents a row in the matrix.
   ///
   /// Example:
-  /// ["#.#", ".#.", "#.#"]
+  /// ```dart
+  /// // ["#.#", ".#.", "#.#"]
+  /// ```
   List<String> gridToStrings({
     String onChar = '#',
     String offChar = '.',

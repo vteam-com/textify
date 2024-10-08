@@ -29,6 +29,7 @@ linter:
     always_put_control_body_on_new_line: true
     use_key_in_widget_constructors: true
     directives_ordering: true
+    public_member_api_docs: true
     # sort_constructors_order:
     #   - super
     #   - required
