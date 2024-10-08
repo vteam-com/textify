@@ -12,14 +12,14 @@ void main() async {
   );
 
   final List<String> supportedCharacters =
-      instance.characterDefinitions.getSupportedCharacters();
+      instance.characterDefinitions.supportedCharacters;
 
   test('Character Definitions', () async {
-    expect(instance.characterDefinitions.count, 73);
+    expect(instance.characterDefinitions.count, 90);
 
     expect(
       supportedCharacters.join(),
-      ' \$(),-./0123456789:;ABCDEFGHIJKLMNOPQRSTUVWXYZ\\abcdefghijklmnopqrstuvwxyz',
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 .,?!:;\'"(){}[]<>-/\\+=#\$&*@',
     );
   });
 

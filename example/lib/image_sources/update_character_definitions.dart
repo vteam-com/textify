@@ -72,7 +72,7 @@ class CharacterGenerationBodyState extends State<CharacterGenerationBody> {
     // we only want to detect a single character, skip Space detections
     this.textify.includeSpaceDetections = false;
     _supportedCharacters =
-        this.textify.characterDefinitions.getSupportedCharacters();
+        this.textify.characterDefinitions.supportedCharacters;
 
     for (String char in _supportedCharacters) {
       if (char == ' ') {

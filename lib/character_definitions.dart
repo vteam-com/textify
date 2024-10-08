@@ -53,11 +53,12 @@ class CharacterDefinitions {
   }
 
   /// Returns a sorted list of all supported characters.
-  List<String> getSupportedCharacters() {
-    final List<String> list =
-        _definitions.map((entry) => entry.character).toList();
-    list.sort();
-    return list;
+  List<String> get supportedCharacters {
+    return letterUpperCase +
+        letterLowerCase +
+        digits +
+        punctuationMarks +
+        otherCharacters;
   }
 
   /// Retrieves the template as a list of strings for a given character.
@@ -157,3 +158,112 @@ class CharacterDefinitions {
     }
   }
 }
+
+/// All Characters representing Letters in upper case
+List<String> letterUpperCase = [
+  'A',
+  'B',
+  'C',
+  'D',
+  'E',
+  'F',
+  'G',
+  'H',
+  'I',
+  'J',
+  'K',
+  'L',
+  'M',
+  'N',
+  'O',
+  'P',
+  'Q',
+  'R',
+  'S',
+  'T',
+  'U',
+  'V',
+  'W',
+  'X',
+  'Y',
+  'Z',
+];
+
+/// All Characters representing Letters in lower case
+List<String> letterLowerCase = [
+  'a',
+  'b',
+  'c',
+  'd',
+  'e',
+  'f',
+  'g',
+  'h',
+  'i',
+  'j',
+  'k',
+  'l',
+  'm',
+  'n',
+  'o',
+  'p',
+  'q',
+  'r',
+  's',
+  't',
+  'u',
+  'v',
+  'w',
+  'x',
+  'y',
+  'z',
+];
+
+/// All Characters representing Digits
+List<String> digits = [
+  '0',
+  '1',
+  '2',
+  '3',
+  '4',
+  '5',
+  '6',
+  '7',
+  '8',
+  '9',
+];
+
+/// All Characters representing punctuation
+List<String> punctuationMarks = [
+  ' ', // Space
+  '.', // Period
+  ',', // Comma
+  '?', // Question Mark
+  '!', // Exclamation Mark
+  ':', // Colon
+  ';', // Semicolon
+  "'", // Apostrophe
+  '"', // Quotation Marks
+  '(', // Parentheses
+  ')', // Parentheses
+  '{', // Brackets Curly open
+  '}', // Brackets Curly close
+  '[', // Brackets Square open
+  ']', // Brackets Square close
+  '<', // Brackets Angle open
+  '>', // Brackets Angle close
+  '-', // Dash
+];
+
+/// All Characters not digits, letters or punctuation
+List<String> otherCharacters = [
+  '/', // Slash
+  '\\', // Back Slash
+  '+', // Plus (the minus is a dash punctuation)
+  '=', // Back Slash
+  '#', // Hash
+  '\$', // Dollar
+  '&', //
+  '*', //
+  '@', //
+];
