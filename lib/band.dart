@@ -258,7 +258,7 @@ class Band {
     return _rectangle;
   }
 
-  // Return the unified bounding box for all artifacts in the band
+  /// Return the unified bounding box for all artifacts in the band
   static Rect getBoundingBox(List<Artifact> artifacts) {
     if (artifacts.isEmpty) {
       return Rect.zero;

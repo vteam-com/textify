@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 0.1.2
+
+* 2024-10-08 Add support for characters  ! @ # & * - + = { } [ ] < > ?
+
 ## 0.1.1
 
 * 2024-10-06 Use embedded fonts for generating template [Arial, Courier, Helvetica, Times New Roman]

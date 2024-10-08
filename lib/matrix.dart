@@ -249,7 +249,8 @@ class Matrix {
     }
   }
 
-  /// Simpler view of the instance
+  /// Returns:
+  /// A string representation ths Matrix.
   @override
   String toString() {
     final Size size = _getContentSize();

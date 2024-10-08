@@ -1,5 +1,4 @@
 import 'dart:ui' as ui;
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:textify/artifact.dart';
@@ -43,11 +42,12 @@ class CharacterGenerationBody extends StatefulWidget {
   CharacterGenerationBodyState createState() => CharacterGenerationBodyState();
 }
 
-class Problem {
-  Problem(this.character, this.artifacts, this.description);
+class ProcessedCharacter {
+  ProcessedCharacter(this.character);
   String character = '';
   List<Artifact> artifacts = [];
-  String description = '';
+  List<String> description = [];
+  List<String> problems = [];
 }
 
 class CharacterGenerationBodyState extends State<CharacterGenerationBody> {
@@ -55,12 +55,15 @@ class CharacterGenerationBodyState extends State<CharacterGenerationBody> {
   bool _completed = false;
   bool _cancel = false;
   late final Textify textify;
-  List<String> log = [];
-  List<Problem> logProblems = [];
+  List _supportedCharacters = [];
+  Map<String, ProcessedCharacter> processedCharacters = {};
+  String displayDetailsForCharacter = '';
+  String displayDetailsForCharacterProblems = '';
 
   @override
   void initState() {
     super.initState();
+
     _generateCharacters();
   }
 
@@ -68,9 +71,12 @@ class CharacterGenerationBodyState extends State<CharacterGenerationBody> {
     this.textify = await Textify().init();
     // we only want to detect a single character, skip Space detections
     this.textify.includeSpaceDetections = false;
+    _supportedCharacters =
+        this.textify.characterDefinitions.getSupportedCharacters();
 
-    for (String char in textify.characterDefinitions.getSupportedCharacters()) {
+    for (String char in _supportedCharacters) {
       if (char == ' ') {
+        processedCharacters[char] = (ProcessedCharacter(char));
         continue;
       }
       if (_cancel) {
@@ -87,53 +93,99 @@ class CharacterGenerationBodyState extends State<CharacterGenerationBody> {
     widget.onComplete(); // Call the completion function when done
   }
 
+  Color _getColorForCharacerBorder(final String char) {
+    ProcessedCharacter? pc = processedCharacters[char];
+    if (pc == null) {
+      return Colors.grey;
+    }
+    return pc.problems.isEmpty ? Colors.green : Colors.orange;
+  }
+
+  Widget _buildProgress() {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text(_completed ? 'Completed' : 'Processing'),
+        ),
+        Wrap(
+          spacing: 4,
+          runSpacing: 8,
+          alignment: WrapAlignment.center,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: _supportedCharacters.map((char) {
+            // Check if the character is the current character
+            final bool isCurrentChar =
+                char == _currentChar && _completed == false;
+            return OutlinedButton(
+              style: OutlinedButton.styleFrom(
+                side: BorderSide(color: _getColorForCharacerBorder(char)),
+              ),
+              onPressed: () {
+                setState(() {
+                  displayDetailsForCharacter = char;
+                  ProcessedCharacter? pc = processedCharacters[char];
+                  displayDetailsForCharacterProblems =
+                      pc!.description.join('\n');
+                });
+              },
+              child: Text(
+                char,
+                style: TextStyle(
+                  fontFamily: 'Courier',
+                  fontWeight: ui.FontWeight.bold,
+                  fontSize: 20, // Larger font for current char
+                  color: isCurrentChar && _completed == false
+                      ? Colors.blue
+                      : Colors.white, // Blue for current char
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDetailsOfCharacter(final String char) {
+    final ProcessedCharacter? pc = processedCharacters[char];
+
+    return Column(
+      children: [
+        Text(
+          displayDetailsForCharacter,
+          style: const TextStyle(fontSize: 100),
+        ),
+        Text(displayDetailsForCharacterProblems),
+        if (pc != null)
+          Expanded(
+            child: Center(
+              child: Wrap(
+                alignment: WrapAlignment.center,
+                spacing: 10,
+                runSpacing: 10,
+                children: pc.artifacts.map((artifact) {
+                  return Text(
+                    style: TextStyle(fontFamily: 'Courier', fontSize: 5),
+                    artifact.matrixOriginal.gridToString(),
+                  );
+                }).toList(),
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(40.0),
       child: Column(
         children: [
-          Center(
-            child: Text(
-              textAlign: ui.TextAlign.center,
-              'Processing character\n\n"$_currentChar"',
-              style: const TextStyle(fontSize: 24),
-            ),
-          ),
+          Center(child: _buildProgress()),
           Expanded(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: log.length,
-                    itemBuilder: (context, index) {
-                      return Text(log[index]);
-                    },
-                  ),
-                ),
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: logProblems.length,
-                    itemBuilder: (context, index) {
-                      final problem = logProblems[index];
-                      return ListTile(
-                        title: Text(problem.character),
-                        subtitle: Row(
-                          children: problem.artifacts.map((artifact) {
-                            return Text(
-                              style:
-                                  TextStyle(fontFamily: 'Courier', fontSize: 5),
-                              artifact.matrixOriginal.gridToString(),
-                            );
-                          }).toList(),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
+            child: _buildDetailsOfCharacter(displayDetailsForCharacter),
           ),
           gap(),
           Row(
@@ -154,7 +206,7 @@ class CharacterGenerationBodyState extends State<CharacterGenerationBody> {
               gap(),
               if (_completed)
                 OutlinedButton(
-                  child: Text('Copy'),
+                  child: Text('Copy as "matrices.json"'),
                   onPressed: () {
                     Clipboard.setData(
                       ClipboardData(
@@ -170,52 +222,62 @@ class CharacterGenerationBodyState extends State<CharacterGenerationBody> {
   }
 
   Future<void> updateEachCharactersForEveryFonts(String char) async {
-    log.add('\n"$char"');
+    final processedCharacter = ProcessedCharacter(char);
+    List<dynamic> problems = [];
+
     for (final fontName in widget.availableFonts) {
-      final ui.Image newImageSource = await createColorImageSingleCharacter(
-        imageWidth: 40 * 6,
-        imageHeight: 60,
-        character: 'A $char W',
-        fontFamily: fontName,
-        fontSize: imageSettings.fontSize.toInt(),
-      );
+      final problemsFound =
+          await upadeteSingleCharSingleFont(char, fontName, processedCharacter);
+      problems.addAll(problemsFound);
+    }
+    processedCharacters[char] = processedCharacter;
+  }
 
-      final ImagePipeline interimImages =
-          await ImagePipeline.apply(newImageSource);
+  Future<List<dynamic>> upadeteSingleCharSingleFont(
+    String char,
+    String fontName,
+    ProcessedCharacter processedCharacter,
+  ) async {
+    List<dynamic> problems = [];
 
-      textify.findArtifactsFromBinaryImage(interimImages.imageBinary);
-      if (textify.bands.length == 1) {
-        List<Artifact> artifactsInTheFirstBand = textify.bands.first.artifacts;
+    final ui.Image newImageSource = await createColorImageSingleCharacter(
+      imageWidth: 40 * 6,
+      imageHeight: 60,
+      character: 'A $char W',
+      fontFamily: fontName,
+      fontSize: imageSettings.fontSize.toInt(),
+    );
 
-        final artifactsInTheFirstBandNoSpaces = artifactsInTheFirstBand
-            .where((Artifact artifact) => artifact.matrixOriginal.isNotEmpty)
-            .toList();
-        if (artifactsInTheFirstBandNoSpaces.length == 3) {
-          final targetArtifact = artifactsInTheFirstBandNoSpaces[
-              1]; // second character from "A?W" skip spaces
+    final ImagePipeline interimImages =
+        await ImagePipeline.apply(newImageSource);
 
-          final Matrix matrix =
-              targetArtifact.matrixOriginal.createNormalizeMatrix(40, 60);
-          final bool wasNewDefinition =
-              textify.characterDefinitions.upsertTemplate(
-            fontName,
-            char,
-            matrix,
-          );
-          String problem = '';
-          if (char != ' ' && matrix.isEmpty) {
-            problem = '***** NO Content found';
-          }
-          String logEntry = '$fontName $matrix New:$wasNewDefinition $problem';
-          log.add(logEntry);
-          if (problem.isNotEmpty) {
-            logProblems.add(Problem(char, [targetArtifact], logEntry));
-          }
+    textify.findArtifactsFromBinaryImage(interimImages.imageBinary);
+    if (textify.bands.length == 1) {
+      List<Artifact> artifactsInTheFirstBand = textify.bands.first.artifacts;
+
+      final artifactsInTheFirstBandNoSpaces = artifactsInTheFirstBand
+          .where((Artifact artifact) => artifact.matrixOriginal.isNotEmpty)
+          .toList();
+      if (artifactsInTheFirstBandNoSpaces.length == 3) {
+        final targetArtifact = artifactsInTheFirstBandNoSpaces[
+            1]; // second character from "A?W" skip spaces
+
+        final Matrix matrix =
+            targetArtifact.matrixOriginal.createNormalizeMatrix(40, 60);
+        final wasNewDefinition =
+            textify.characterDefinitions.upsertTemplate(fontName, char, matrix);
+        if (matrix.isEmpty) {
+          processedCharacter.problems.add('***** NO Content found');
         } else {
-          logProblems.add(Problem(char, artifactsInTheFirstBand,
-              'Band has ${artifactsInTheFirstBandNoSpaces.length} artifacts'));
+          processedCharacter.description
+              .add('$fontName  IsNew:$wasNewDefinition    $matrix');
         }
+        processedCharacter.artifacts.add(targetArtifact);
+      } else {
+        processedCharacter.problems.add('Not found');
+        processedCharacter.artifacts.addAll(artifactsInTheFirstBand);
       }
     }
+    return problems;
   }
 }
