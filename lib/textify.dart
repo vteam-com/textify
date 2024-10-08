@@ -29,6 +29,9 @@ class Textify {
   /// Should textify attempt to detect the Space ' ' character
   bool includeSpaceDetections = true;
 
+  /// Ignore horizontal and vertical lines
+  bool excludeLongLines = true;
+
   /// Initializes the Textify instance by loading character definitions.
   ///
   /// [pathToAssetsDefinition] is the path to the JSON file containing character definitions.
@@ -506,7 +509,8 @@ class Textify {
             connectedPoints,
           );
 
-          if (artifactFound.matrixOriginal.isConsideredLine()) {
+          if (excludeLongLines &&
+              artifactFound.matrixOriginal.isConsideredLine()) {
             // discard lines
           } else {
             // Add the found artifact to the list

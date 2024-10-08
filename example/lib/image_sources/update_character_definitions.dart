@@ -71,6 +71,7 @@ class CharacterGenerationBodyState extends State<CharacterGenerationBody> {
     this.textify = await Textify().init();
     // we only want to detect a single character, skip Space detections
     this.textify.includeSpaceDetections = false;
+    this.textify.excludeLongLines = false;
     _supportedCharacters =
         this.textify.characterDefinitions.supportedCharacters;
 
@@ -165,9 +166,21 @@ class CharacterGenerationBodyState extends State<CharacterGenerationBody> {
                 spacing: 10,
                 runSpacing: 10,
                 children: pc.artifacts.map((artifact) {
-                  return Text(
-                    style: TextStyle(fontFamily: 'Courier', fontSize: 5),
-                    artifact.matrixOriginal.gridToString(),
+                  return DecoratedBox(
+                    decoration:
+                        BoxDecoration(border: Border.all(color: Colors.grey)),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        style: TextStyle(
+                            fontFamily: 'Courier',
+                            fontSize: 5,
+                            color: pc.problems.isEmpty
+                                ? Colors.green
+                                : Colors.orange),
+                        artifact.matrixOriginal.gridToString(),
+                      ),
+                    ),
                   );
                 }).toList(),
               ),
@@ -223,61 +236,101 @@ class CharacterGenerationBodyState extends State<CharacterGenerationBody> {
 
   Future<void> updateEachCharactersForEveryFonts(String char) async {
     final processedCharacter = ProcessedCharacter(char);
-    List<dynamic> problems = [];
 
     for (final fontName in widget.availableFonts) {
-      final problemsFound =
-          await upadeteSingleCharSingleFont(char, fontName, processedCharacter);
-      problems.addAll(problemsFound);
+      await updateSingleCharSingleFont(char, fontName, processedCharacter);
+      setState(() {
+        // update
+      });
     }
     processedCharacters[char] = processedCharacter;
   }
 
-  Future<List<dynamic>> upadeteSingleCharSingleFont(
+  /// Updates the character definition for a single character and a single font.
+  ///
+  /// This function generates an image for the given character and font, processes
+  /// the image to find artifacts, and updates the character definition accordingly.
+  ///
+  /// Args:
+  ///   char: The character to be processed.
+  ///   fontName: The name of the font to be used.
+  ///   processedCharacter: An object to store the processed character information.
+  ///
+  /// Returns:
+  ///   A list of dynamic problems encountered during the processing.
+  Future<void> updateSingleCharSingleFont(
     String char,
     String fontName,
     ProcessedCharacter processedCharacter,
   ) async {
-    List<dynamic> problems = [];
-
+    // Generate an image for the character and font
     final ui.Image newImageSource = await createColorImageSingleCharacter(
       imageWidth: 40 * 6,
       imageHeight: 60,
+      // Surround the character with 'A' and 'W' for better detection
       character: 'A $char W',
       fontFamily: fontName,
       fontSize: imageSettings.fontSize.toInt(),
     );
 
+    // Apply image processing pipeline
     final ImagePipeline interimImages =
         await ImagePipeline.apply(newImageSource);
 
+    // Find artifacts from the binary image
     textify.findArtifactsFromBinaryImage(interimImages.imageBinary);
-    if (textify.bands.length == 1) {
-      List<Artifact> artifactsInTheFirstBand = textify.bands.first.artifacts;
 
+    // If there is only one band (expected for a single character)
+    if (textify.bands.length == 1) {
+      final List<Artifact> artifactsInTheFirstBand =
+          textify.bands.first.artifacts;
+
+      // Filter out artifacts with empty matrices (spaces)
       final artifactsInTheFirstBandNoSpaces = artifactsInTheFirstBand
           .where((Artifact artifact) => artifact.matrixOriginal.isNotEmpty)
           .toList();
+
+      // If there are exactly three artifacts (expected for a single character)
       if (artifactsInTheFirstBandNoSpaces.length == 3) {
         final targetArtifact = artifactsInTheFirstBandNoSpaces[
-            1]; // second character from "A?W" skip spaces
+            1]; // The middle artifact is the target
 
+        // Create a normalized matrix for the character definition
         final Matrix matrix =
             targetArtifact.matrixOriginal.createNormalizeMatrix(40, 60);
+
+        // Update the character definition with the new matrix
         final wasNewDefinition =
             textify.characterDefinitions.upsertTemplate(fontName, char, matrix);
+
+        // If the matrix is empty, add a problem message
         if (matrix.isEmpty) {
           processedCharacter.problems.add('***** NO Content found');
         } else {
+          // Add a description with the font name, whether it's a new definition, and the matrix
           processedCharacter.description
               .add('$fontName  IsNew:$wasNewDefinition    $matrix');
         }
+
+        // Add the target artifact to the processed character
         processedCharacter.artifacts.add(targetArtifact);
       } else {
+        // If the number of artifacts is not 3, add a problem message
         processedCharacter.problems.add('Not found');
-        processedCharacter.artifacts.addAll(artifactsInTheFirstBand);
+
+        // Merge all artifacts into the first one
+        if (artifactsInTheFirstBandNoSpaces.isNotEmpty) {
+          final firstArtifact = artifactsInTheFirstBandNoSpaces[0];
+          for (int i = 1; i < artifactsInTheFirstBandNoSpaces.length; i++) {
+            firstArtifact.mergeArtifact(artifactsInTheFirstBandNoSpaces[i]);
+          }
+          processedCharacter.artifacts
+              .add(firstArtifact); // Add the merged artifact
+        } else {
+          processedCharacter.problems.add(
+              'No artifacts found'); // Add a problem message if no artifacts were found
+        }
       }
     }
-    return problems;
   }
 }
