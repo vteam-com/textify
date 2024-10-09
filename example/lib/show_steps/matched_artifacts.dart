@@ -147,25 +147,78 @@ double getPercentageOfMatches(List<String> expectedStrings, String textFound) {
     return 0;
   }
 
-  int matchCount = 0;
   List<String> stringsFound = textFound.split('\n');
+
+  double totalPercentages = 0;
 
   // Implement distance matching
   for (int i = 0; i < expectedStrings.length && i < stringsFound.length; i++) {
     String expected = expectedStrings[i];
     String found = stringsFound[i];
 
-    // Calculate Levenshtein distance
-    int distance = damerauLevenshteinDistance(expected, found);
-
-    // Consider it a match if the distance is less than 30% of the expected string length
-    if (distance <= (expected.length * 0.3).round()) {
-      matchCount++;
-    }
+    double singleResult = compareStringInPercentage(expected, found);
+    totalPercentages += singleResult;
   }
 
-  double percentage = (matchCount / expectedStrings.length) * 100;
+  double percentage = totalPercentages / expectedStrings.length;
   return percentage;
+}
+
+/// Compares two strings and returns their similarity as a percentage.
+///
+/// This function uses the Levenshtein distance algorithm to calculate the
+/// edit distance between the two strings, and then converts it to a percentage
+/// based on the maximum length of the strings.
+///
+/// If the two strings are identical, it returns 100.0. If either string is
+/// empty, it returns 0.0.
+///
+/// Example usage:
+///
+/// ```dart
+/// String s1 = "hello";
+/// String s2 = "hallo";
+/// double similarity = compareStringInPercentage(s1, s2);
+/// print("Similarity: ${similarity.toStringAsFixed(2)}%"); // Output: Similarity: 80.00%
+/// ```
+///
+/// Parameters:
+///   s1: The first string to compare.
+///   s2: The second string to compare.
+///
+/// Returns:
+///   A double value representing the similarity percentage between the two
+///   strings, clamped between 0.0 and 100.0.
+double compareStringInPercentage(final String s1, final String s2) {
+  if (s1 == s2) return 100.0;
+  if (s1.isEmpty || s2.isEmpty) return 0.0;
+
+  final int len1 = s1.length;
+  final int len2 = s2.length;
+
+  List<int> prevRow = List<int>.generate(len2 + 1, (i) => i);
+  List<int> currentRow = List<int>.filled(len2 + 1, 0);
+
+  for (int i = 0; i < len1; i++) {
+    currentRow[0] = i + 1;
+
+    for (int j = 0; j < len2; j++) {
+      int insertCost = currentRow[j] + 1;
+      int deleteCost = prevRow[j + 1] + 1;
+      int replaceCost = prevRow[j] + (s1[i] != s2[j] ? 1 : 0);
+
+      currentRow[j + 1] = [insertCost, deleteCost, replaceCost].reduce(min);
+    }
+
+    var temp = prevRow;
+    prevRow = currentRow;
+    currentRow = temp;
+  }
+
+  int levenshteinDistance = prevRow[len2];
+  int maxLength = max(len1, len2);
+
+  return ((1 - levenshteinDistance / maxLength) * 100).clamp(0.0, 100.0);
 }
 
 int damerauLevenshteinDistance(String source, String target) {
