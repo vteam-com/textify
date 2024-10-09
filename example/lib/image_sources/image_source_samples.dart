@@ -28,15 +28,15 @@ class _ImageSourceSamplesState extends State<ImageSourceSamples> {
   final List<ImageData> imageFileData = [
     ImageData(
       'generated_odd_colors.png',
-      'ABCDEFGHI JKLMNOPQR STUVWXYZ 0123456789',
+      'ABCDEFGHI\nJKLMNOPQR\nSTUVWXYZ 0123456789',
     ),
     ImageData(
       'black-on-white-rounded.png',
-      'ABCDE FGHIJ KLMN OPQRS TUVW XYZ',
+      'ABCDE\nFGHIJ\nKLMN\nOPQRS\nTUVW\nXYZ',
     ),
     ImageData(
       'black-on-white-typewriter.png',
-      'ABCDEFGH IJKLMNOP QRSTUVWX YZ',
+      'A B C D E F G H\nI J K L M N O P\nQ R S T U V W X\nY Z',
     ),
     ImageData(
       'back-on-white-the_example_text.png',
@@ -44,11 +44,11 @@ class _ImageSourceSamplesState extends State<ImageSourceSamples> {
     ),
     ImageData(
       'classy.png',
-      'ABCDE FGHIJK LMNOP QRSTUV WXYZ',
+      'ABCDE\nFGHIJK\nLMNOP\nQRSTUV\nWXYZ',
     ),
     ImageData(
       'upper-case-alphabet-times-700x490.jpg',
-      'ABCDEFG HIJKLMN OPQRSTU VWXYZ',
+      'ABCDEFG\nHIJKLMN\nOPQRSTU\nVWXYZ',
     ),
     ImageData(
       'lines-circles.png',
@@ -56,7 +56,7 @@ class _ImageSourceSamplesState extends State<ImageSourceSamples> {
     ),
     ImageData(
       'color-on-white-gummy.png',
-      'ABCDEF GHIJKL MNOPQ RSTUV WXYZ',
+      'ABCDEF\nGHIJKL\nMNOPQ\nRSTUV\nWXYZ',
     ),
     ImageData(
       'bank-statement.png',
@@ -112,7 +112,11 @@ class _ImageSourceSamplesState extends State<ImageSourceSamples> {
     if (index < 0 && index >= imageFileData.length) {
       index = 0;
     }
-    return [imageFileData[index].expected];
+    if (imageFileData[index].expected.isEmpty) {
+      return [];
+    } else {
+      return imageFileData[index].expected.split('\n');
+    }
   }
 
   String getSampleAssetName(int index) {
