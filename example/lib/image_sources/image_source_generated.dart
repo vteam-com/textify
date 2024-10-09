@@ -54,6 +54,8 @@ class _ImageSourceGeneratedState extends State<ImageSourceGenerated> {
   ];
 
   Debouncer debouncer = Debouncer(const Duration(milliseconds: 700));
+  Debouncer debouncerGenerteImage =
+      Debouncer(const Duration(milliseconds: 400));
 
   final TextEditingController _textControllerLine1 = TextEditingController();
   final TextEditingController _textControllerLine2 = TextEditingController();
@@ -62,41 +64,44 @@ class _ImageSourceGeneratedState extends State<ImageSourceGenerated> {
   // The image that will be use for detecting the text
   ui.Image? _imageGenerated;
 
-  bool _isLoading = true;
-
   @override
   void initState() {
     super.initState();
+
     loadSavedText().then((_) {
       setState(() {
         _textControllerLine1.text = imageSettings.defaultTextLine1;
         _textControllerLine2.text = imageSettings.defaultTextLine2;
         _textControllerLine3.text = imageSettings.defaultTextLine3;
-        _isLoading = false;
+        inputHasChanged();
       });
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
     // adapt to screen size layout
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        buildControllers(),
+        _buildDashboardInputs(),
         Expanded(
           child: PanelContent(
             start: const SizedBox(),
-            middle: InteractiveViewer(
-              constrained: false,
-              minScale: 0.1,
-              maxScale: 50,
-              transformationController: widget.transformationController,
-              child: showImage(),
-            ),
+            middle: _imageGenerated == null
+                ? Center(child: Text('Loading...'))
+                : InteractiveViewer(
+                    constrained: false,
+                    minScale: 0.1,
+                    maxScale: 50,
+                    transformationController: widget.transformationController,
+                    child: RawImage(
+                      image: _imageGenerated,
+                      width: _imageGenerated!.width.toDouble(),
+                      height: _imageGenerated!.height.toDouble(),
+                      fit: BoxFit.contain,
+                    ),
+                  ),
             end: _buildActionButtons(),
           ),
         ),
@@ -104,8 +109,8 @@ class _ImageSourceGeneratedState extends State<ImageSourceGenerated> {
     );
   }
 
-  /// Builds the controllers for font size and font selection.
-  Widget buildControllers() {
+  /// Builds the input dahsboard, for customizing, FontSize,FontFamily and text input.
+  Widget _buildDashboardInputs() {
     return Padding(
       padding: const EdgeInsets.all(20.0),
       child: Row(
@@ -156,7 +161,9 @@ class _ImageSourceGeneratedState extends State<ImageSourceGenerated> {
             label: imageSettings.fontSize.toString(),
             onChanged: (value) {
               setState(() {
+                // this widge we need to call setState in order to show the UI animation of the slider
                 imageSettings.fontSize = value.round().toDouble();
+                inputHasChanged();
               });
             },
           ),
@@ -183,9 +190,8 @@ class _ImageSourceGeneratedState extends State<ImageSourceGenerated> {
           }).toList(),
           onChanged: (String? newValue) {
             if (newValue != null) {
-              setState(() {
-                imageSettings.selectedFont = newValue;
-              });
+              imageSettings.selectedFont = newValue;
+              inputHasChanged();
             }
           },
         ),
@@ -203,10 +209,9 @@ class _ImageSourceGeneratedState extends State<ImageSourceGenerated> {
         labelText: 'Line 1',
       ),
       onChanged: (text) {
-        setState(() {
-          imageSettings.defaultTextLine1 = text;
-          saveText('textLine1', text);
-        });
+        imageSettings.defaultTextLine1 = text;
+        saveText('textLine1', text);
+        inputHasChanged();
       },
     );
   }
@@ -221,10 +226,9 @@ class _ImageSourceGeneratedState extends State<ImageSourceGenerated> {
         labelText: 'Line 2',
       ),
       onChanged: (text) {
-        setState(() {
-          imageSettings.defaultTextLine2 = text;
-          saveText('textLine2', text);
-        });
+        imageSettings.defaultTextLine2 = text;
+        saveText('textLine2', text);
+        inputHasChanged();
       },
     );
   }
@@ -239,10 +243,9 @@ class _ImageSourceGeneratedState extends State<ImageSourceGenerated> {
         labelText: 'Line 3',
       ),
       onChanged: (text) {
-        setState(() {
-          imageSettings.defaultTextLine3 = text;
-          saveText('textLine3', text);
-        });
+        imageSettings.defaultTextLine3 = text;
+        saveText('textLine3', text);
+        inputHasChanged();
       },
     );
   }
@@ -276,13 +279,13 @@ class _ImageSourceGeneratedState extends State<ImageSourceGenerated> {
   }
 
   void notify() {
-    final expectedLinesOfText = [
-      _textControllerLine1.text,
-      _textControllerLine2.text,
-      _textControllerLine3.text,
-    ];
-
     debouncer.run(() {
+      final List<String> expectedLinesOfText = [
+        _textControllerLine1.text,
+        _textControllerLine2.text,
+        _textControllerLine3.text,
+      ];
+
       widget.onImageChanged(
         _imageGenerated,
         expectedLinesOfText,
@@ -292,13 +295,17 @@ class _ImageSourceGeneratedState extends State<ImageSourceGenerated> {
     });
   }
 
-  void resetContent() async {
-    setState(() {
-      imageSettings = ImageGeneratorInput.empty();
-      _textControllerLine1.text = imageSettings.defaultTextLine1;
-      _textControllerLine2.text = imageSettings.defaultTextLine2;
-      _textControllerLine3.text = imageSettings.defaultTextLine3;
+  void inputHasChanged() {
+    debouncerGenerteImage.run(() {
+      _generateImage();
     });
+  }
+
+  void resetContent() async {
+    imageSettings = ImageGeneratorInput.empty();
+    _textControllerLine1.text = imageSettings.defaultTextLine1;
+    _textControllerLine2.text = imageSettings.defaultTextLine2;
+    _textControllerLine3.text = imageSettings.defaultTextLine3;
 
     // Save the reset text
     saveText('textLine1', imageSettings.defaultTextLine1);
@@ -306,17 +313,8 @@ class _ImageSourceGeneratedState extends State<ImageSourceGenerated> {
     saveText('textLine3', imageSettings.defaultTextLine3);
 
     // Let the parent know Trigger image regeneration
-    debouncer.run(() {
-      widget.onImageChanged(
-        _imageGenerated,
-        [
-          _textControllerLine1.text,
-          _textControllerLine2.text,
-          _textControllerLine3.text
-        ],
-        imageSettings.selectedFont,
-        false,
-      );
+    setState(() {
+      _generateImage();
     });
   }
 
@@ -337,22 +335,6 @@ class _ImageSourceGeneratedState extends State<ImageSourceGenerated> {
   Future<void> saveText(String key, String value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(key, value);
-  }
-
-  Widget showImage() {
-    return FutureBuilder(
-      future: _buildGenerateImageWidget(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasError) {
-          return Text('Error: ${snapshot.error}');
-        } else if (snapshot.hasData) {
-          return snapshot.data!;
-        }
-        return Container();
-      },
-    );
   }
 
   Widget _buildActionButtons() {
@@ -382,9 +364,9 @@ class _ImageSourceGeneratedState extends State<ImageSourceGenerated> {
   }
 
   /// Builds a quick preview of the text with the selected font and size.
-  Future<Widget> _buildGenerateImageWidget() async {
+  Future<void> _generateImage() async {
     if (lastImageSettingsUseForImageSource != imageSettings) {
-      final ui.Image newImageSource = await createColorImageUsingTextPainter(
+      await createColorImageUsingTextPainter(
         fontFamily: imageSettings.selectedFont,
         backgroundColor: imageSettings.imageBackgroundColor,
         text1: _textControllerLine1.text,
@@ -394,25 +376,13 @@ class _ImageSourceGeneratedState extends State<ImageSourceGenerated> {
         text3: _textControllerLine3.text,
         textColor3: imageSettings.imageTextColorNumbers,
         fontSize: imageSettings.fontSize.toInt(),
-      );
-      imageSettings.lastUpdated = DateTime.now();
-      _imageGenerated = newImageSource;
-      lastImageSettingsUseForImageSource = imageSettings.clone();
-      notify();
+      ).then((newImageSource) {
+        _imageGenerated = newImageSource;
+        imageSettings.lastUpdated = DateTime.now();
+        lastImageSettingsUseForImageSource = imageSettings.clone();
+        notify();
+      });
     }
-
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: Colors.transparent,
-        border: Border.all(color: Colors.grey),
-      ),
-      child: RawImage(
-        image: _imageGenerated,
-        width: _imageGenerated!.width.toDouble(),
-        height: _imageGenerated!.height.toDouble(),
-        fit: BoxFit.contain,
-      ),
-    );
   }
 }
 

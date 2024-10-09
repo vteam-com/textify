@@ -1,3 +1,4 @@
+import 'package:intl/intl.dart';
 import 'dart:ui' as ui;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -43,7 +44,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await _textify.init();
-      _triggetTextifyConvertion();
+      _convertImageToText();
     });
   }
 
@@ -111,7 +112,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 _buildExpansionPanel(
                   titleLeft: '${_textify.bands.length} Bands',
                   titleCenter: '${_textify.count} Artifacts',
-                  titleRight: '',
+                  titleRight:
+                      '${NumberFormat.decimalPattern().format(_textify.duration)}ms',
                   isExpanded: _isExpandedArtifactFound,
                   content: _buildArtifactFound(
                     _textify,
@@ -245,7 +247,7 @@ class _HomeScreenState extends State<HomeScreen> {
         _charactersExpectedToBeFoundInTheImage = expectedText;
         _fontName = fontName;
         _textify.includeSpaceDetections = includeSpaceDetection;
-        _triggetTextifyConvertion();
+        _convertImageToText();
       },
     );
   }
@@ -333,13 +335,5 @@ class _HomeScreenState extends State<HomeScreen> {
         _textFound = _textify.textFound;
       });
     }
-  }
-
-  void _triggetTextifyConvertion() {
-    _convertImageToText().then((__) {
-      if (mounted) {
-        setState(() {});
-      }
-    });
   }
 }

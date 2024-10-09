@@ -26,6 +26,26 @@ class Textify {
   /// The extracted text from the image.
   String textFound = '';
 
+  /// Represents the start time of a process or operation.
+  DateTime processeBegin = DateTime.now();
+
+  /// Represents the end time of a process or operation.
+  DateTime processedEnd = DateTime.now();
+
+  /// Calculates the duration, in milliseconds, between the start and end times
+  /// of a process or operation.
+  ///
+  /// The duration is calculated by subtracting the number of milliseconds since
+  /// the Unix epoch for the start time (`processeBegin`) from the number of
+  /// milliseconds since the Unix epoch for the end time (`processedEnd`).
+  ///
+  /// Returns:
+  ///   An integer representing the duration, in milliseconds, between the start
+  ///   and end times of the process or operation.
+  int get duration =>
+      processedEnd.millisecondsSinceEpoch -
+      processeBegin.millisecondsSinceEpoch;
+
   /// Should textify attempt to detect the Space ' ' character
   bool includeSpaceDetections = true;
 
@@ -201,9 +221,20 @@ class Textify {
       characterDefinitions.count > 0,
       'No character definitions loaded, did you forget to call Init()',
     );
+
+    /// Start
+    processeBegin = DateTime.now();
+
     findArtifactsFromBinaryImage(imageAsBinary);
 
-    return _getTextFromArtifacts(supportedCharacters: supportedCharacters);
+    final String result = _getTextFromArtifacts(
+      supportedCharacters: supportedCharacters,
+    );
+
+    processedEnd = DateTime.now();
+    // End
+
+    return result;
   }
 
   /// Processes a binary image to find, merge, and categorize artifacts.
@@ -729,6 +760,7 @@ class Textify {
     }
 
     textFound += linesFound.join('\n');
+
     return textFound; // Trim to remove leading space
   }
 

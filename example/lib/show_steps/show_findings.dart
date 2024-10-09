@@ -34,6 +34,7 @@ class ShowFindings extends StatelessWidget {
       width: maxWidth,
       height: maxHeight + 100,
       child: CustomPaint(
+        key: Key(textify.processedEnd.toString()),
         painter: DisplayArtifacts(
           textify: textify,
           applyPacking: applyPacking,

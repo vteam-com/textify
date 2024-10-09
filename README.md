@@ -95,6 +95,6 @@ void main() async {
 Please contribute and report issues on the GitHub repository.
 <https://github.com/vteam-com/textify>
 
-## Call Graph
+## Components
 
 ![Call Graph](graph.svg)

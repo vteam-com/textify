@@ -9,9 +9,11 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  intl:
   path_provider: ^2.1.4
   pasteboard: ^0.3.0
   shared_preferences: ^2.2.2
+
   textify:
     path: ../
 
