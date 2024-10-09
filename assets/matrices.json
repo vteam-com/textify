@@ -13582,7 +13582,7 @@
         },
         {
             "character": "R",
-            "enclosers": 0,
+            "enclosers": 1,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,

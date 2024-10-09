@@ -24,7 +24,7 @@ void main() async {
   });
 
   test('Character Definitions Enclosures', () async {
-    const String charactersWithEnclosures = '04689ABDOPQbdegopq';
+    const String charactersWithEnclosures = '04689ABDOPQRbdegopq';
 
     List<String> charactersWithNoEnclosures = supportedCharacters
         .where((c) => !charactersWithEnclosures.contains(c))
