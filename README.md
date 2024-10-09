@@ -1,6 +1,8 @@
-# Textify
+# Textify (OCR)
 
-Textify is a Flutter package designed to extract text from clean digital images with standard fonts. It is 100% cross-platform, utilizing native Dart and Flutter code, and works offline without any package dependencies.
+Textify is a Dart package that provides utilities for working with text representations in a specific character set. It is designed to handle text processing tasks for the English language and a limited set of characters.
+
+ It is 100% cross-platform, utilizing native Dart and Flutter code, and works offline without any package dependencies.
 
 ## Features
 
@@ -23,6 +25,21 @@ Textify addresses common limitations of existing OCR (Optical Character Recognit
 
 Textify overcomes these issues with a lightweight, pure Dart implementation that works seamlessly across all Flutter platforms, including web, without external dependencies.
 
+## Supported Characters
+
+This package intentionally supports only the following characters:
+
+- Uppercase letters: `ABCDEFGHIJKLMNOPQRSTUVWXYZ`
+- Lowercase letters: `abcdefghijklmnopqrstuvwxyz`
+- Digits: `0123456789`
+- Punctuation marks: `/\(){}[]<>,;:.!@#$&*-+=?`
+
+Any text containing characters outside of this set may not be processed correctly or may result in errors.
+
+## Language Support
+
+Textify is currently designed to work with the English language only. While it may handle some text in other languages that use the supported character set, its functionality is optimized and intended for English text processing.
+
 ## Limitations and Requirements
 
 While Textify offers significant advantages, it's essential to understand its limitations:
@@ -41,14 +58,18 @@ While Textify offers significant advantages, it's essential to understand its li
 
 ## Getting Started
 
-To install Textify, add it to your pubspec.yaml file:
+To use Textify in your Dart project, add it to your `pubspec.yaml` file:
 
+```yaml
 dependencies:
   textify: ^latest_version
+```
 
 Then run:
 
+```bash
 flutter pub get
+```
 
 ## Usage
 
