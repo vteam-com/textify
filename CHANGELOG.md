@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## 0.1.3
+
+* 2024-10-09 Update README.md
+* 2024-10-09 Update Example/Dashboard
+* 2024-10-09 Fix encloser count for 'R'
+
 ## 0.1.2
 
 * 2024-10-08 Add support for characters  ! @ # & * - + = { } [ ] < > ?
