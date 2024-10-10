@@ -17,13 +17,13 @@ class ScoreMatch {
   });
 
   /// Charcter matched
-  String character;
+  final String character;
 
   /// Index of the matching template matrices
-  int matrixIndex;
+  final int matrixIndex;
 
   /// final score in pecentation 0..1
-  double score;
+  final double score;
 
   /// Checks if the current object represents an empty or uninitialized state.
   ///

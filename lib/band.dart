@@ -15,7 +15,7 @@ class Band {
   int id = 0;
 
   /// List of artifacts contained within this band.
-  List<Artifact> artifacts = [];
+  final List<Artifact> artifacts = [];
 
   /// Private fields to store calculated average of space between earh artifacts
   double _averageKerning = -1;
@@ -129,7 +129,7 @@ class Band {
   void identifySpacesInBand() {
     final double exceeding = this.averageWidth * 0.75; //%
 
-    List<Artifact> insertInFrontOfTheseArtifacts = [];
+    final List<Artifact> insertInFrontOfTheseArtifacts = [];
 
     for (int indexOfArtifact = 0;
         indexOfArtifact < this.artifacts.length;
@@ -137,10 +137,11 @@ class Band {
       if (indexOfArtifact > 0) {
         // Left
         final Artifact artifactLeft = this.artifacts[indexOfArtifact - 1];
-        var x1 = artifactLeft.rectangleOrinal.right;
+        final double x1 = artifactLeft.rectangleOrinal.right;
+
         // Right
         final Artifact artifactRight = this.artifacts[indexOfArtifact];
-        var x2 = artifactRight.rectangleOrinal.left;
+        final double x2 = artifactRight.rectangleOrinal.left;
 
         final double kerning = x2 - x1;
 
@@ -179,9 +180,9 @@ class Band {
   /// - Rectangle is set based on the provided x-coordinates and the band's top and bottom.
   /// - A matrix is created based on the dimensions of the rectangle.
   void insetArtifactForSpace(
-    int indexOfArtifact,
-    double x1,
-    double x2,
+    final int indexOfArtifact,
+    final double x1,
+    final double x2,
   ) {
     final Artifact artifactSpace = Artifact();
     artifactSpace.characterMatched = ' ';
@@ -225,8 +226,8 @@ class Band {
             (rectangle.bottom - artifact.rectangleOrinal.bottom).toInt(),
       );
 
-      double dx = left - artifact.rectangleOrinal.left;
-      double dy = rectangle.top - artifact.rectangleOrinal.top;
+      final double dx = left - artifact.rectangleOrinal.left;
+      final double dy = rectangle.top - artifact.rectangleOrinal.top;
       artifact.rectangleAdjusted =
           artifact.rectangleOrinal.shift(Offset(dx, dy));
       artifact.rectangleOrinal = artifact.rectangleAdjusted;
@@ -259,7 +260,7 @@ class Band {
   }
 
   /// Return the unified bounding box for all artifacts in the band
-  static Rect getBoundingBox(List<Artifact> artifacts) {
+  static Rect getBoundingBox(final List<Artifact> artifacts) {
     if (artifacts.isEmpty) {
       return Rect.zero;
     }

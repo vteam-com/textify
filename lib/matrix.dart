@@ -16,7 +16,11 @@ class Matrix {
   /// [width] The number of columns in the matrix.
   /// [height] The number of rows in the matrix.
   /// [value] The initial value for all cells (default is false).
-  Matrix([num width = 0, num height = 0, bool value = false]) {
+  Matrix([
+    final num width = 0,
+    final num height = 0,
+    final bool value = false,
+  ]) {
     data = List.generate(
       height.toInt(),
       (_) => List.filled(width.toInt(), false),
@@ -29,7 +33,7 @@ class Matrix {
   ///
   /// [template] A list of strings where '#' represents true and any other character represents false.
   factory Matrix.fromAsciiDefinition(final List<String> template) {
-    Matrix matrix = Matrix();
+    final Matrix matrix = Matrix();
     matrix.rows = template.length;
     matrix.cols = template[0].length;
     matrix.data = List.generate(
@@ -43,7 +47,7 @@ class Matrix {
   ///
   /// [input] A 2D list of boolean values.
   factory Matrix.fromBoolMatrix(final List<List<bool>> input) {
-    Matrix matrix = Matrix();
+    final Matrix matrix = Matrix();
     matrix.setGrid(input);
     return matrix;
   }
@@ -56,7 +60,7 @@ class Matrix {
     final List<bool> inputList,
     final int width,
   ) {
-    Matrix matrix = Matrix();
+    final Matrix matrix = Matrix();
     matrix.rows = inputList.length ~/ width;
     matrix.cols = width;
 
@@ -70,8 +74,8 @@ class Matrix {
   /// Creates a Matrix from JSON data.
   ///
   /// [json] A map containing 'rows', 'cols', and 'data' keys.
-  factory Matrix.fromJson(Map<String, dynamic> json) {
-    Matrix matrix = Matrix();
+  factory Matrix.fromJson(final Map<String, dynamic> json) {
+    final Matrix matrix = Matrix();
     matrix.font = json['font'];
     matrix.rows = json['rows'];
     matrix.cols = json['cols'];
@@ -87,7 +91,7 @@ class Matrix {
   /// [width] The width of the image.
   factory Matrix.fromUint8List(
     final Uint8List pixels,
-    int width,
+    final int width,
   ) {
     return Matrix.fromFlatListOfBool(
       [
@@ -255,8 +259,8 @@ class Matrix {
   ///
   /// This method handles resizing and special cases like punctuation.
   Matrix createNormalizeMatrix(
-    int desiredWidth,
-    int desiredHeight,
+    final int desiredWidth,
+    final int desiredHeight,
   ) {
     // help resizing by ensuring there's a border
     if (isPunctuation()) {
@@ -300,29 +304,29 @@ class Matrix {
   /// - For downscaling (target size smaller than original), it averages the values in each sub-grid.
   Matrix createResizedGrid(final int targetWidth, final int targetHeight) {
     // Initialize the resized grid
-    Matrix resizedGrid = Matrix(targetWidth, targetHeight);
+    final Matrix resizedGrid = Matrix(targetWidth, targetHeight);
 
     // Calculate the scale factors
-    double xScale = cols / targetWidth;
-    double yScale = rows / targetHeight;
+    final double xScale = cols / targetWidth;
+    final double yScale = rows / targetHeight;
 
     for (int y = 0; y < targetHeight; y++) {
       for (int x = 0; x < targetWidth; x++) {
         // Coordinates in the original grid
-        double srcX = x * xScale;
-        double srcY = y * yScale;
+        final double srcX = x * xScale;
+        final double srcY = y * yScale;
 
         if (targetWidth > cols || targetHeight > rows) {
           // UpScaling: Use nearest-neighbor interpolation
-          int srcXInt = srcX.floor();
-          int srcYInt = srcY.floor();
+          final int srcXInt = srcX.floor();
+          final int srcYInt = srcY.floor();
           resizedGrid.data[y][x] = data[srcYInt][srcXInt];
         } else {
           // DownScaling: Average the values in the sub-grid
-          int startX = srcX.floor();
-          int endX = (srcX + xScale).ceil();
-          int startY = srcY.floor();
-          int endY = (srcY + yScale).ceil();
+          final int startX = srcX.floor();
+          final int endX = (srcX + xScale).ceil();
+          final startY = srcY.floor();
+          final int endY = (srcY + yScale).ceil();
 
           int blackCount = 0;
           int totalCount = 0;
@@ -360,19 +364,19 @@ class Matrix {
   /// 3. Appending the specified number of blank lines at the bottom of the matrix.
   /// 4. Updating the total number of rows in the matrix.
   void paddTopBottom({
-    required int paddingTop,
-    required int paddingBottom,
+    required final int paddingTop,
+    required final int paddingBottom,
   }) {
     final blankLine = List.filled(cols, false);
 
-    for (var add = 0; add < paddingTop; add++) {
-      data.insert(0, blankLine);
+    for (int add = 0; add < paddingTop; add++) {
+      this.data.insert(0, blankLine);
     }
 
-    for (var add = 0; add < paddingBottom; add++) {
-      data.add(blankLine);
+    for (int add = 0; add < paddingBottom; add++) {
+      this.data.add(blankLine);
     }
-    rows = data.length;
+    this.rows = data.length;
   }
 
   /// Creates a new Matrix with a false border wrapping around the original matrix.
@@ -405,7 +409,7 @@ class Matrix {
     }
 
     // Create a new grid with increased dimensions
-    Matrix newGrid = Matrix.fromBoolMatrix(
+    final Matrix newGrid = Matrix.fromBoolMatrix(
       List.generate(
         rows + 2,
         (r) => List.generate(cols + 2, (c) => false),
@@ -466,12 +470,12 @@ class Matrix {
     required final Matrix binaryImage,
     required final Rect rect,
   }) {
-    int startX = rect.left.toInt();
-    int startY = rect.top.toInt();
-    int subImageWidth = rect.width.toInt();
-    int subImageHeight = rect.height.toInt();
+    final int startX = rect.left.toInt();
+    final int startY = rect.top.toInt();
+    final int subImageWidth = rect.width.toInt();
+    final int subImageHeight = rect.height.toInt();
 
-    Matrix subImagePixels = Matrix(subImageWidth, subImageHeight, false);
+    final Matrix subImagePixels = Matrix(subImageWidth, subImageHeight, false);
 
     for (int x = 0; x < subImageWidth; x++) {
       for (int y = 0; y < subImageHeight; y++) {
@@ -601,7 +605,7 @@ class Matrix {
       throw Exception('Grids must have the same dimensions');
     }
 
-    List<String> overladedGrid = [];
+    final List<String> overladedGrid = [];
 
     for (int row = 0; row < height; row++) {
       String overladedRow = '';
@@ -665,9 +669,9 @@ class Matrix {
   /// Note: This method uses [gridToStrings] internally to generate the list
   /// of strings representing each row of the matrix.
   String gridToString({
-    bool forCode = false,
-    String onChar = '#',
-    String offChar = '.',
+    final bool forCode = false,
+    final String onChar = '#',
+    final String offChar = '.',
   }) {
     final List<String> list = gridToStrings(onChar: onChar, offChar: offChar);
     return forCode ? '"${list.join('",\n"')}"' : list.join('\n');
@@ -689,10 +693,10 @@ class Matrix {
   /// // ["#.#", ".#.", "#.#"]
   /// ```
   List<String> gridToStrings({
-    String onChar = '#',
-    String offChar = '.',
+    final String onChar = '#',
+    final String offChar = '.',
   }) {
-    List<String> result = [];
+    final List<String> result = [];
 
     for (int row = 0; row < rows; row++) {
       String rowString = '';
@@ -725,8 +729,8 @@ class Matrix {
   /// If the matrices have different sizes, the behavior is undefined and may
   /// result in errors or incorrect results.
   static double hammingDistancePercentage(
-    Matrix inputGrid,
-    Matrix templateGrid,
+    final Matrix inputGrid,
+    final Matrix templateGrid,
   ) {
     int matchingPixels = 0;
     int totalPixels = 0;
@@ -846,7 +850,7 @@ class Matrix {
   ///   as `cols`. If not, it throws an `ArgumentError`.
   /// - If the input grid is valid, it updates the `rows` and `cols` properties
   ///   based on the dimensions of the input grid.
-  void setGrid(List<List<bool>> grid) {
+  void setGrid(final List<List<bool>> grid) {
     if (grid.isEmpty || grid[0].isEmpty) {
       rows = 0;
       cols = 0;
@@ -965,11 +969,11 @@ class Matrix {
   ///
   /// Time Complexity: O(rows * cols), where each cell is visited at most once.
   /// Space Complexity: O(rows * cols) for the 'visited' matrix.
-  int _countEnclosedRegion(Matrix grid) {
-    int rows = grid.rows;
-    int cols = grid.cols;
+  int _countEnclosedRegion(final Matrix grid) {
+    final int rows = grid.rows;
+    final int cols = grid.cols;
 
-    Matrix visited = Matrix(cols, rows);
+    final Matrix visited = Matrix(cols, rows);
 
     int loopCount = 0;
     int minRegionSize = 3; // Minimum size for a region to be considered a loop
@@ -1006,10 +1010,10 @@ class Matrix {
   ///
   /// Note: This function modifies the [visited] matrix in-place to mark explored cells.
   int _exploreRegion(
-    Matrix grid,
-    Matrix visited,
-    int startX,
-    int startY,
+    final Matrix grid,
+    final Matrix visited,
+    final int startX,
+    final int startY,
   ) {
     int rows = grid.rows;
     int cols = grid.cols;
@@ -1027,13 +1031,13 @@ class Matrix {
     ];
 
     while (queue.isNotEmpty) {
-      List<int> current = queue.removeFirst();
-      int x = current[0], y = current[1];
+      final List<int> current = queue.removeFirst();
+      final int x = current[0], y = current[1];
       regionSize++;
 
       // Explore all adjacent cells
-      for (var dir in directions) {
-        int newX = x + dir[0], newY = y + dir[1];
+      for (final List<int> dir in directions) {
+        final int newX = x + dir[0], newY = y + dir[1];
 
         // Check if the new coordinates are within bounds and the cell is explorable
         if (newX >= 0 &&
@@ -1070,21 +1074,21 @@ class Matrix {
   /// 1. It reaches the edge of the grid during exploration.
   /// 2. Its size is less than 1% of the total grid area (adjustable threshold).
   bool _isEnclosedRegion(
-    Matrix grid,
-    int startX,
-    int startY,
-    int regionSize,
+    final Matrix grid,
+    final int startX,
+    final int startY,
+    final int regionSize,
   ) {
-    int rows = grid.rows;
-    int cols = grid.cols;
-    Queue<List<int>> queue = Queue();
-    Set<String> visited = {};
+    final int rows = grid.rows;
+    final int cols = grid.cols;
+    final Queue<List<int>> queue = Queue();
+    final Set<String> visited = {};
     queue.add([startX, startY]);
     visited.add('$startX,$startY');
     bool isEnclosed = true;
 
     // Directions for exploring adjacent cells (up, down, left, right)
-    final directions = [
+    final List<List<int>> directions = [
       [-1, 0],
       [1, 0],
       [0, -1],
@@ -1092,10 +1096,10 @@ class Matrix {
     ];
 
     while (queue.isNotEmpty) {
-      List<int> current = queue.removeFirst();
-      int x = current[0], y = current[1];
+      final List<int> current = queue.removeFirst();
+      final int x = current[0], y = current[1];
 
-      for (var dir in directions) {
+      for (final List<int> dir in directions) {
         int newX = x + dir[0], newY = y + dir[1];
 
         // Check if the new coordinates are outside the grid
@@ -1104,7 +1108,7 @@ class Matrix {
           continue;
         }
 
-        String key = '$newX,$newY';
+        final String key = '$newX,$newY';
         // If the cell is explorable and not visited, add it to the queue
         if (!grid.data[newY][newX] && !visited.contains(key)) {
           queue.add([newX, newY]);
@@ -1114,8 +1118,8 @@ class Matrix {
     }
 
     // Check if the region is too small compared to the grid size
-    int gridArea = rows * cols;
-    double regionPercentage = regionSize / gridArea;
+    final int gridArea = rows * cols;
+    final double regionPercentage = regionSize / gridArea;
     if (regionPercentage < 0.01) {
       // Adjust this threshold as needed
       isEnclosed = false;
@@ -1144,11 +1148,12 @@ class Matrix {
   /// - The minimum height for a vertical line is determined by `_thresholdLinePercentage`,
   ///   which is a constant value representing the percentage of the character's height.
   /// - The function modifies the [visited] matrix in-place to keep track of visited cells.
-  bool _hasVerticalLineLeft(Matrix matrix) {
-    Matrix visited = Matrix(matrix.cols, matrix.rows);
+  bool _hasVerticalLineLeft(final Matrix matrix) {
+    final Matrix visited = Matrix(matrix.cols, matrix.rows);
 
     // We only consider lines that are more than 40% of the character's height
-    int minVerticalLine = (matrix.rows * _thresholdLinePercentage).toInt();
+    final int minVerticalLine =
+        (matrix.rows * _thresholdLinePercentage).toInt();
 
     // Iterate over the matrix from left to right
     for (int x = 0; x < matrix.cols; x++) {
@@ -1191,11 +1196,12 @@ class Matrix {
   /// - The minimum height for a vertical line is determined by `_thresholdLinePercentage`,
   ///   which is assumed to be a class-level constant or variable.
   /// - The function modifies the [visited] matrix in-place to keep track of visited cells.
-  bool _hasVerticalLineRight(Matrix matrix) {
-    Matrix visited = Matrix(matrix.cols, matrix.rows);
+  bool _hasVerticalLineRight(final Matrix matrix) {
+    final Matrix visited = Matrix(matrix.cols, matrix.rows);
 
     // We only consider lines that are more than 40% of the character's height
-    int minVerticalLine = (matrix.rows * _thresholdLinePercentage).toInt();
+    final int minVerticalLine =
+        (matrix.rows * _thresholdLinePercentage).toInt();
 
     // Iterate over the matrix from right to left
     for (int x = matrix.cols - 1; x >= 0; x--) {
@@ -1225,13 +1231,13 @@ class Matrix {
   /// Only considers it a vertical line if there are no filled pixels to the left
   /// at any point in the line.
   bool _isValidVerticalLineLeft(
-    int minVerticalLine,
-    Matrix matrix,
-    int x,
+    final int minVerticalLine,
+    final Matrix matrix,
+    final int x,
     int y,
-    Matrix visited,
+    final Matrix visited,
   ) {
-    int rows = matrix.rows;
+    final int rows = matrix.rows;
     int lineLength = 0;
 
     // Ensure no filled pixels on the immediate left side at any point
@@ -1270,13 +1276,13 @@ class Matrix {
   /// Returns:
   /// A boolean value indicating whether a valid vertical line was found (true) or not (false).
   bool _isValidVerticalLineRight(
-    int minVerticalLine,
-    Matrix matrix,
-    int x,
+    final int minVerticalLine,
+    final Matrix matrix,
+    final int x,
     int y,
-    Matrix visited,
+    final Matrix visited,
   ) {
-    int rows = matrix.rows;
+    final int rows = matrix.rows;
     int lineLength = 0;
 
     // Traverse downwards from the starting point
@@ -1303,9 +1309,9 @@ class Matrix {
 
   /// inspection left side with some tolerance
   bool _validLeftSideLeft(
-    Matrix m,
-    int x,
-    int y,
+    final Matrix m,
+    final int x,
+    final int y,
   ) {
     if (x - 1 < 0) {
       return true;
@@ -1325,9 +1331,9 @@ class Matrix {
 
   /// inspection right side with some tolerance
   bool _validLeftSideRight(
-    Matrix m,
-    int x,
-    int y,
+    final Matrix m,
+    final int x,
+    final int y,
   ) {
     if (x + 1 >= m.cols) {
       return true;
@@ -1362,8 +1368,8 @@ class Matrix {
 /// Throws:
 /// An [Exception] if it fails to get image data from the input image.
 Future<ui.Image> imageToBlackOnWhite(
-  ui.Image inputImage, {
-  double threshold = 190,
+  final ui.Image inputImage, {
+  final double threshold = 190,
 }) async {
   // Get the bytes from the input image
   final ByteData? byteData =

@@ -75,28 +75,28 @@ class CharacterDefinition {
   final int enclosures;
 
   /// Indicates if this character is used in amounts.
-  bool isAmount;
+  final bool isAmount;
 
   /// Indicates if this character is used in dates.
-  bool isDate;
+  final bool isDate;
 
   /// Indicates if this character is a digit.
-  bool isDigit;
+  final bool isDigit;
 
   /// Indicates if this character is a letter.
-  bool isLetter;
+  final bool isLetter;
 
   /// Indicates if this character is a punctuation mark.
-  bool isPunctuation;
+  final bool isPunctuation;
 
   /// Indicates if the character has a left vertical line as part of its shape.
-  bool lineLeft;
+  final bool lineLeft;
 
   /// Indicates if the character has a right vertical line as part of its shape.
-  bool lineRight;
+  final bool lineRight;
 
   /// List of matrices representing this character.
-  List<Matrix> matrices;
+  final List<Matrix> matrices;
 
   /// Converts this [CharacterDefinition] to a JSON map.
   Map<String, dynamic> toJson() {
@@ -117,35 +117,3 @@ class CharacterDefinition {
   /// Converts this [CharacterDefinition] to a JSON string.
   String toJsonString() => jsonEncode(toJson());
 }
-
-/// List of all digit characters.
-const List<String> allDigits = [
-  '0',
-  '1',
-  '2',
-  '3',
-  '4',
-  '5',
-  '6',
-  '7',
-  '8',
-  '9',
-];
-
-/// List of characters typically used in representing amounts.
-const List<String> charactersForAmount = [
-  ...allDigits,
-  '-',
-  '(',
-  ')',
-  '.',
-  ',',
-];
-
-/// List of characters typically used in date formats.
-const List<String> charactersForDate = [
-  ...allDigits,
-  '-',
-  '.',
-  '/',
-];

@@ -17,7 +17,7 @@ class Textify {
   final CharacterDefinitions characterDefinitions = CharacterDefinitions();
 
   /// List of text bands identified in the image.
-  List<Band> bands = [];
+  final List<Band> bands = [];
 
   /// List of artifacts (potential characters) identified in the image.
   final List<Artifact> artifacts = [];
@@ -155,7 +155,7 @@ class Textify {
       }
 
       // Calculate match percentage
-      double matchPercentage = matchingChecks / totalChecks;
+      final double matchPercentage = matchingChecks / totalChecks;
 
       // Include templates that meet or exceed the percentage needed
       return matchPercentage >= percentageNeeded;
@@ -257,7 +257,7 @@ class Textify {
   ///
   /// Note: This method assumes that the input [Matrix] is a valid binary image.
   /// Behavior may be undefined for non-binary input.
-  void findArtifactsFromBinaryImage(Matrix imageAsBinary) {
+  void findArtifactsFromBinaryImage(final Matrix imageAsBinary) {
     // (1) Find artifact using flood fill
     _findArtifacts(imageAsBinary);
 
@@ -292,16 +292,16 @@ class Textify {
   /// Returns:
   ///   A list of [Artifact] objects after merging connected artifacts.
   List<Artifact> _mergeConnectedArtifacts({
-    required double verticalThreshold,
-    required double horizontalThreshold,
+    required final double verticalThreshold,
+    required final double horizontalThreshold,
   }) {
-    List<Artifact> mergedArtifacts = [];
+    final List<Artifact> mergedArtifacts = [];
 
     for (int i = 0; i < artifacts.length; i++) {
-      Artifact current = artifacts[i];
+      final Artifact current = artifacts[i];
 
       for (int j = i + 1; j < artifacts.length; j++) {
-        Artifact next = artifacts[j];
+        final Artifact next = artifacts[j];
 
         if (_areArtifactsConnected(
           current.rectangleOrinal,
@@ -334,22 +334,23 @@ class Textify {
   /// Returns:
   ///   true if the artifacts are considered connected, false otherwise.
   bool _areArtifactsConnected(
-    Rect rect1,
-    Rect rect2,
-    double verticalThreshold,
-    double horizontalThreshold,
+    final Rect rect1,
+    final Rect rect2,
+    final double verticalThreshold,
+    final double horizontalThreshold,
   ) {
     // Calculate the center X of each rectangle
-    double centerX1 = (rect1.left + rect1.right) / 2;
-    double centerX2 = (rect2.left + rect2.right) / 2;
+    final double centerX1 = (rect1.left + rect1.right) / 2;
+    final double centerX2 = (rect2.left + rect2.right) / 2;
 
     // Check horizontal connection using the center X values
-    bool horizontallyConnected =
+    final bool horizontallyConnected =
         (centerX1 - centerX2).abs() <= horizontalThreshold;
 
     // Check vertical connection as before
-    bool verticallyConnected = (rect1.bottom + verticalThreshold >= rect2.top &&
-        rect1.top - verticalThreshold <= rect2.bottom);
+    final bool verticallyConnected =
+        (rect1.bottom + verticalThreshold >= rect2.top &&
+            rect1.top - verticalThreshold <= rect2.bottom);
 
     return horizontallyConnected && verticallyConnected;
   }
@@ -436,7 +437,7 @@ class Textify {
   /// The method uses a vertical tolerance to determine if an artifact belongs
   /// to an existing band.
   void _groupArtifactsIntoBands() {
-    double verticalTolerance = 10;
+    final double verticalTolerance = 10;
     // Sort artifacts by the top y-position of their rectangles
     this.artifacts.sort(
           (a, b) => a.rectangleOrinal.top.compareTo(b.rectangleOrinal.top),
@@ -492,9 +493,9 @@ class Textify {
   ///   2. The top of the artifact is at or above the bottom of the band
   ///      (considering the tolerance).
   bool _isOverlappingVertically(
-    Rect bandBoundingBox,
-    Rect artifactRectangle,
-    double verticalTolerance,
+    final Rect bandBoundingBox,
+    final Rect artifactRectangle,
+    final double verticalTolerance,
   ) {
     return (artifactRectangle.bottom >=
             bandBoundingBox.top - verticalTolerance &&
@@ -659,7 +660,7 @@ class Textify {
         // Calculate the similarity score and create a ScoreMatch object
         for (int i = 0; i < template.matrices.length; i++) {
           final Matrix matrix = template.matrices[i];
-          ScoreMatch scoreMatch = ScoreMatch(
+          final ScoreMatch scoreMatch = ScoreMatch(
             character: template.character,
             matrixIndex: i,
             score: Matrix.hammingDistancePercentage(
@@ -743,7 +744,7 @@ class Textify {
 
     textFound = '';
 
-    List<String> linesFound = [];
+    final List<String> linesFound = [];
 
     for (final band in bands) {
       String line = '';

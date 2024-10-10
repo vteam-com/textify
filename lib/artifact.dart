@@ -45,7 +45,7 @@ class Artifact {
   ///
   /// Parameters:
   /// - targetRect: The rectangle representing the area the artifact should fit into.
-  void fitToRectangleHeight(Rect targetRect) {
+  void fitToRectangleHeight(final Rect targetRect) {
     final int newHeight = targetRect.height.toInt();
 
     if (rectangleAdjusted.height == newHeight) {
@@ -87,7 +87,7 @@ class Artifact {
   String getResizedString({
     required final int w,
     required final int h,
-    String onChar = '#',
+    final String onChar = '#',
     final bool forCode = false,
   }) {
     _matrixNormalized.data = matrixOriginal.createNormalizeMatrix(w, h).data;
@@ -131,7 +131,7 @@ class Artifact {
   ///
   /// Returns:
   /// The resized matrix.
-  Matrix resize(int width, int height) {
+  Matrix resize(final int width, final int height) {
     _matrixNormalized.setGrid(
       matrixOriginal
           .createNormalizeMatrix(
@@ -152,8 +152,8 @@ class Artifact {
   /// Returns:
   /// A string representation of the artifact.
   String toText({
-    String onChar = '#',
-    bool forCode = false,
+    final String onChar = '#',
+    final bool forCode = false,
   }) {
     return _matrix.gridToString(
       forCode: forCode,
@@ -174,10 +174,10 @@ class Artifact {
   /// Returns:
   /// A new List<List<bool>> representing the adjusted grid.
   List<List<bool>> _createNewGrid(
-    List<List<bool>> originalData,
-    int newHeight,
-    double relativeTop,
-    int currentWidth,
+    final List<List<bool>> originalData,
+    final int newHeight,
+    final double relativeTop,
+    final int currentWidth,
   ) {
     if (originalData.length > newHeight) {
       return _cropGrid(originalData, newHeight, relativeTop);
@@ -196,9 +196,9 @@ class Artifact {
   /// Returns:
   /// A new List<List<bool>> representing the cropped grid.
   List<List<bool>> _cropGrid(
-    List<List<bool>> originalData,
-    int newHeight,
-    double relativeTop,
+    final List<List<bool>> originalData,
+    final int newHeight,
+    final double relativeTop,
   ) {
     int startRow = (relativeTop * originalData.length).round();
     startRow = startRow.clamp(0, originalData.length - newHeight);
@@ -216,13 +216,14 @@ class Artifact {
   /// Returns:
   /// A new List<List<bool>> representing the padded grid.
   List<List<bool>> _padGrid(
-    List<List<bool>> originalData,
-    int newHeight,
-    double relativeTop,
-    int currentWidth,
+    final List<List<bool>> originalData,
+    final int newHeight,
+    final double relativeTop,
+    final int currentWidth,
   ) {
-    int topPadding = (relativeTop * newHeight).round().clamp(0, newHeight);
-    int bottomPadding =
+    final int topPadding =
+        (relativeTop * newHeight).round().clamp(0, newHeight);
+    final int bottomPadding =
         (newHeight - originalData.length - topPadding).clamp(0, newHeight);
 
     return [

@@ -116,7 +116,7 @@ class CharacterDefinitions {
   String toJsonString() {
     _sortDefinitions();
 
-    Map<String, dynamic> matricesMap = {
+    final Map<String, dynamic> matricesMap = {
       'templates': definitions.map((template) => template.toJson()).toList(),
     };
 
@@ -134,7 +134,7 @@ class CharacterDefinitions {
   bool upsertTemplate(
     final String font,
     final String character,
-    Matrix matrix,
+    final Matrix matrix,
   ) {
     matrix.font = font;
     final CharacterDefinition? found = getDefinition(character);

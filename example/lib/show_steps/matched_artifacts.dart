@@ -210,7 +210,8 @@ double compareStringInPercentage(final String s1, final String s2) {
       currentRow[j + 1] = [insertCost, deleteCost, replaceCost].reduce(min);
     }
 
-    var temp = prevRow;
+    // swap
+    final List<int> temp = prevRow;
     prevRow = currentRow;
     currentRow = temp;
   }
