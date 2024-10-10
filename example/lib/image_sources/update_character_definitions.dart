@@ -2,7 +2,6 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:textify/artifact.dart';
-import 'package:textify/image_pipeline.dart';
 import 'package:textify/matrix.dart';
 import 'package:textify/textify.dart';
 import 'package:textify_dashoard/image_sources/image_source_generated.dart';
@@ -274,11 +273,11 @@ class CharacterGenerationBodyState extends State<CharacterGenerationBody> {
     );
 
     // Apply image processing pipeline
-    final ImagePipeline interimImages =
-        await ImagePipeline.apply(newImageSource);
+    final ui.Image imageOptimized = await imageToBlackOnWhite(newImageSource);
+    final Matrix imageAsMatrix = await Matrix.fromImage(imageOptimized);
 
     // Find artifacts from the binary image
-    textify.findArtifactsFromBinaryImage(interimImages.imageBinary);
+    textify.findArtifactsFromBinaryImage(imageAsMatrix);
 
     // If there is only one band (expected for a single character)
     if (textify.bands.length == 1) {

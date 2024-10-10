@@ -4,7 +4,6 @@ import 'package:flutter/widgets.dart';
 import 'package:textify/artifact.dart';
 import 'package:textify/band.dart';
 import 'package:textify/character_definitions.dart';
-import 'package:textify/image_pipeline.dart';
 import 'package:textify/matrix.dart';
 import 'package:textify/score_match.dart';
 
@@ -201,20 +200,23 @@ class Textify {
     required final ui.Image image,
     final String supportedCharacters = '',
   }) async {
-    final ImagePipeline interimImages = await ImagePipeline.apply(image);
+    final ui.Image imageBlackAndWhite = await imageToBlackOnWhite(image);
+
+    final Matrix imageAsMatrix = await Matrix.fromImage(imageBlackAndWhite);
+
     return getTextFromMatrix(
-      imageAsBinary: interimImages.imageBinary,
+      imageAsMatrix: imageAsMatrix,
       supportedCharacters: supportedCharacters,
     );
   }
 
   /// Extracts text from a binary image.
   ///
-  /// [imageAsBinary] is the binary representation of the image.
+  /// [imageAsMatrix] is the binary representation of the image.
   /// [supportedCharacters] is an optional string of characters to limit the recognition to.
   /// Returns the extracted text as a string.
   String getTextFromMatrix({
-    required final Matrix imageAsBinary,
+    required final Matrix imageAsMatrix,
     final String supportedCharacters = '',
   }) {
     assert(
@@ -225,7 +227,7 @@ class Textify {
     /// Start
     processeBegin = DateTime.now();
 
-    findArtifactsFromBinaryImage(imageAsBinary);
+    findArtifactsFromBinaryImage(imageAsMatrix);
 
     final String result = _getTextFromArtifacts(
       supportedCharacters: supportedCharacters,

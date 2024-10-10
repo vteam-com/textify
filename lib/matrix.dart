@@ -1,7 +1,8 @@
 import 'dart:collection';
 import 'dart:math';
+import 'dart:typed_data';
 import 'dart:ui';
-
+import 'dart:ui' as ui;
 import 'package:flutter/foundation.dart';
 
 /// Represents a 2D grid of boolean values, primarily used for image processing
@@ -94,6 +95,30 @@ class Matrix {
       ],
       width,
     );
+  }
+
+  /// Creates a [Matrix] from a [ui.Image].
+  ///
+  /// This factory constructor takes a [ui.Image] object and transforms it into a [Matrix]
+  /// representation. The process involves two main steps:
+  /// 1. Converting the image to a Uint8List using [imageToUint8List].
+  /// 2. Creating a Matrix from the Uint8List using [Matrix.fromUint8List].
+  ///
+  /// [image] The ui.Image object to be converted. This should be a valid,
+  /// non-null image object.
+  ///
+  /// Returns a [Future<Matrix>] representing the image data. The returned Matrix
+  /// will have the same width as the input image, and its height will be
+  /// determined by the length of the Uint8List and the width.
+  ///
+  /// Throws an exception if [imageToUint8List] fails to convert the image or if
+  /// [Matrix.fromUint8List] encounters an error during matrix creation.
+  ///
+  /// Note: This constructor is asynchronous due to the [imageToUint8List] operation.
+  /// Ensure to await its result when calling.
+  static Future<Matrix> fromImage(final ui.Image image) async {
+    final Uint8List uint8List = await imageToUint8List(image);
+    return Matrix.fromUint8List(uint8List, image.width);
   }
 
   /// Font this matrix template is based on
@@ -1211,4 +1236,96 @@ class Matrix {
     // }
     return false;
   }
+}
+
+/// Binarizes an input image by converting it to black and white based on a brightness threshold.
+///
+/// This function takes an input [ui.Image] and converts it to a black and white image
+/// where pixels brighter than the specified [threshold] become white, and those below become black.
+///
+/// Parameters:
+/// - [inputImage]: The source image to be binarized.
+/// - [threshold]: Optional. The brightness threshold used to determine black or white pixels.
+///   Defaults to 190. Range is 0-255.
+///
+/// Returns:
+/// A [Future] that resolves to a new [ui.Image] containing the binarized version of the input image.
+///
+/// Throws:
+/// An [Exception] if it fails to get image data from the input image.
+Future<ui.Image> imageToBlackOnWhite(
+  ui.Image inputImage, {
+  double threshold = 190,
+}) async {
+  // Get the bytes from the input image
+  final ByteData? byteData =
+      await inputImage.toByteData(format: ui.ImageByteFormat.rawRgba);
+  if (byteData == null) {
+    throw Exception('Failed to get image data');
+  }
+
+  final int width = inputImage.width;
+  final int height = inputImage.height;
+  final Uint8List pixels = byteData.buffer.asUint8List();
+
+  // Create a new Uint8List for the output image
+  final Uint8List outputPixels = Uint8List(width * height * 4);
+
+  for (int i = 0; i < pixels.length; i += 4) {
+    final int r = pixels[i];
+    final int g = pixels[i + 1];
+    final int b = pixels[i + 2];
+    final int a = pixels[i + 3];
+
+    // Calculate brightness as the average of R, G, and B
+    final double brightness = (r + g + b) / 3;
+
+    // If brightness is above the threshold, set pixel to white, otherwise black
+    if (brightness > threshold) {
+      outputPixels[i] = 255; // R
+      outputPixels[i + 1] = 255; // G
+      outputPixels[i + 2] = 255; // B
+    } else {
+      outputPixels[i] = 0; // R
+      outputPixels[i + 1] = 0; // G
+      outputPixels[i + 2] = 0; // B
+    }
+
+    // Keep the alpha channel unchanged
+    outputPixels[i + 3] = a;
+  }
+
+  // Create a new ui.Image from the modified pixels
+  final ui.ImmutableBuffer buffer =
+      await ui.ImmutableBuffer.fromUint8List(outputPixels);
+  final ui.ImageDescriptor descriptor = ui.ImageDescriptor.raw(
+    buffer,
+    width: width,
+    height: height,
+    pixelFormat: ui.PixelFormat.rgba8888,
+  );
+  final ui.Codec codec = await descriptor.instantiateCodec();
+  final ui.FrameInfo frameInfo = await codec.getNextFrame();
+
+  return frameInfo.image;
+}
+
+/// Converts a [ui.Image] to a [Uint8List] representation.
+///
+/// This function takes a [ui.Image] and converts it to a [Uint8List] containing
+/// the raw RGBA data of the image.
+///
+/// Parameters:
+/// - [image]: The source image to be converted. Can be null.
+///
+/// Returns:
+/// A [Future] that resolves to a [Uint8List] containing the raw RGBA data of the image.
+/// If the input [image] is null or conversion fails, returns an empty [Uint8List].
+Future<Uint8List> imageToUint8List(final ui.Image? image) async {
+  if (image == null) {
+    return Uint8List(0);
+  }
+  final ByteData? data =
+      await image.toByteData(format: ui.ImageByteFormat.rawRgba);
+  return data?.buffer.asUint8List() ?? Uint8List(0);
 }

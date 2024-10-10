@@ -2,7 +2,7 @@ import 'package:intl/intl.dart';
 import 'dart:ui' as ui;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:textify/image_pipeline.dart';
+import 'package:textify/matrix.dart';
 import 'package:textify/textify.dart';
 
 import 'image_sources/image_source_selector.dart';
@@ -23,7 +23,8 @@ class _HomeScreenState extends State<HomeScreen> {
   final Textify _textify = Textify();
 
   // The image that will be use for detecting the text
-  ImagePipeline? _imagePipeline;
+  ui.Image? _imageBlackOnWhite;
+
   ui.Image? _imageSource;
   String _fontName = '';
   List<String> _charactersExpectedToBeFoundInTheImage = [];
@@ -101,7 +102,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   titleRight: '',
                   isExpanded: _isExpandedHightContrast,
                   content: _buildShowPiplineStateHightContrast(
-                    _imagePipeline,
+                    _imageBlackOnWhite,
                     _transformationController,
                   ),
                 ),
@@ -289,13 +290,13 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildShowPiplineStateHightContrast(
-    pipelineImages,
-    transformationController,
+    final ui.Image? imageHighContrast,
+    final TransformationController? transformationController,
   ) {
-    return pipelineImages?.imageHighContrast == null
+    return imageHighContrast == null
         ? const CupertinoActivityIndicator(radius: 30)
         : buildInteractiveImageViewer(
-            pipelineImages.imageHighContrast,
+            imageHighContrast,
             transformationController,
           );
   }
@@ -303,7 +304,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void _clearState() {
     if (mounted) {
       setState(() {
-        _imagePipeline = null;
+        _imageBlackOnWhite = null;
         _textFound = '';
       });
     }
@@ -323,15 +324,17 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     // Convert color image source to a grid of on=ink/off=paper
-    final ImagePipeline interimImages = await ImagePipeline.apply(_imageSource);
+    final ui.Image tmpImageBlackOnWhite = await imageToBlackOnWhite(
+      _imageSource!,
+    );
 
     _textify.getTextFromMatrix(
-      imageAsBinary: interimImages.imageBinary,
+      imageAsMatrix: await Matrix.fromImage(tmpImageBlackOnWhite),
     );
 
     if (mounted) {
       setState(() {
-        _imagePipeline = interimImages;
+        _imageBlackOnWhite = tmpImageBlackOnWhite;
         _textFound = _textify.textFound;
       });
     }

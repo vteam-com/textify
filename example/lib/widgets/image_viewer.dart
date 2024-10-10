@@ -38,8 +38,8 @@ class ImagePainter extends CustomPainter {
 }
 
 Widget buildInteractiveImageViewer(
-  ui.Image iamgeToDiplay,
-  TransformationController? transformationController,
+  final ui.Image iamgeToDiplay,
+  final TransformationController? transformationController,
 ) {
   return PanelContent(
     start: const SizedBox(),

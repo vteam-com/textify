@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Removed [image_pipeline.dart]
 - Rename "Encloser" to "Enclosure"
   
 ## [0.1.3] - 2024-10-09
