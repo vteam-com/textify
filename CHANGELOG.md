@@ -1,63 +1,114 @@
-# CHANGELOG
+<!-- markdownlint-disable MD024 -->
 
-## 0.1.3
+# Changelog
 
-* 2024-10-09 Update README.md
-* 2024-10-09 Update Example/Dashboard
-* 2024-10-09 Fix encloser count for 'R'
+All notable changes to this project will be documented in this file.
 
-## 0.1.2
+## [0.1.3] - 2024-10-09
 
-* 2024-10-08 Add support for characters  ! @ # & * - + = { } [ ] < > ?
+### Changed
 
-## 0.1.1
+- Updated README.md
+- Updated Example/Dashboard
 
-* 2024-10-06 Use embedded fonts for generating template [Arial, Courier, Helvetica, Times New Roman]
+### Fixed
 
-## 0.1.0
+- Fixed enclosure count for 'R'
 
-* 2024-10-03 Remove unused function
-* 2024-10-03 Made functions private
-* 2024-10-03 Document code
-  
-## 0.0.9
+## [0.1.2] - 2024-10-08
 
-* 2024-10-02 Refactor to handle Bands and detect spaces
+### Added
 
-## 0.0.8
+- Support for characters: ! @ # & * - + = { } [ ] < > ?
 
-* 2024-10-01 Document public API - Artifact, Band, CharacterDefinitions
+## [0.1.1] - 2024-10-06
 
-## 0.0.7
+### Changed
 
-* 2024-10-01 Support characters  $  ;  \
-* 2024-10-01 Refactor to enable better Editing of templates
+- Use embedded fonts for generating template [Arial, Courier, Helvetica, Times New Roman]
 
-## 0.0.6
+## [0.1.0] - 2024-10-03
 
-* 2024-10-01 Document Matrix.dart
-* 2024-10-01 Perf improvement avoid scoring the Artifact for space " "
-* 2024-10-01 Fix bug in the Example:Edit Screen
+### Changed
 
-## 0.0.5
+- Removed unused function
+- Made functions private
+- Documented code
 
-* 2024-09-30 New top level API "String getTextFromImage(IMAGE)"
-* 2024-09-30 [dart format .]
+## [0.0.9] - 2024-10-02
 
-## 0.0.4
+### Changed
 
-* 2024-09-30 Link Package to GitHub repo <https://github.com/vteam-com/textify>
+- Refactored to handle Bands and detect spaces
 
-## 0.0.3
+## [0.0.8] - 2024-10-01
 
-* 2024-09-30 Update README.md
+### Added
 
-## 0.0.2
+- Documented public API - Artifact, Band, CharacterDefinitions
 
-* 2024-09-30 Fix many typos
-* 2024-09-30 Example - When pasting just show the resulting text
-* 2024-09-30 Support for characters-allowed
+## [0.0.7] - 2024-10-01
 
-## 0.0.1
+### Added
 
-* 2024-09-23 Inital implementation
+- Support for characters: $ ; \
+
+### Changed
+
+- Refactored to enable better editing of templates
+
+## [0.0.6] - 2024-10-01
+
+### Added
+
+- Documented Matrix.dart
+
+### Changed
+
+- Performance improvement: avoid scoring the Artifact for space " "
+
+### Fixed
+
+- Bug in the Example:Edit Screen
+
+## [0.0.5] - 2024-09-30
+
+### Added
+
+- New top-level API "String getTextFromImage(IMAGE)"
+
+### Changed
+
+- Ran `dart format .`
+
+## [0.0.4] - 2024-09-30
+
+### Added
+
+- Linked package to GitHub repo: <https://github.com/vteam-com/textify>
+
+## [0.0.3] - 2024-09-30
+
+### Changed
+
+- Updated README.md
+
+## [0.0.2] - 2024-09-30
+
+### Added
+
+- Support for characters-allowed
+
+### Changed
+
+- Updated Example - When pasting, just show the resulting text
+
+### Fixed
+
+- Fixed many typos
+
+## [0.0.1] - 2024-09-23
+
+### Added
+
+- Initial implementation
