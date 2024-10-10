@@ -989,6 +989,22 @@ class Matrix {
     return loopCount;
   }
 
+  /// Explores a connected region in a grid starting from a given point.
+  ///
+  /// This function uses a breadth-first search algorithm to explore a region
+  /// of connected cells in a grid, starting from the specified coordinates.
+  ///
+  /// Parameters:
+  /// - [grid]: A Matrix representing the grid to explore.
+  ///   Assumed to contain boolean values where false represents an explorable cell.
+  /// - [visited]: A Matrix of the same size as [grid] to keep track of visited cells.
+  /// - [startX]: The starting X-coordinate for exploration.
+  /// - [startY]: The starting Y-coordinate for exploration.
+  ///
+  /// Returns:
+  /// The size of the explored region (number of connected cells).
+  ///
+  /// Note: This function modifies the [visited] matrix in-place to mark explored cells.
   int _exploreRegion(
     Matrix grid,
     Matrix visited,
@@ -1002,19 +1018,24 @@ class Matrix {
     visited.data[startY][startX] = true;
     int regionSize = 0;
 
+    // Directions for exploring adjacent cells (up, down, left, right)
+    final directions = [
+      [-1, 0],
+      [1, 0],
+      [0, -1],
+      [0, 1],
+    ];
+
     while (queue.isNotEmpty) {
       List<int> current = queue.removeFirst();
       int x = current[0], y = current[1];
       regionSize++;
 
-      for (var dir in [
-        [-1, 0],
-        [1, 0],
-        [0, -1],
-        [0, 1],
-      ]) {
+      // Explore all adjacent cells
+      for (var dir in directions) {
         int newX = x + dir[0], newY = y + dir[1];
 
+        // Check if the new coordinates are within bounds and the cell is explorable
         if (newX >= 0 &&
             newX < cols &&
             newY >= 0 &&
@@ -1030,6 +1051,24 @@ class Matrix {
     return regionSize;
   }
 
+  /// Determines if a region in a grid is enclosed.
+  ///
+  /// This function uses a breadth-first search algorithm to explore a region
+  /// starting from the given coordinates and checks if it's enclosed within the grid.
+  ///
+  /// Parameters:
+  /// - [grid]: A Matrix representing the grid.
+  ///   Assumed to contain boolean values where false represents an explorable cell.
+  /// - [startX]: The starting X-coordinate for exploration.
+  /// - [startY]: The starting Y-coordinate for exploration.
+  /// - [regionSize]: The size of the region being checked.
+  ///
+  /// Returns:
+  /// A boolean value indicating whether the region is enclosed (true) or not (false).
+  ///
+  /// A region is considered not enclosed if:
+  /// 1. It reaches the edge of the grid during exploration.
+  /// 2. Its size is less than 1% of the total grid area (adjustable threshold).
   bool _isEnclosedRegion(
     Matrix grid,
     int startX,
@@ -1044,24 +1083,29 @@ class Matrix {
     visited.add('$startX,$startY');
     bool isEnclosed = true;
 
+    // Directions for exploring adjacent cells (up, down, left, right)
+    final directions = [
+      [-1, 0],
+      [1, 0],
+      [0, -1],
+      [0, 1],
+    ];
+
     while (queue.isNotEmpty) {
       List<int> current = queue.removeFirst();
       int x = current[0], y = current[1];
 
-      for (var dir in [
-        [-1, 0],
-        [1, 0],
-        [0, -1],
-        [0, 1],
-      ]) {
+      for (var dir in directions) {
         int newX = x + dir[0], newY = y + dir[1];
 
+        // Check if the new coordinates are outside the grid
         if (newX < 0 || newX >= cols || newY < 0 || newY >= rows) {
           isEnclosed = false;
           continue;
         }
 
         String key = '$newX,$newY';
+        // If the cell is explorable and not visited, add it to the queue
         if (!grid.data[newY][newX] && !visited.contains(key)) {
           queue.add([newX, newY]);
           visited.add(key);
@@ -1080,17 +1124,38 @@ class Matrix {
     return isEnclosed;
   }
 
+  /// The minimum percentage of the character's height required for a vertical line to be considered valid.
   final double _thresholdLinePercentage = 0.7;
 
+  /// Checks if the given matrix contains a vertical line on the left side.
+  ///
+  /// This function scans the matrix from left to right, looking for vertical lines
+  /// that meet a minimum height requirement. It uses a helper function
+  /// `_isValidVerticalLineLeft` to validate potential vertical lines.
+  ///
+  /// Parameters:
+  /// - [matrix]: A Matrix representing the data to be analyzed.
+  ///   Assumed to contain boolean values where true represents a filled cell.
+  ///
+  /// Returns:
+  /// A boolean value indicating whether a valid vertical line was found on the left side.
+  ///
+  /// Note:
+  /// - The minimum height for a vertical line is determined by `_thresholdLinePercentage`,
+  ///   which is a constant value representing the percentage of the character's height.
+  /// - The function modifies the [visited] matrix in-place to keep track of visited cells.
   bool _hasVerticalLineLeft(Matrix matrix) {
     Matrix visited = Matrix(matrix.cols, matrix.rows);
 
     // We only consider lines that are more than 40% of the character's height
     int minVerticalLine = (matrix.rows * _thresholdLinePercentage).toInt();
 
+    // Iterate over the matrix from left to right
     for (int x = 0; x < matrix.cols; x++) {
       for (int y = 0; y < matrix.rows; y++) {
+        // If the current cell is filled and not visited
         if (matrix.data[y][x] && !visited.data[y][x]) {
+          // Check if a valid vertical line exists starting from this cell
           if (_isValidVerticalLineLeft(
             minVerticalLine,
             matrix,
@@ -1098,24 +1163,46 @@ class Matrix {
             y,
             visited,
           )) {
+            // If a valid line is found, return true
             return true;
           }
         }
       }
     }
 
+    // If no valid vertical line is found, return false
     return false;
   }
 
+  /// Checks if the given matrix contains a vertical line on the right side.
+  ///
+  /// This function scans the matrix from right to left, looking for vertical lines
+  /// that meet a minimum height requirement. It uses a helper function
+  /// `_isValidVerticalLineRight` to validate potential vertical lines.
+  ///
+  /// Parameters:
+  /// - [matrix]: A Matrix representing the data to be analyzed.
+  ///   Assumed to contain boolean values where true represents a filled cell.
+  ///
+  /// Returns:
+  /// A boolean value indicating whether a valid vertical line was found on the right side.
+  ///
+  /// Note:
+  /// - The minimum height for a vertical line is determined by `_thresholdLinePercentage`,
+  ///   which is assumed to be a class-level constant or variable.
+  /// - The function modifies the [visited] matrix in-place to keep track of visited cells.
   bool _hasVerticalLineRight(Matrix matrix) {
     Matrix visited = Matrix(matrix.cols, matrix.rows);
 
     // We only consider lines that are more than 40% of the character's height
     int minVerticalLine = (matrix.rows * _thresholdLinePercentage).toInt();
 
+    // Iterate over the matrix from right to left
     for (int x = matrix.cols - 1; x >= 0; x--) {
       for (int y = 0; y < matrix.rows; y++) {
+        // If the current cell is filled and not visited
         if (matrix.data[y][x] && !visited.data[y][x]) {
+          // Check if a valid vertical line exists starting from this cell
           if (_isValidVerticalLineRight(
             minVerticalLine,
             matrix,
@@ -1123,12 +1210,14 @@ class Matrix {
             y,
             visited,
           )) {
+            // If a valid line is found, return true
             return true;
           }
         }
       }
     }
 
+    // If no valid vertical line is found, return false
     return false;
   }
 
@@ -1164,6 +1253,22 @@ class Matrix {
     return false;
   }
 
+  /// Validates a potential vertical line on the right side of a character.
+  ///
+  /// This function checks if there's a valid vertical line starting from the given
+  /// coordinates (x, y) in the matrix. A valid line must meet the following criteria:
+  /// 1. It must be at least [minVerticalLine] pixels long.
+  /// 2. It must not have any filled pixels immediately to its left.
+  ///
+  /// Parameters:
+  /// - [minVerticalLine]: The minimum length required for a vertical line to be considered valid.
+  /// - [matrix]: The Matrix representing the character or image being analyzed.
+  /// - [x]: The x-coordinate of the starting point of the potential line.
+  /// - [y]: The y-coordinate of the starting point of the potential line.
+  /// - [visited]: A Matrix to keep track of visited pixels.
+  ///
+  /// Returns:
+  /// A boolean value indicating whether a valid vertical line was found (true) or not (false).
   bool _isValidVerticalLineRight(
     int minVerticalLine,
     Matrix matrix,
@@ -1174,22 +1279,25 @@ class Matrix {
     int rows = matrix.rows;
     int lineLength = 0;
 
-    // Ensure no filled pixels on the immediate left side at any point
+    // Traverse downwards from the starting point
     while (y < rows && matrix.data[y][x]) {
       visited.data[y][x] = true;
       lineLength++;
 
-      // If there's a filled pixel to the left of any point in the line, it's invalid
+      // Check if there's a filled pixel to the left of the current point
       if (!_validLeftSideRight(matrix, x, y)) {
-        lineLength = 0; // reset
+        lineLength = 0; // Reset line length if an invalid pixel is found
       }
+
+      // If we've found a line of sufficient length, return true
       if (lineLength >= minVerticalLine) {
         return true;
       }
-      y++;
+
+      y++; // Move to the next row
     }
 
-    // Only count if the line length is sufficient
+    // If we've exited the loop, no valid line was found
     return false;
   }
 
