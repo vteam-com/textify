@@ -74,7 +74,7 @@ class ImageSourceSelectorState extends State<ImageSourceSelector>
               },
             ),
             IntrinsicHeight(
-              child: _buildContent(_tabController.index),
+              child: _buildContent(),
             ),
           ],
         );
@@ -82,8 +82,8 @@ class ImageSourceSelectorState extends State<ImageSourceSelector>
     );
   }
 
-  Widget _buildContent(final int selectedView) {
-    switch (selectedView) {
+  Widget _buildContent() {
+    switch (_tabController.index) {
       // Image source is from Samples
       case 1:
         return ImageSourceSamples(
@@ -93,18 +93,21 @@ class ImageSourceSelectorState extends State<ImageSourceSelector>
             final List<String> expectedText,
             bool includeSpaceDetection,
           ) async {
-            _imageSelected = image;
-            _expectedText = expectedText;
-            _includeSpaceDetection = true;
-            if (mounted) {
-              setState(() {
-                widget.onSourceChanged(
-                  _imageSelected,
-                  _expectedText,
-                  _fontName,
-                  _includeSpaceDetection,
-                );
-              });
+            // async call back we must double check that the user is still on the same Tab
+            if (_tabController.index == 1) {
+              _imageSelected = image;
+              _expectedText = expectedText;
+              _includeSpaceDetection = true;
+              if (mounted) {
+                setState(() {
+                  widget.onSourceChanged(
+                    _imageSelected,
+                    _expectedText,
+                    _fontName,
+                    _includeSpaceDetection,
+                  );
+                });
+              }
             }
           },
         );
@@ -114,18 +117,21 @@ class ImageSourceSelectorState extends State<ImageSourceSelector>
         return ImageSourceClipboard(
           transformationController: widget.transformationController,
           onImageChanged: (final ui.Image? newImage) {
-            _imageSelected = newImage;
-            _expectedText = [];
-            _includeSpaceDetection = true;
-            if (mounted) {
-              setState(() {
-                widget.onSourceChanged(
-                  _imageSelected,
-                  _expectedText,
-                  _fontName,
-                  _includeSpaceDetection,
-                );
-              });
+            // async call back we must double check that the user is still on the same Tab
+            if (_tabController.index == 2) {
+              _imageSelected = newImage;
+              _expectedText = [];
+              _includeSpaceDetection = true;
+              if (mounted) {
+                setState(() {
+                  widget.onSourceChanged(
+                    _imageSelected,
+                    _expectedText,
+                    _fontName,
+                    _includeSpaceDetection,
+                  );
+                });
+              }
             }
           },
         );
@@ -141,19 +147,22 @@ class ImageSourceSelectorState extends State<ImageSourceSelector>
             final String fontName,
             final bool includeSpaceDetections,
           ) {
-            _imageSelected = newImage;
-            _expectedText = expectedText;
-            _fontName = fontName;
-            _includeSpaceDetection = includeSpaceDetections;
-            if (mounted) {
-              setState(() {
-                widget.onSourceChanged(
-                  _imageSelected,
-                  _expectedText,
-                  _fontName,
-                  _includeSpaceDetection,
-                );
-              });
+            // async call back we must double check that the user is still on the same Tab
+            if (_tabController.index == 0) {
+              _imageSelected = newImage;
+              _expectedText = expectedText;
+              _fontName = fontName;
+              _includeSpaceDetection = includeSpaceDetections;
+              if (mounted) {
+                setState(() {
+                  widget.onSourceChanged(
+                    _imageSelected,
+                    _expectedText,
+                    _fontName,
+                    _includeSpaceDetection,
+                  );
+                });
+              }
             }
           },
         );
