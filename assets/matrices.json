@@ -2,7 +2,7 @@
     "templates": [
         {
             "character": " ",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -82,7 +82,7 @@
         },
         {
             "character": "!",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -363,7 +363,7 @@
         },
         {
             "character": "\"",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -375,7 +375,7 @@
         },
         {
             "character": "#",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -656,7 +656,7 @@
         },
         {
             "character": "$",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": true,
             "isDate": false,
             "isDigit": false,
@@ -937,7 +937,7 @@
         },
         {
             "character": "&",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -1218,7 +1218,7 @@
         },
         {
             "character": "'",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -1499,7 +1499,7 @@
         },
         {
             "character": "(",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -1780,7 +1780,7 @@
         },
         {
             "character": ")",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -2061,7 +2061,7 @@
         },
         {
             "character": "*",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -2342,7 +2342,7 @@
         },
         {
             "character": "+",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": true,
             "isDate": false,
             "isDigit": false,
@@ -2623,7 +2623,7 @@
         },
         {
             "character": ",",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": true,
             "isDate": false,
             "isDigit": false,
@@ -2904,7 +2904,7 @@
         },
         {
             "character": "-",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": true,
             "isDate": false,
             "isDigit": false,
@@ -3185,7 +3185,7 @@
         },
         {
             "character": "-",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": true,
             "isDate": true,
             "isDigit": false,
@@ -3466,7 +3466,7 @@
         },
         {
             "character": ".",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": true,
             "isDate": true,
             "isDigit": false,
@@ -3747,7 +3747,7 @@
         },
         {
             "character": "/",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": false,
             "isDate": true,
             "isDigit": false,
@@ -4028,7 +4028,7 @@
         },
         {
             "character": "0",
-            "enclosers": 1,
+            "enclosures": 1,
             "isAmount": true,
             "isDate": true,
             "isDigit": true,
@@ -4309,7 +4309,7 @@
         },
         {
             "character": "1",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": true,
             "isDate": true,
             "isDigit": true,
@@ -4590,7 +4590,7 @@
         },
         {
             "character": "2",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": true,
             "isDate": true,
             "isDigit": true,
@@ -4871,7 +4871,7 @@
         },
         {
             "character": "3",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": true,
             "isDate": true,
             "isDigit": true,
@@ -5152,7 +5152,7 @@
         },
         {
             "character": "4",
-            "enclosers": 1,
+            "enclosures": 1,
             "isAmount": true,
             "isDate": true,
             "isDigit": true,
@@ -5433,7 +5433,7 @@
         },
         {
             "character": "5",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": true,
             "isDate": true,
             "isDigit": true,
@@ -5714,7 +5714,7 @@
         },
         {
             "character": "6",
-            "enclosers": 1,
+            "enclosures": 1,
             "isAmount": true,
             "isDate": true,
             "isDigit": true,
@@ -5995,7 +5995,7 @@
         },
         {
             "character": "7",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": true,
             "isDate": true,
             "isDigit": true,
@@ -6276,7 +6276,7 @@
         },
         {
             "character": "8",
-            "enclosers": 2,
+            "enclosures": 2,
             "isAmount": true,
             "isDate": true,
             "isDigit": true,
@@ -6557,7 +6557,7 @@
         },
         {
             "character": "9",
-            "enclosers": 1,
+            "enclosures": 1,
             "isAmount": true,
             "isDate": true,
             "isDigit": true,
@@ -6838,7 +6838,7 @@
         },
         {
             "character": ":",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -7119,7 +7119,7 @@
         },
         {
             "character": ";",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -7400,7 +7400,7 @@
         },
         {
             "character": "<",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -7681,7 +7681,7 @@
         },
         {
             "character": "=",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -7962,7 +7962,7 @@
         },
         {
             "character": ">",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -8243,7 +8243,7 @@
         },
         {
             "character": "?",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -8524,7 +8524,7 @@
         },
         {
             "character": "@",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -8805,7 +8805,7 @@
         },
         {
             "character": "A",
-            "enclosers": 1,
+            "enclosures": 1,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -9086,7 +9086,7 @@
         },
         {
             "character": "B",
-            "enclosers": 2,
+            "enclosures": 2,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -9367,7 +9367,7 @@
         },
         {
             "character": "C",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -9648,7 +9648,7 @@
         },
         {
             "character": "D",
-            "enclosers": 1,
+            "enclosures": 1,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -9929,7 +9929,7 @@
         },
         {
             "character": "E",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -10210,7 +10210,7 @@
         },
         {
             "character": "F",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -10491,7 +10491,7 @@
         },
         {
             "character": "G",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -10772,7 +10772,7 @@
         },
         {
             "character": "H",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -11053,7 +11053,7 @@
         },
         {
             "character": "I",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -11334,7 +11334,7 @@
         },
         {
             "character": "J",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -11615,7 +11615,7 @@
         },
         {
             "character": "K",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -11896,7 +11896,7 @@
         },
         {
             "character": "L",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -12177,7 +12177,7 @@
         },
         {
             "character": "M",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -12458,7 +12458,7 @@
         },
         {
             "character": "N",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -12739,7 +12739,7 @@
         },
         {
             "character": "O",
-            "enclosers": 1,
+            "enclosures": 1,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -13020,7 +13020,7 @@
         },
         {
             "character": "P",
-            "enclosers": 1,
+            "enclosures": 1,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -13301,7 +13301,7 @@
         },
         {
             "character": "Q",
-            "enclosers": 1,
+            "enclosures": 1,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -13582,7 +13582,7 @@
         },
         {
             "character": "R",
-            "enclosers": 1,
+            "enclosures": 1,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -13863,7 +13863,7 @@
         },
         {
             "character": "S",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -14144,7 +14144,7 @@
         },
         {
             "character": "T",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -14425,7 +14425,7 @@
         },
         {
             "character": "U",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -14706,7 +14706,7 @@
         },
         {
             "character": "V",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -14987,7 +14987,7 @@
         },
         {
             "character": "W",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -15268,7 +15268,7 @@
         },
         {
             "character": "X",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -15549,7 +15549,7 @@
         },
         {
             "character": "Y",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -15830,7 +15830,7 @@
         },
         {
             "character": "Z",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -16111,7 +16111,7 @@
         },
         {
             "character": "[",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -16392,7 +16392,7 @@
         },
         {
             "character": "\\",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": false,
             "isDate": true,
             "isDigit": false,
@@ -16673,7 +16673,7 @@
         },
         {
             "character": "]",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -16954,7 +16954,7 @@
         },
         {
             "character": "a",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -17235,7 +17235,7 @@
         },
         {
             "character": "b",
-            "enclosers": 1,
+            "enclosures": 1,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -17516,7 +17516,7 @@
         },
         {
             "character": "c",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -17797,7 +17797,7 @@
         },
         {
             "character": "d",
-            "enclosers": 1,
+            "enclosures": 1,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -18078,7 +18078,7 @@
         },
         {
             "character": "e",
-            "enclosers": 1,
+            "enclosures": 1,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -18359,7 +18359,7 @@
         },
         {
             "character": "f",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -18640,7 +18640,7 @@
         },
         {
             "character": "g",
-            "enclosers": 1,
+            "enclosures": 1,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -18921,7 +18921,7 @@
         },
         {
             "character": "h",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -19202,7 +19202,7 @@
         },
         {
             "character": "i",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -19483,7 +19483,7 @@
         },
         {
             "character": "j",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -19764,7 +19764,7 @@
         },
         {
             "character": "k",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -20045,7 +20045,7 @@
         },
         {
             "character": "l",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -20326,7 +20326,7 @@
         },
         {
             "character": "m",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -20607,7 +20607,7 @@
         },
         {
             "character": "n",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -20888,7 +20888,7 @@
         },
         {
             "character": "o",
-            "enclosers": 1,
+            "enclosures": 1,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -21169,7 +21169,7 @@
         },
         {
             "character": "p",
-            "enclosers": 1,
+            "enclosures": 1,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -21450,7 +21450,7 @@
         },
         {
             "character": "q",
-            "enclosers": 1,
+            "enclosures": 1,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -21731,7 +21731,7 @@
         },
         {
             "character": "r",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -22012,7 +22012,7 @@
         },
         {
             "character": "s",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -22293,7 +22293,7 @@
         },
         {
             "character": "t",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -22574,7 +22574,7 @@
         },
         {
             "character": "u",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -22855,7 +22855,7 @@
         },
         {
             "character": "v",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -23136,7 +23136,7 @@
         },
         {
             "character": "w",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -23417,7 +23417,7 @@
         },
         {
             "character": "x",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -23698,7 +23698,7 @@
         },
         {
             "character": "y",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -23979,7 +23979,7 @@
         },
         {
             "character": "z",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -24260,7 +24260,7 @@
         },
         {
             "character": "{",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -24541,7 +24541,7 @@
         },
         {
             "character": "}",
-            "enclosers": 0,
+            "enclosures": 0,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,

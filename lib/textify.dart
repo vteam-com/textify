@@ -142,7 +142,7 @@ class Textify {
       }
 
       int matchingChecks = 0;
-      if (numberOfEnclosure == template.enclosers) {
+      if (numberOfEnclosure == template.enclosures) {
         matchingChecks++;
       }
       if (punctuation == template.isPunctuation) {

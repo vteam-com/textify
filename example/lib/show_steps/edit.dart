@@ -252,7 +252,7 @@ class _EditScreenState extends State<EditScreen> {
           final templateMatrix = definition.matrices[match.matrixIndex];
 
           title +=
-              '\nTeamplate "${match.character}"[${match.matrixIndex}] ${templateMatrix.font}\nScore = ${(match.score * 100).toStringAsFixed(1)}% E:${definition.enclosers}, ${verticalLinesTemplate(definition)}';
+              '\nTeamplate "${match.character}"[${match.matrixIndex}] ${templateMatrix.font}\nScore = ${(match.score * 100).toStringAsFixed(1)}% E:${definition.enclosures}, ${verticalLinesTemplate(definition)}';
 
           overlayGridText = Matrix.getStringListOfOverladedGrids(
             matrixNormalized,

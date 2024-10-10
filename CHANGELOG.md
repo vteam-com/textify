@@ -4,6 +4,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.4] - 2024-10-10
+
+### Changed
+
+- Rename "Encloser" to "Enclosure"
+  
 ## [0.1.3] - 2024-10-09
 
 ### Changed

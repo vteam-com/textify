@@ -43,30 +43,30 @@ void main() async {
       );
 
       expect(
-        instance.characterDefinitions.getDefinition(char)!.enclosers,
+        instance.characterDefinitions.getDefinition(char)!.enclosures,
         0,
         reason: reason,
       );
     }
 
     // Enclosures
-    expect(instance.characterDefinitions.getDefinition('A')!.enclosers, 1);
-    expect(instance.characterDefinitions.getDefinition('B')!.enclosers, 2);
-    expect(instance.characterDefinitions.getDefinition('b')!.enclosers, 1);
-    expect(instance.characterDefinitions.getDefinition('D')!.enclosers, 1);
-    expect(instance.characterDefinitions.getDefinition('d')!.enclosers, 1);
-    expect(instance.characterDefinitions.getDefinition('e')!.enclosers, 1);
-    expect(instance.characterDefinitions.getDefinition('g')!.enclosers, 1);
-    expect(instance.characterDefinitions.getDefinition('O')!.enclosers, 1);
-    expect(instance.characterDefinitions.getDefinition('o')!.enclosers, 1);
-    expect(instance.characterDefinitions.getDefinition('P')!.enclosers, 1);
-    expect(instance.characterDefinitions.getDefinition('p')!.enclosers, 1);
-    expect(instance.characterDefinitions.getDefinition('Q')!.enclosers, 1);
-    expect(instance.characterDefinitions.getDefinition('q')!.enclosers, 1);
-    expect(instance.characterDefinitions.getDefinition('0')!.enclosers, 1);
-    expect(instance.characterDefinitions.getDefinition('4')!.enclosers, 1);
-    expect(instance.characterDefinitions.getDefinition('6')!.enclosers, 1);
-    expect(instance.characterDefinitions.getDefinition('8')!.enclosers, 2);
-    expect(instance.characterDefinitions.getDefinition('9')!.enclosers, 1);
+    expect(instance.characterDefinitions.getDefinition('A')!.enclosures, 1);
+    expect(instance.characterDefinitions.getDefinition('B')!.enclosures, 2);
+    expect(instance.characterDefinitions.getDefinition('b')!.enclosures, 1);
+    expect(instance.characterDefinitions.getDefinition('D')!.enclosures, 1);
+    expect(instance.characterDefinitions.getDefinition('d')!.enclosures, 1);
+    expect(instance.characterDefinitions.getDefinition('e')!.enclosures, 1);
+    expect(instance.characterDefinitions.getDefinition('g')!.enclosures, 1);
+    expect(instance.characterDefinitions.getDefinition('O')!.enclosures, 1);
+    expect(instance.characterDefinitions.getDefinition('o')!.enclosures, 1);
+    expect(instance.characterDefinitions.getDefinition('P')!.enclosures, 1);
+    expect(instance.characterDefinitions.getDefinition('p')!.enclosures, 1);
+    expect(instance.characterDefinitions.getDefinition('Q')!.enclosures, 1);
+    expect(instance.characterDefinitions.getDefinition('q')!.enclosures, 1);
+    expect(instance.characterDefinitions.getDefinition('0')!.enclosures, 1);
+    expect(instance.characterDefinitions.getDefinition('4')!.enclosures, 1);
+    expect(instance.characterDefinitions.getDefinition('6')!.enclosures, 1);
+    expect(instance.characterDefinitions.getDefinition('8')!.enclosures, 2);
+    expect(instance.characterDefinitions.getDefinition('9')!.enclosures, 1);
   });
 }

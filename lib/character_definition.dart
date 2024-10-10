@@ -9,7 +9,7 @@ class CharacterDefinition {
   /// [character] is required. All other parameters are optional and have default values.
   CharacterDefinition({
     required this.character,
-    this.enclosers = 0,
+    this.enclosures = 0,
     this.isAmount = false,
     this.isDate = false,
     this.isDigit = false,
@@ -24,7 +24,7 @@ class CharacterDefinition {
   factory CharacterDefinition.fromJson(Map<String, dynamic> json) {
     return CharacterDefinition(
       character: json['character'] as String,
-      enclosers: json['enclosers'] as int,
+      enclosures: json['enclosures'] as int,
       lineLeft: json['lineLeft'] as bool,
       lineRight: json['lineRight'] as bool,
       isLetter: json['isLetter'] as bool,
@@ -54,8 +54,8 @@ class CharacterDefinition {
   /// The character being defined.
   final String character;
 
-  /// The number of enclosers for this character.
-  final int enclosers;
+  /// The number of enclosures for this character.
+  final int enclosures;
 
   /// Indicates if this character is used in amounts.
   bool isAmount;
@@ -85,7 +85,7 @@ class CharacterDefinition {
   Map<String, dynamic> toJson() {
     return {
       'character': character,
-      'enclosers': enclosers,
+      'enclosures': enclosures,
       'isAmount': isAmount,
       'isDate': isDate,
       'isDigit': isDigit,
