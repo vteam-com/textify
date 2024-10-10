@@ -87,8 +87,8 @@ class _ImageSourceGeneratedState extends State<ImageSourceGenerated> {
         _buildDashboardInputs(),
         Expanded(
           child: PanelContent(
-            start: const SizedBox(),
-            middle: _imageGenerated == null
+            top: _buildActionButtons(),
+            center: _imageGenerated == null
                 ? Center(child: Text('Loading...'))
                 : InteractiveViewer(
                     constrained: false,
@@ -102,7 +102,6 @@ class _ImageSourceGeneratedState extends State<ImageSourceGenerated> {
                       fit: BoxFit.contain,
                     ),
                   ),
-            end: _buildActionButtons(),
           ),
         ),
       ],
@@ -338,28 +337,25 @@ class _ImageSourceGeneratedState extends State<ImageSourceGenerated> {
   }
 
   Widget _buildActionButtons() {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          SizedBox(
-            width: 150,
-            child: OutlinedButton(
-              onPressed: resetContent,
-              child: const Text('Reset'),
-            ),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        SizedBox(
+          width: 150,
+          child: OutlinedButton(
+            onPressed: resetContent,
+            child: const Text('Reset'),
           ),
-          gap(),
-          SizedBox(
-            width: 150,
-            child: OutlinedButton(
-              onPressed: switchToRegenerateTemplatesScreen,
-              child: const Text('Regenerate'),
-            ),
+        ),
+        gap(),
+        SizedBox(
+          width: 150,
+          child: OutlinedButton(
+            onPressed: switchToRegenerateTemplatesScreen,
+            child: const Text('Regenerate'),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 

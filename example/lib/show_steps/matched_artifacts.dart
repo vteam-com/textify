@@ -110,8 +110,7 @@ class MatchedArtifacts extends StatelessWidget {
 
   Widget _buildMatchingCharacter(final BuildContext context) {
     return PanelContent(
-      start: const SizedBox(),
-      middle: Center(
+      center: Center(
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: SizedBox(
@@ -125,7 +124,6 @@ class MatchedArtifacts extends StatelessWidget {
           ),
         ),
       ),
-      end: const SizedBox(),
     );
   }
 

@@ -79,7 +79,7 @@ class _ImageSourceSamplesState extends State<ImageSourceSamples> {
   @override
   Widget build(BuildContext context) {
     return PanelContent(
-      start: IconButton(
+      left: IconButton(
         icon: const Icon(Icons.arrow_back),
         onPressed: _currentIndex > 0
             ? () {
@@ -87,7 +87,7 @@ class _ImageSourceSamplesState extends State<ImageSourceSamples> {
               }
             : null,
       ),
-      middle: InteractiveViewer(
+      center: InteractiveViewer(
         transformationController: widget.transformationController,
         constrained: false,
         minScale: 0.1,
@@ -97,7 +97,7 @@ class _ImageSourceSamplesState extends State<ImageSourceSamples> {
           fit: BoxFit.contain,
         ),
       ),
-      end: IconButton(
+      right: IconButton(
         icon: const Icon(Icons.arrow_forward),
         onPressed: _currentIndex < imageFileData.length - 1
             ? () {

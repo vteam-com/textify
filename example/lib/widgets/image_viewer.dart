@@ -42,8 +42,7 @@ Widget buildInteractiveImageViewer(
   final TransformationController? transformationController,
 ) {
   return PanelContent(
-    start: const SizedBox(),
-    middle: InteractiveViewer(
+    center: InteractiveViewer(
       transformationController: transformationController,
       constrained: false,
       minScale: 0.1,
@@ -52,6 +51,5 @@ Widget buildInteractiveImageViewer(
         image: iamgeToDiplay,
       ),
     ),
-    end: const SizedBox(),
   );
 }

@@ -3,45 +3,56 @@ import 'package:flutter/material.dart';
 class PanelContent extends StatelessWidget {
   const PanelContent({
     super.key,
-    required this.middle,
-    required this.end,
-    required this.start,
+    this.left,
+    this.top,
+    required this.center,
+    this.bottom,
+    this.right,
   });
 
-  final Widget end;
-  final Widget middle;
-  final Widget start;
+  final Widget? left;
+  final Widget? top;
+  final Widget center;
+  final Widget? bottom;
+  final Widget? right;
 
   @override
   Widget build(final BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        start,
+        if (left != null) left!,
         Expanded(
-          child: Container(
-            height: 400,
-            margin: const EdgeInsets.only(top: 13, bottom: 3),
-            padding: const EdgeInsets.all(2),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8.0),
-              border: Border.all(
-                color: Theme.of(context).colorScheme.secondary.withAlpha(200),
+          child: Column(
+            children: [
+              if (top != null) top!,
+              Container(
+                height: 400,
+                margin: const EdgeInsets.only(top: 13, bottom: 3),
+                padding: const EdgeInsets.all(2),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8.0),
+                  border: Border.all(
+                    color:
+                        Theme.of(context).colorScheme.secondary.withAlpha(200),
+                  ),
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.orange.shade900.withAlpha(50),
+                      Colors.purple.shade900.withAlpha(50),
+                      Colors.blue.shade900.withAlpha(50),
+                    ],
+                  ),
+                ),
+                child: center,
               ),
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Colors.orange.shade900.withAlpha(50),
-                  Colors.purple.shade900.withAlpha(50),
-                  Colors.blue.shade900.withAlpha(50),
-                ],
-              ),
-            ),
-            child: middle,
+              if (bottom != null) bottom!,
+            ],
           ),
         ),
-        end,
+        if (right != null) right!,
       ],
     );
   }

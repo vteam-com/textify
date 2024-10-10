@@ -36,7 +36,7 @@ class _ImageSourceClipboardState extends State<ImageSourceClipboard> {
   Widget build(BuildContext context) {
     return PanelContent(
       // Paste button
-      start: IconButton(
+      left: IconButton(
         icon: const Icon(Icons.paste),
         onPressed: () async {
           final Uint8List? bytes = await Pasteboard.image;
@@ -56,9 +56,9 @@ class _ImageSourceClipboardState extends State<ImageSourceClipboard> {
         },
       ),
       // Display image
-      middle: _buildDisplayImage(),
+      center: _buildDisplayImage(),
       // Clear button
-      end: IconButton(
+      right: IconButton(
         icon: const Icon(Icons.clear),
         onPressed: () async {
           if (mounted) {

@@ -32,7 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
   String _textFound = '';
 
   bool _isExpandedArtifactFound = true;
-  bool _isExpandedHightContrast = false;
+  bool _isExpandedHightContrast = true;
   bool _isExpandedResults = true;
   bool _isExpandedSource = true;
 
@@ -153,41 +153,39 @@ class _HomeScreenState extends State<HomeScreen> {
     final Function onToggleCleanup,
     final bool cleanUpArtifacts,
   ) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        children: [
-          OutlinedButton(
-            onPressed: () {
-              _transformationController.value =
-                  _transformationController.value.scaled(1 / 1.5);
-            },
-            child: const Text('Zoom -'),
-          ),
-          gap(),
-          OutlinedButton(
-            onPressed: () {
-              _transformationController.value =
-                  _transformationController.value.scaled(1.5);
-            },
-            child: const Text('Zoom +'),
-          ),
-          gap(),
-          OutlinedButton(
-            onPressed: () {
-              _transformationController.value = Matrix4.identity();
-            },
-            child: const Text('Center'),
-          ),
-          gap(),
-          OutlinedButton(
-            onPressed: () {
-              onToggleCleanup();
-            },
-            child: Text(cleanUpArtifacts ? 'Original' : 'Normalized'),
-          ),
-        ],
-      ),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        OutlinedButton(
+          onPressed: () {
+            _transformationController.value =
+                _transformationController.value.scaled(1 / 1.5);
+          },
+          child: const Text('Zoom -'),
+        ),
+        gap(),
+        OutlinedButton(
+          onPressed: () {
+            _transformationController.value =
+                _transformationController.value.scaled(1.5);
+          },
+          child: const Text('Zoom +'),
+        ),
+        gap(),
+        OutlinedButton(
+          onPressed: () {
+            _transformationController.value = Matrix4.identity();
+          },
+          child: const Text('Center'),
+        ),
+        gap(),
+        OutlinedButton(
+          onPressed: () {
+            onToggleCleanup();
+          },
+          child: Text(cleanUpArtifacts ? 'Original' : 'Normalized'),
+        ),
+      ],
     );
   }
 
@@ -197,8 +195,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final Function onToggleCleanup,
   ) {
     return PanelContent(
-      start: const SizedBox(),
-      middle: InteractiveViewer(
+      center: InteractiveViewer(
         transformationController: _transformationController,
         constrained: false,
         minScale: 0.1,
@@ -208,7 +205,7 @@ class _HomeScreenState extends State<HomeScreen> {
           applyPacking: cleanUpArtifacts,
         ),
       ),
-      end: _buildActionButtons(
+      top: _buildActionButtons(
         onToggleCleanup,
         cleanUpArtifacts,
       ),
