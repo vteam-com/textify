@@ -21,7 +21,13 @@ class CharacterDefinition {
   });
 
   /// Creates a [CharacterDefinition] from a JSON map.
-  factory CharacterDefinition.fromJson(Map<String, dynamic> json) {
+  ///
+  /// [json] is a map containing key-value pairs representing the properties
+  /// of a CharacterDefinition. The keys should match the property names of
+  /// the CharacterDefinition class, and the values should be of the appropriate types.
+  ///
+  /// Returns a new instance of [CharacterDefinition] populated with the data from [json].
+  factory CharacterDefinition.fromJson(final Map<String, dynamic> json) {
     return CharacterDefinition(
       character: json['character'] as String,
       enclosures: json['enclosures'] as int,
@@ -39,7 +45,18 @@ class CharacterDefinition {
   }
 
   /// Creates a [CharacterDefinition] from a JSON string.
-  factory CharacterDefinition.fromJsonString(String jsonString) {
+  ///
+  /// [jsonString] is a String containing a JSON representation of a CharacterDefinition.
+  /// The JSON structure should match the properties of the CharacterDefinition class.
+  ///
+  /// This factory method first decodes the JSON string into a Map using [jsonDecode],
+  /// then delegates to [CharacterDefinition.fromJson] to create the instance.
+  ///
+  /// Returns a new instance of [CharacterDefinition] populated with the data from [jsonString].
+  ///
+  /// Throws a [FormatException] if the string is not valid JSON.
+  /// Throws a [TypeError] if the JSON structure doesn't match the expected format.
+  factory CharacterDefinition.fromJsonString(final String jsonString) {
     return CharacterDefinition.fromJson(
       jsonDecode(jsonString) as Map<String, dynamic>,
     );
