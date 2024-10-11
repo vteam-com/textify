@@ -14,8 +14,12 @@ class ImageSourceSelector extends StatefulWidget {
     required this.onSourceChanged,
   });
 
-  final Function(ui.Image? imageSelected, List<String> expectedText,
-      String fontName, bool includeSpaceDetection) onSourceChanged;
+  final Function(
+    ui.Image? imageSelected,
+    List<String> expectedText,
+    String fontName,
+    bool includeSpaceDetection,
+  ) onSourceChanged;
   final TransformationController transformationController;
 
   @override

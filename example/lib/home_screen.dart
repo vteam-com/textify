@@ -1,7 +1,7 @@
-import 'package:intl/intl.dart';
 import 'dart:ui' as ui;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:textify/matrix.dart';
 import 'package:textify/textify.dart';
@@ -13,7 +13,9 @@ import 'show_steps/show_findings.dart';
 import 'widgets/gap.dart';
 import 'widgets/image_viewer.dart';
 
+///
 class HomeScreen extends StatefulWidget {
+  ///
   const HomeScreen({super.key});
 
   @override
@@ -33,7 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
   String _textFound = '';
 
   bool _isExpandedArtifactFound = true;
-  bool _isExpandedHightContrast = true;
+  bool _isExpandedOptimized = true;
   bool _isExpandedResults = true;
   bool _isExpandedSource = true;
 
@@ -75,14 +77,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     case 0:
                       _isExpandedSource = isExpanded;
                     case 1:
-                      _isExpandedHightContrast = isExpanded;
+                      _isExpandedOptimized = isExpanded;
                     case 2:
                       _isExpandedArtifactFound = isExpanded;
                     case 3:
                       _isExpandedResults = isExpanded;
                   }
                 });
-                _savePreferrences();
+                _savePreferences();
               },
               children: [
                 //
@@ -97,14 +99,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
 
                 //
-                // Input image in high conttrast
+                // Input image in high contrast
                 //
                 _buildExpansionPanel(
                   titleLeft: 'High Contrast',
                   titleCenter: _getDimensionOfImageSource(_imageSource),
                   titleRight: '',
-                  isExpanded: _isExpandedHightContrast,
-                  content: _buildShowPiplineStateHightContrast(
+                  isExpanded: _isExpandedOptimized,
+                  content: _buildOptimizedImage(
                     _imageBlackOnWhite,
                     _transformationController,
                   ),
@@ -286,7 +288,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildShowPiplineStateHightContrast(
+  Widget _buildOptimizedImage(
     final ui.Image? imageHighContrast,
     final TransformationController? transformationController,
   ) {
@@ -341,16 +343,16 @@ class _HomeScreenState extends State<HomeScreen> {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     _isExpandedSource = prefs.getBool('expanded_source') ?? true;
     _isExpandedArtifactFound = prefs.getBool('expanded_found') ?? true;
-    _isExpandedHightContrast = prefs.getBool('expanded_contrast') ?? true;
+    _isExpandedOptimized = prefs.getBool('expanded_contrast') ?? true;
     _isExpandedResults = prefs.getBool('expanded_results') ?? true;
   }
 
-  Future<void> _savePreferrences() async {
+  Future<void> _savePreferences() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
 
     await prefs.setBool('expanded_source', _isExpandedSource);
     await prefs.setBool('expanded_found', _isExpandedArtifactFound);
-    await prefs.setBool('expanded_contrast', _isExpandedHightContrast);
+    await prefs.setBool('expanded_contrast', _isExpandedOptimized);
     await prefs.setBool('expanded_results', _isExpandedResults);
   }
 }

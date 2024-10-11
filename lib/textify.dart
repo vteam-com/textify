@@ -26,24 +26,23 @@ class Textify {
   String textFound = '';
 
   /// Represents the start time of a process or operation.
-  DateTime processeBegin = DateTime.now();
+  DateTime processBegin = DateTime.now();
 
   /// Represents the end time of a process or operation.
-  DateTime processedEnd = DateTime.now();
+  DateTime processEnd = DateTime.now();
 
   /// Calculates the duration, in milliseconds, between the start and end times
   /// of a process or operation.
   ///
   /// The duration is calculated by subtracting the number of milliseconds since
-  /// the Unix epoch for the start time (`processeBegin`) from the number of
+  /// the Unix epoch for the start time (`processBegin`) from the number of
   /// milliseconds since the Unix epoch for the end time (`processedEnd`).
   ///
   /// Returns:
   ///   An integer representing the duration, in milliseconds, between the start
   ///   and end times of the process or operation.
   int get duration =>
-      processedEnd.millisecondsSinceEpoch -
-      processeBegin.millisecondsSinceEpoch;
+      processEnd.millisecondsSinceEpoch - processBegin.millisecondsSinceEpoch;
 
   /// Should textify attempt to detect the Space ' ' character
   bool includeSpaceDetections = true;
@@ -234,7 +233,7 @@ class Textify {
     );
 
     /// Start
-    processeBegin = DateTime.now();
+    processBegin = DateTime.now();
 
     findArtifactsFromBinaryImage(imageAsMatrix);
 
@@ -242,7 +241,7 @@ class Textify {
       supportedCharacters: supportedCharacters,
     );
 
-    processedEnd = DateTime.now();
+    processEnd = DateTime.now();
     // End
 
     return result;
@@ -270,13 +269,13 @@ class Textify {
     // (1) Find artifact using flood fill
     _findArtifacts(imageAsBinary);
 
-    // (2) merge overlaping artifact
+    // (2) merge overlapping artifact
     _mergeOverlappingArtifacts();
 
     // (3) merge proximity artifact for cases like  [i j ; :]
     _mergeConnectedArtifacts(verticalThreshold: 20, horizontalThreshold: 4);
 
-    // (4) create band based on proxymity of artifacts
+    // (4) create band based on proximity of artifacts
     _groupArtifactsIntoBands();
 
     // (5) post-process each band for addition clean up of the artifacts in each band
@@ -313,8 +312,8 @@ class Textify {
         final Artifact next = artifacts[j];
 
         if (_areArtifactsConnected(
-          current.rectangleOrinal,
-          next.rectangleOrinal,
+          current.rectangleOriginal,
+          next.rectangleOriginal,
           verticalThreshold,
           horizontalThreshold,
         )) {
@@ -428,7 +427,7 @@ class Textify {
 
     // Create and return the Artifact object
     final Artifact artifact = Artifact();
-    artifact.rectangleOrinal = rectangle;
+    artifact.rectangleOriginal = rectangle;
     artifact.rectangleAdjusted = rectangle;
     artifact.matrixOriginal = subGrid;
 
@@ -449,7 +448,7 @@ class Textify {
     final double verticalTolerance = 10;
     // Sort artifacts by the top y-position of their rectangles
     this.artifacts.sort(
-          (a, b) => a.rectangleOrinal.top.compareTo(b.rectangleOrinal.top),
+          (a, b) => a.rectangleOriginal.top.compareTo(b.rectangleOriginal.top),
         );
 
     this.bands.clear();
@@ -460,7 +459,7 @@ class Textify {
       for (Band band in bands) {
         Rect boundingBox = Band.getBoundingBox(band.artifacts);
         if (_isOverlappingVertically(
-          artifact.rectangleOrinal,
+          artifact.rectangleOriginal,
           boundingBox,
           verticalTolerance,
         )) {

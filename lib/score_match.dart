@@ -16,13 +16,13 @@ class ScoreMatch {
     required this.score,
   });
 
-  /// Charcter matched
+  /// Character matched
   final String character;
 
   /// Index of the matching template matrices
   final int matrixIndex;
 
-  /// final score in pecentation 0..1
+  /// final score in percentage 0..1
   final double score;
 
   /// Checks if the current object represents an empty or uninitialized state.

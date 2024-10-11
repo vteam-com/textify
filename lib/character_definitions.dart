@@ -69,15 +69,15 @@ class CharacterDefinitions {
   /// Parameters:
   /// - [character]: A [String] representing the character for which to retrieve the matrix.
   ///   This should be a single character, typically.
-  /// - [matriceIndex]: An [int] specifying the index of the desired matrix within the character's
+  /// - [matricesIndex]: An [int] specifying the index of the desired matrix within the character's
   ///   definition. Different indices may represent variations or different representations of the character.
   ///
   /// Returns:
   /// - A [Matrix] object representing the character at the specified index.
   /// - Returns an empty [Matrix] if:
   ///   - No definition is found for the character.
-  ///   - The matriceIndex is negative.
-  ///   - The matriceIndex is out of bounds for the character's matrices.
+  ///   - The matricesIndex is negative.
+  ///   - The matricesIndex is out of bounds for the character's matrices.
   ///
   /// Example:
   /// ```dart
@@ -86,15 +86,15 @@ class CharacterDefinitions {
   /// ```
   Matrix getMatrix(
     final String character,
-    final int matriceIndex,
+    final int matricesIndex,
   ) {
     final CharacterDefinition? definition = getDefinition(character);
     if (definition == null ||
-        matriceIndex < 0 ||
-        matriceIndex >= definition.matrices.length) {
+        matricesIndex < 0 ||
+        matricesIndex >= definition.matrices.length) {
       return Matrix();
     }
-    return definition.matrices[matriceIndex];
+    return definition.matrices[matricesIndex];
   }
 
   /// Loads character definitions from a JSON file.

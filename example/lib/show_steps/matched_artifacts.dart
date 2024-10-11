@@ -2,9 +2,8 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:textify/textify.dart';
-
-import '../image_sources/panel_content.dart';
-import '../../widgets/gap.dart';
+import 'package:textify_dashboard/image_sources/panel_content.dart';
+import 'package:textify_dashboard/widgets/gap.dart';
 import 'edit.dart';
 import 'matched_artifact.dart';
 
@@ -188,8 +187,12 @@ double getPercentageOfMatches(List<String> expectedStrings, String textFound) {
 ///   A double value representing the similarity percentage between the two
 ///   strings, clamped between 0.0 and 100.0.
 double compareStringInPercentage(final String s1, final String s2) {
-  if (s1 == s2) return 100.0;
-  if (s1.isEmpty || s2.isEmpty) return 0.0;
+  if (s1 == s2) {
+    return 100.0;
+  }
+  if (s1.isEmpty || s2.isEmpty) {
+    return 0.0;
+  }
 
   final int len1 = s1.length;
   final int len2 = s2.length;
@@ -221,9 +224,15 @@ double compareStringInPercentage(final String s1, final String s2) {
 }
 
 int damerauLevenshteinDistance(String source, String target) {
-  if (source == target) return 0;
-  if (source.isEmpty) return target.length;
-  if (target.isEmpty) return source.length;
+  if (source == target) {
+    return 0;
+  }
+  if (source.isEmpty) {
+    return target.length;
+  }
+  if (target.isEmpty) {
+    return source.length;
+  }
 
   List<List<int>> matrix = List.generate(
     source.length + 1,

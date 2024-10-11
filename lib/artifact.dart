@@ -16,7 +16,7 @@ class Artifact {
   String characterMatched = '';
 
   /// The rectangular area that this artifact occupies.
-  Rect rectangleOrinal = Rect.zero;
+  Rect rectangleOriginal = Rect.zero;
 
   /// The rectangular area that this artifact occupies.
   Rect rectangleAdjusted = Rect.zero;
@@ -275,7 +275,7 @@ class Artifact {
       (toMerge.rectangleAdjusted.top - newRect.top).toInt(),
     );
     this.matrixOriginal = newGrid;
-    this.rectangleOrinal =
-        this.rectangleOrinal.expandToInclude(toMerge.rectangleOrinal);
+    this.rectangleOriginal =
+        this.rectangleOriginal.expandToInclude(toMerge.rectangleOriginal);
   }
 }

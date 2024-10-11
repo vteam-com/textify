@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:textify/artifact.dart';
 import 'package:textify/band.dart';
 import 'package:textify/textify.dart';
-import 'package:textify_dashoard/widgets/paint_grid.dart';
+import 'package:textify_dashboard/widgets/paint_grid.dart';
 
 class DisplayArtifacts extends CustomPainter {
   DisplayArtifacts({
@@ -12,8 +12,6 @@ class DisplayArtifacts extends CustomPainter {
 
   final Textify textify;
   final bool applyPacking;
-
-  int p = 9;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -38,8 +36,13 @@ class DisplayArtifacts extends CustomPainter {
     canvas.drawRect(bandRect, paintRect);
   }
 
-  void _drawText(Canvas canvas, double x, double y, String text,
-      [double fontSize = 10]) {
+  void _drawText(
+    Canvas canvas,
+    double x,
+    double y,
+    String text, [
+    double fontSize = 10,
+  ]) {
     // Draw information about the band
     final textSpan = TextSpan(
       text: text,
@@ -84,8 +87,13 @@ class DisplayArtifacts extends CustomPainter {
         artifact.rectangleAdjusted.top.toInt(),
         artifact.matrixOriginal,
       );
-      _drawText(canvas, artifact.rectangleAdjusted.left,
-          artifact.rectangleAdjusted.top, id.toString(), 8);
+      _drawText(
+        canvas,
+        artifact.rectangleAdjusted.left,
+        artifact.rectangleAdjusted.top,
+        id.toString(),
+        8,
+      );
       id++;
     }
   }
@@ -110,8 +118,8 @@ class DisplayArtifacts extends CustomPainter {
       paintMatrix(
         canvas,
         colors[textify.artifacts.indexOf(artifact) % colors.length],
-        artifact.rectangleOrinal.left.toInt(),
-        artifact.rectangleOrinal.top.toInt(),
+        artifact.rectangleOriginal.left.toInt(),
+        artifact.rectangleOriginal.top.toInt(),
         artifact.matrixOriginal,
       );
     }
@@ -149,7 +157,7 @@ class DisplayArtifacts extends CustomPainter {
     final caption = _getBandTitle(band);
     final bandRect = Band.getBoundingBox(band.artifacts);
 
-    // main regsion in blue
+    // main region in blue
     _drawRectangle(
       canvas,
       bandRect,

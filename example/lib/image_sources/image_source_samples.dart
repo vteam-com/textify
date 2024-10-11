@@ -2,9 +2,9 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:textify_dashoard/widgets/image_viewer.dart';
+import 'package:textify_dashboard/widgets/image_viewer.dart';
 
-import 'debouce.dart';
+import 'debounce.dart';
 import 'panel_content.dart';
 
 class ImageSourceSamples extends StatefulWidget {

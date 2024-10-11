@@ -6,7 +6,7 @@ import 'package:textify/matrix.dart';
 import 'package:textify/score_match.dart';
 
 import 'package:textify/textify.dart';
-import 'package:textify_dashoard/widgets/paint_grid.dart';
+import 'package:textify_dashboard/widgets/paint_grid.dart';
 
 class EditScreen extends StatefulWidget {
   const EditScreen({
@@ -104,7 +104,7 @@ class _EditScreenState extends State<EditScreen> {
       // not found
     } else {
       if (scoreMatches.first != scoreOfExpectedCharacter) {
-        // We do not have a expecte match
+        // We do not have the expected match
         // Move the expected match to the second position of the list
         scoreMatches.remove(scoreOfExpectedCharacter);
         scoreMatches.insert(1, scoreOfExpectedCharacter);
@@ -224,7 +224,7 @@ class _EditScreenState extends State<EditScreen> {
           final templateMatrix = definition.matrices[match.matrixIndex];
 
           title +=
-              '\nTeamplate "${match.character}"[${match.matrixIndex}] ${templateMatrix.font}\nScore = ${(match.score * 100).toStringAsFixed(1)}% E:${definition.enclosures}, ${verticalLinesTemplate(definition)}';
+              '\nTemplate "${match.character}"[${match.matrixIndex}] ${templateMatrix.font}\nScore = ${(match.score * 100).toStringAsFixed(1)}% E:${definition.enclosures}, ${verticalLinesTemplate(definition)}';
         }
 
         final Matrix characterMatrix = widget.textify.characterDefinitions
@@ -241,11 +241,12 @@ class _EditScreenState extends State<EditScreen> {
                 characterMatrix..gridToString(forCode: true),
               ),
               ..._buildVariations(
-                  match.character,
-                  matrixNormalized,
-                  [0, 1, 2, 3]
-                      .where((number) => number != match.matrixIndex)
-                      .toList())
+                match.character,
+                matrixNormalized,
+                [0, 1, 2, 3]
+                    .where((number) => number != match.matrixIndex)
+                    .toList(),
+              ),
             ],
           ),
         );

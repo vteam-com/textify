@@ -17,7 +17,7 @@ class Band {
   /// List of artifacts contained within this band.
   final List<Artifact> artifacts = [];
 
-  /// Private fields to store calculated average of space between earh artifacts
+  /// Private fields to store calculated average of space between each artifacts
   double _averageKerning = -1;
 
   /// Private fields to store calculated average of artifact width
@@ -116,12 +116,12 @@ class Band {
 
   /// Identifies and inserts space artifacts between existing artifacts in the band.
   ///
-  /// This method analyzes the Kernings between artifacts and inserts space artifacts
+  /// This method analyzes the Kerning between artifacts and inserts space artifacts
   /// where the Kerning exceeds a certain threshold.
   ///
   /// The process involves:
   /// 1. Calculating a threshold Kerning size based on the average width.
-  /// 2. Iterating through artifacts to identify Kernings exceeding the threshold.
+  /// 2. Iterating through artifacts to identify Kerning exceeding the threshold.
   /// 3. Creating a list of artifacts that need spaces inserted before them.
   /// 4. Inserting space artifacts at the appropriate positions.
   ///
@@ -137,11 +137,11 @@ class Band {
       if (indexOfArtifact > 0) {
         // Left
         final Artifact artifactLeft = this.artifacts[indexOfArtifact - 1];
-        final double x1 = artifactLeft.rectangleOrinal.right;
+        final double x1 = artifactLeft.rectangleOriginal.right;
 
         // Right
         final Artifact artifactRight = this.artifacts[indexOfArtifact];
-        final double x2 = artifactRight.rectangleOrinal.left;
+        final double x2 = artifactRight.rectangleOriginal.left;
 
         final double kerning = x2 - x1;
 
@@ -156,10 +156,10 @@ class Band {
       final indexOfArtifact = this.artifacts.indexOf(artifactOnTheRightSide);
       insetArtifactForSpace(
         indexOfArtifact,
-        artifactOnTheRightSide.rectangleOrinal.left -
+        artifactOnTheRightSide.rectangleOriginal.left -
             averageWidth -
             averageKerning,
-        artifactOnTheRightSide.rectangleOrinal.left - averageKerning,
+        artifactOnTheRightSide.rectangleOriginal.left - averageKerning,
       );
     }
   }
@@ -188,17 +188,17 @@ class Band {
     artifactSpace.characterMatched = ' ';
     artifactSpace.bandId = this.id;
 
-    artifactSpace.rectangleOrinal = Rect.fromLTRB(
+    artifactSpace.rectangleOriginal = Rect.fromLTRB(
       x1,
       rectangle.top,
       x2,
       rectangle.bottom,
     );
-    artifactSpace.rectangleAdjusted = artifactSpace.rectangleOrinal;
+    artifactSpace.rectangleAdjusted = artifactSpace.rectangleOriginal;
 
     artifactSpace.matrixOriginal = Matrix(
-      artifactSpace.rectangleOrinal.width.toInt(),
-      artifactSpace.rectangleOrinal.height.toInt(),
+      artifactSpace.rectangleOriginal.width.toInt(),
+      artifactSpace.rectangleOriginal.height.toInt(),
     );
     this.artifacts.insert(indexOfArtifact, artifactSpace);
   }
@@ -220,17 +220,17 @@ class Band {
     double left = this.rectangle.left;
 
     for (final Artifact artifact in artifacts) {
-      artifact.matrixOriginal.paddTopBottom(
-        paddingTop: (artifact.rectangleOrinal.top - rectangle.top).toInt(),
+      artifact.matrixOriginal.padTopBottom(
+        paddingTop: (artifact.rectangleOriginal.top - rectangle.top).toInt(),
         paddingBottom:
-            (rectangle.bottom - artifact.rectangleOrinal.bottom).toInt(),
+            (rectangle.bottom - artifact.rectangleOriginal.bottom).toInt(),
       );
 
-      final double dx = left - artifact.rectangleOrinal.left;
-      final double dy = rectangle.top - artifact.rectangleOrinal.top;
+      final double dx = left - artifact.rectangleOriginal.left;
+      final double dy = rectangle.top - artifact.rectangleOriginal.top;
       artifact.rectangleAdjusted =
-          artifact.rectangleOrinal.shift(Offset(dx, dy));
-      artifact.rectangleOrinal = artifact.rectangleAdjusted;
+          artifact.rectangleOriginal.shift(Offset(dx, dy));
+      artifact.rectangleOriginal = artifact.rectangleAdjusted;
       left += artifact.rectangleAdjusted.width;
       left += kerningWidth;
     }

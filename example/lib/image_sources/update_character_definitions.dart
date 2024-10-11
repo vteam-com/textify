@@ -4,38 +4,38 @@ import 'package:flutter/services.dart';
 import 'package:textify/artifact.dart';
 import 'package:textify/matrix.dart';
 import 'package:textify/textify.dart';
-import 'package:textify_dashoard/image_sources/image_source_generated.dart';
-import 'package:textify_dashoard/widgets/gap.dart';
+import 'package:textify_dashboard/image_sources/image_source_generated.dart';
+import 'package:textify_dashboard/widgets/gap.dart';
 
 class CharacterGenerationScreen extends StatelessWidget {
-  final Function onComplete;
-  final List<String> availableFonts;
-
   const CharacterGenerationScreen({
     super.key,
     required this.onComplete,
     required this.availableFonts,
   });
+  final Function onComplete;
+  final List<String> availableFonts;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Character Generation')),
       body: CharacterGenerationBody(
-          availableFonts: availableFonts, onComplete: onComplete),
+        availableFonts: availableFonts,
+        onComplete: onComplete,
+      ),
     );
   }
 }
 
 class CharacterGenerationBody extends StatefulWidget {
-  final Function onComplete;
-  final List<String> availableFonts;
-
   const CharacterGenerationBody({
     super.key,
     required this.onComplete,
     required this.availableFonts,
   });
+  final Function onComplete;
+  final List<String> availableFonts;
 
   @override
   CharacterGenerationBodyState createState() => CharacterGenerationBodyState();
@@ -93,7 +93,7 @@ class CharacterGenerationBodyState extends State<CharacterGenerationBody> {
     widget.onComplete(); // Call the completion function when done
   }
 
-  Color _getColorForCharacerBorder(final String char) {
+  Color _getColorForCharacterBorder(final String char) {
     ProcessedCharacter? pc = processedCharacters[char];
     if (pc == null) {
       return Colors.grey;
@@ -119,7 +119,7 @@ class CharacterGenerationBodyState extends State<CharacterGenerationBody> {
                 char == _currentChar && _completed == false;
             return OutlinedButton(
               style: OutlinedButton.styleFrom(
-                side: BorderSide(color: _getColorForCharacerBorder(char)),
+                side: BorderSide(color: _getColorForCharacterBorder(char)),
               ),
               onPressed: () {
                 setState(() {
@@ -172,11 +172,12 @@ class CharacterGenerationBodyState extends State<CharacterGenerationBody> {
                       padding: const EdgeInsets.all(8.0),
                       child: Text(
                         style: TextStyle(
-                            fontFamily: 'Courier',
-                            fontSize: 5,
-                            color: pc.problems.isEmpty
-                                ? Colors.green
-                                : Colors.orange),
+                          fontFamily: 'Courier',
+                          fontSize: 5,
+                          color: pc.problems.isEmpty
+                              ? Colors.green
+                              : Colors.orange,
+                        ),
                         artifact.matrixOriginal.gridToString(),
                       ),
                     ),
@@ -222,10 +223,11 @@ class CharacterGenerationBodyState extends State<CharacterGenerationBody> {
                   onPressed: () {
                     Clipboard.setData(
                       ClipboardData(
-                          text: textify.characterDefinitions.toJsonString()),
+                        text: textify.characterDefinitions.toJsonString(),
+                      ),
                     );
                   },
-                )
+                ),
             ],
           ),
         ],
@@ -327,7 +329,8 @@ class CharacterGenerationBodyState extends State<CharacterGenerationBody> {
               .add(firstArtifact); // Add the merged artifact
         } else {
           processedCharacter.problems.add(
-              'No artifacts found'); // Add a problem message if no artifacts were found
+            'No artifacts found',
+          ); // Add a problem message if no artifacts were found
         }
       }
     }

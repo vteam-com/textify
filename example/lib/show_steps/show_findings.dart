@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:textify/band.dart';
 import 'package:textify/textify.dart';
-import 'package:textify_dashoard/widgets/display_artifact.dart';
+import 'package:textify_dashboard/widgets/display_artifact.dart';
 
 const int offsetX = 00;
 const int offsetY = 14;
@@ -33,7 +33,7 @@ class ShowFindings extends StatelessWidget {
       width: maxWidth,
       height: maxHeight + 100,
       child: CustomPaint(
-        key: Key(textify.processedEnd.toString()),
+        key: Key(textify.processEnd.toString()),
         painter: DisplayArtifacts(
           textify: textify,
           applyPacking: applyPacking,

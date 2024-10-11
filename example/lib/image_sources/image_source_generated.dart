@@ -2,11 +2,11 @@ import 'dart:math';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:textify_dashoard/image_sources/update_character_definitions.dart';
-import 'package:textify_dashoard/widgets/image_viewer.dart';
+import 'package:textify_dashboard/image_sources/update_character_definitions.dart';
+import 'package:textify_dashboard/widgets/image_viewer.dart';
 
 import '../../widgets/gap.dart';
-import 'debouce.dart';
+import 'debounce.dart';
 import 'image_generator_input.dart';
 import 'panel_content.dart';
 
@@ -456,14 +456,15 @@ Future<ui.Image> createColorImageUsingTextPainter({
   const int padding = 20;
   final int imageWidth = padding +
       max(
-          1,
+        1,
+        max(
           max(
-            max(
-              maxWidthLine1,
-              maxWidthLine2,
-            ),
-            maxWidthLine3,
-          ));
+            maxWidthLine1,
+            maxWidthLine2,
+          ),
+          maxWidthLine3,
+        ),
+      );
   final int imageHeight = padding + (5 * fontSize);
 
   newCanvas.drawRect(

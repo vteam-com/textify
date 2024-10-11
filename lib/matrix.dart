@@ -364,7 +364,7 @@ class Matrix {
   /// 2. Inserting the specified number of blank lines at the top of the matrix.
   /// 3. Appending the specified number of blank lines at the bottom of the matrix.
   /// 4. Updating the total number of rows in the matrix.
-  void paddTopBottom({
+  void padTopBottom({
     required final int paddingTop,
     required final int paddingBottom,
   }) {
@@ -456,7 +456,7 @@ class Matrix {
   ///
   /// Parameters:
   /// - [binaryImage]: The source Matrix from which to extract the sub-grid.
-  /// - [rect]: A Rect object specifying the region to extract. The rect's
+  /// - [rect]: A Rect object specifying the region to extract. The rectangle's
   ///   coordinates are relative to the top-left corner of the binaryImage.
   ///
   /// Returns:
@@ -595,7 +595,7 @@ class Matrix {
   /// Note:
   /// This method is useful for visualizing the differences and similarities
   /// between two matrices, which can be helpful in debugging or analysis tasks.
-  static List<String> getStringListOfOverladedGrids(
+  static List<String> getStringListOfOverlappedGrids(
     final Matrix grid1,
     final Matrix grid2,
   ) {
@@ -606,30 +606,30 @@ class Matrix {
       throw Exception('Grids must have the same dimensions');
     }
 
-    final List<String> overladedGrid = [];
+    final List<String> overlappedGrid = [];
 
     for (int row = 0; row < height; row++) {
-      String overladedRow = '';
+      String overlappedRow = '';
 
       for (int col = 0; col < width; col++) {
         final bool cell1 = grid1.data[row][col];
         final bool cell2 = grid2.data[row][col];
 
         if (cell1 && cell2) {
-          overladedRow += '=';
+          overlappedRow += '=';
         } else if (cell1) {
-          overladedRow += '*';
+          overlappedRow += '*';
         } else if (cell2) {
-          overladedRow += '#';
+          overlappedRow += '#';
         } else {
-          overladedRow += '.';
+          overlappedRow += '.';
         }
       }
 
-      overladedGrid.add(overladedRow);
+      overlappedGrid.add(overlappedRow);
     }
 
-    return overladedGrid;
+    return overlappedGrid;
   }
 
   /// Converts the matrix to a string representation.
@@ -1353,7 +1353,7 @@ class Matrix {
   }
 }
 
-/// Binarizes an input image by converting it to black and white based on a brightness threshold.
+/// Binarize an input image by converting it to black and white based on a brightness threshold.
 ///
 /// This function takes an input [ui.Image] and converts it to a black and white image
 /// where pixels brighter than the specified [threshold] become white, and those below become black.

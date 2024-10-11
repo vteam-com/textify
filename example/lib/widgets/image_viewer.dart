@@ -1,9 +1,7 @@
-import 'package:flutter/gestures.dart';
 import 'dart:ui' as ui;
-
+import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
-
-import '../image_sources/panel_content.dart';
+import 'package:textify_dashboard/image_sources/panel_content.dart';
 
 class ImageViewer extends StatelessWidget {
   const ImageViewer({super.key, required this.image});
@@ -39,14 +37,14 @@ class ImagePainter extends CustomPainter {
 }
 
 Widget buildInteractiveImageViewer(
-  final ui.Image iamgeToDiplay,
+  final ui.Image imageToDisplay,
   final TransformationController? transformationController,
 ) {
   return PanelContent(
     center: CustomInteractiveViewer(
       transformationController: transformationController,
       child: ImageViewer(
-        image: iamgeToDiplay,
+        image: imageToDisplay,
       ),
     ),
   );
@@ -66,13 +64,6 @@ class PanningGestureRecognizer extends PanGestureRecognizer {
 }
 
 class CustomInteractiveViewer extends StatefulWidget {
-  final Widget child;
-  final TransformationController? transformationController;
-
-  final bool constrained;
-  final double minScale;
-  final double maxScale;
-
   const CustomInteractiveViewer({
     super.key,
     required this.child,
@@ -83,6 +74,12 @@ class CustomInteractiveViewer extends StatefulWidget {
     //        minScale: 0.1,
     // maxScale: 50,
   });
+  final Widget child;
+  final TransformationController? transformationController;
+
+  final bool constrained;
+  final double minScale;
+  final double maxScale;
 
   @override
   CustomInteractiveViewerState createState() => CustomInteractiveViewerState();

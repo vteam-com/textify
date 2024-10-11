@@ -40,8 +40,6 @@ class DisplayMatrixPaint extends CustomPainter {
   final Matrix? matrix2;
   final double pixelSize;
 
-  int p = 9;
-
   @override
   void paint(Canvas canvas, Size size) {
     // Paints the bands and artifacts on the canvas in their original positions.
@@ -90,14 +88,22 @@ void paintMatrix(
       final double yPos = startY + y.toDouble();
       if (matrix.cellGet(x, y)) {
         canvas.drawRect(
-          Rect.fromLTWH(xPos * pixelSize + gapForOn,
-              yPos * pixelSize + gapForOn, sizeForOn, sizeForOn),
+          Rect.fromLTWH(
+            xPos * pixelSize + gapForOn,
+            yPos * pixelSize + gapForOn,
+            sizeForOn,
+            sizeForOn,
+          ),
           paintForeground,
         );
       } else {
         canvas.drawRect(
-          Rect.fromLTWH(xPos * pixelSize + gapForOff,
-              yPos * pixelSize + gapForOff, sizeForOff, sizeForOff),
+          Rect.fromLTWH(
+            xPos * pixelSize + gapForOff,
+            yPos * pixelSize + gapForOff,
+            sizeForOff,
+            sizeForOff,
+          ),
           paintBackground,
         );
       }
@@ -113,8 +119,21 @@ void paintOverlay(
   final Matrix matrix2, [
   final double pixelSize = 1,
 ]) {
-  paintMatrix(canvas, Colors.blue, startX, startY, matrix2,
-      pixelSize: pixelSize, background: Colors.transparent);
-  paintMatrix(canvas, Colors.yellow.withAlpha(150), startX, startY, matrix1,
-      pixelSize: pixelSize);
+  paintMatrix(
+    canvas,
+    Colors.blue,
+    startX,
+    startY,
+    matrix2,
+    pixelSize: pixelSize,
+    background: Colors.transparent,
+  );
+  paintMatrix(
+    canvas,
+    Colors.yellow.withAlpha(150),
+    startX,
+    startY,
+    matrix1,
+    pixelSize: pixelSize,
+  );
 }
