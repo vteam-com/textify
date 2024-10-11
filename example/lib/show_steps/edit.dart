@@ -7,8 +7,6 @@ import 'package:textify/score_match.dart';
 
 import 'package:textify/textify.dart';
 
-import '../../widgets/gap.dart';
-
 class EditScreen extends StatefulWidget {
   const EditScreen({
     super.key,
@@ -102,22 +100,29 @@ class _EditScreenState extends State<EditScreen> {
     final multiLineText,
     final textForClipboard,
   ) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        _buildHeader(
-          title,
-          headerBackgroundColor,
-          OutlinedButton(
-            onPressed: () {
-              Clipboard.setData(ClipboardData(text: textForClipboard));
-            },
-            child: const Text('Copy'),
+    return Container(
+      margin: EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: Colors.black,
+        borderRadius: BorderRadius.circular(8.0),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          _buildHeader(
+            title,
+            headerBackgroundColor,
+            IconButton(
+              icon: Icon(Icons.copy),
+              onPressed: () {
+                Clipboard.setData(ClipboardData(text: textForClipboard));
+              },
+            ),
           ),
-        ),
-        buildColoredText(multiLineText),
-      ],
+          buildColoredText(multiLineText),
+        ],
+      ),
     );
   }
 
@@ -163,7 +168,7 @@ class _EditScreenState extends State<EditScreen> {
         widget.artifact.toText(onChar: '*'),
         widget.artifact.toText(forCode: true),
       ),
-      gap(),
+
       // Found Normalized
       _buildArtifactGrid(
         'Artifact\nNormalized\n${w}x$h E:${widget.artifact.matrixNormalized.enclosures} ${verticalLines(widget.artifact.matrixNormalized)}',
@@ -195,28 +200,29 @@ class _EditScreenState extends State<EditScreen> {
   static Widget _buildHeader(
     final String title,
     final Color headerBackgroundColor,
-    final Widget child,
+    final Widget copyButton,
   ) {
-    return SizedBox(
-      height: 150,
-      child: Column(
+    return Container(
+      height: 100,
+      width: 250,
+      color: headerBackgroundColor,
+      padding: const EdgeInsets.all(4.0),
+      margin: const EdgeInsets.all(4.0),
+      child: Stack(
+        alignment: AlignmentDirectional.topStart,
         children: [
-          Expanded(
-            child: Container(
-              color: headerBackgroundColor,
-              padding: const EdgeInsets.all(8.0),
-              margin: const EdgeInsets.all(8.0),
-              child: Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontFamily: 'Courier',
-                ),
-              ),
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 14,
+              fontFamily: 'Courier',
             ),
           ),
-          child,
-          gap(),
+          Positioned(
+            bottom: 0,
+            right: 0,
+            child: copyButton,
+          ),
         ],
       ),
     );
@@ -260,7 +266,6 @@ class _EditScreenState extends State<EditScreen> {
           );
         }
 
-        widgets.add(gap());
         widgets.add(
           Column(
             children: [
