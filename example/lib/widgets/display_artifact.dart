@@ -82,7 +82,7 @@ class DisplayArtifacts extends CustomPainter {
     for (final Artifact artifact in artifactsInTheBand) {
       paintMatrix(
         canvas,
-        colors[textify.artifacts.indexOf(artifact) % colors.length],
+        colors[id % colors.length],
         artifact.rectangleAdjusted.left.toInt(),
         artifact.rectangleAdjusted.top.toInt(),
         artifact.matrixOriginal,

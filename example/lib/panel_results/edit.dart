@@ -126,16 +126,16 @@ class _EditScreenState extends State<EditScreen> {
     final int h = widget.textify.templateHeight;
 
     List<Widget> widgets = [
-      // as found
+      // Artifact Original
       _buildArtifactGrid(
-        'Artifact\nBand #${widget.artifact.bandId}',
+        'Artifact\nFound\n${w}x$h E:${widget.artifact.matrixOriginal.enclosures} ${verticalLines(widget.artifact.matrixOriginal)}',
         Colors.black,
         widget.artifact.matrixOriginal,
         null,
         widget.artifact.toText(forCode: true),
       ),
 
-      // Found Normalized
+      // Artifact Adjusted
       _buildArtifactGrid(
         'Artifact\nNormalized\n${w}x$h E:${widget.artifact.matrixNormalized.enclosures} ${verticalLines(widget.artifact.matrixNormalized)}',
         Colors.grey.withAlpha(100),

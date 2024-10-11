@@ -11,9 +11,6 @@ class Band {
   ///
   Band();
 
-  /// unique Band id
-  int id = 0;
-
   /// List of artifacts contained within this band.
   final List<Artifact> artifacts = [];
 
@@ -186,7 +183,6 @@ class Band {
   ) {
     final Artifact artifactSpace = Artifact();
     artifactSpace.characterMatched = ' ';
-    artifactSpace.bandId = this.id;
 
     artifactSpace.rectangleOriginal = Rect.fromLTRB(
       x1,

@@ -62,17 +62,6 @@ class Textify {
     return this;
   }
 
-  /// Returns a list of artifacts belonging to a specific band.
-  ///
-  /// [bandIndex] is the index of the band to retrieve artifacts from.
-  List<Artifact> artifactsInBand(final int bandIndex) {
-    return artifacts
-        .where(
-          (final Artifact artifact) => artifact.bandId == bandIndex,
-        )
-        .toList();
-  }
-
   /// Clears all stored data, resetting the Textify instance.
   void clear() {
     artifacts.clear();
@@ -463,7 +452,6 @@ class Textify {
           boundingBox,
           verticalTolerance,
         )) {
-          artifact.bandId = bands.length;
           band.addArtifact(artifact);
           foundBand = true;
           break;
@@ -472,7 +460,6 @@ class Textify {
 
       if (!foundBand) {
         Band newBand = Band();
-        newBand.id = bands.length;
         newBand.addArtifact(artifact);
         bands.add(newBand);
       }

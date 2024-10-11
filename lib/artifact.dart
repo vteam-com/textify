@@ -9,9 +9,6 @@ import 'package:textify/matrix.dart';
 /// An artifact contains information about a specific character or group of characters,
 /// including its position, size, and matrix representation.
 class Artifact {
-  /// Unique identifier for the band this artifact belongs to.
-  int bandId = 0;
-
   /// The character that this artifact matches.
   String characterMatched = '';
 
@@ -31,7 +28,7 @@ class Artifact {
   /// A string representation ths artifact.
   @override
   String toString() {
-    return '"$characterMatched" Band:$bandId Rect:${rectangleAdjusted.toString()} Area: $area}';
+    return '"$characterMatched" Rect:${rectangleAdjusted.toString()} Area: $area}';
   }
 
   /// The area of the artifact, calculated from its matrix representation.
