@@ -24,7 +24,7 @@ void main() async {
   });
 
   test('Character Definitions Enclosures', () async {
-    const String charactersWithEnclosures = '04689ABDOPQRbdegopq#@&';
+    const String charactersWithEnclosures = '04689ABDOPQRabdegopq#@&';
 
     List<String> charactersWithNoEnclosures = supportedCharacters
         .where((c) => !charactersWithEnclosures.contains(c))
@@ -52,16 +52,17 @@ void main() async {
     // Enclosures
     expect(instance.characterDefinitions.getDefinition('A')!.enclosures, 1);
     expect(instance.characterDefinitions.getDefinition('B')!.enclosures, 2);
-    expect(instance.characterDefinitions.getDefinition('b')!.enclosures, 1);
     expect(instance.characterDefinitions.getDefinition('D')!.enclosures, 1);
+    expect(instance.characterDefinitions.getDefinition('O')!.enclosures, 1);
+    expect(instance.characterDefinitions.getDefinition('P')!.enclosures, 1);
+    expect(instance.characterDefinitions.getDefinition('Q')!.enclosures, 1);
+    expect(instance.characterDefinitions.getDefinition('a')!.enclosures, 1);
+    expect(instance.characterDefinitions.getDefinition('b')!.enclosures, 1);
     expect(instance.characterDefinitions.getDefinition('d')!.enclosures, 1);
     expect(instance.characterDefinitions.getDefinition('e')!.enclosures, 1);
     expect(instance.characterDefinitions.getDefinition('g')!.enclosures, 1);
-    expect(instance.characterDefinitions.getDefinition('O')!.enclosures, 1);
     expect(instance.characterDefinitions.getDefinition('o')!.enclosures, 1);
-    expect(instance.characterDefinitions.getDefinition('P')!.enclosures, 1);
     expect(instance.characterDefinitions.getDefinition('p')!.enclosures, 1);
-    expect(instance.characterDefinitions.getDefinition('Q')!.enclosures, 1);
     expect(instance.characterDefinitions.getDefinition('q')!.enclosures, 1);
     expect(instance.characterDefinitions.getDefinition('0')!.enclosures, 1);
     expect(instance.characterDefinitions.getDefinition('4')!.enclosures, 1);
@@ -81,6 +82,7 @@ void main() async {
     expect(instance.characterDefinitions.getDefinition('K')!.lineLeft, true);
     expect(instance.characterDefinitions.getDefinition('L')!.lineLeft, true);
     expect(instance.characterDefinitions.getDefinition('M')!.lineLeft, true);
+    expect(instance.characterDefinitions.getDefinition('N')!.lineLeft, true);
     expect(instance.characterDefinitions.getDefinition('P')!.lineLeft, true);
     expect(instance.characterDefinitions.getDefinition('R')!.lineLeft, true);
     expect(instance.characterDefinitions.getDefinition('T')!.lineLeft, true);
@@ -93,6 +95,7 @@ void main() async {
     expect(instance.characterDefinitions.getDefinition('J')!.lineRight, true);
     expect(instance.characterDefinitions.getDefinition('L')!.lineRight, true);
     expect(instance.characterDefinitions.getDefinition('M')!.lineRight, true);
+    expect(instance.characterDefinitions.getDefinition('N')!.lineRight, true);
     expect(instance.characterDefinitions.getDefinition('T')!.lineRight, true);
     expect(instance.characterDefinitions.getDefinition('U')!.lineRight, true);
   });

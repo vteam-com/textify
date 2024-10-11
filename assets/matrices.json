@@ -12464,8 +12464,8 @@
             "isDigit": false,
             "isLetter": false,
             "isPunctuation": false,
-            "lineLeft": false,
-            "lineRight": false,
+            "lineLeft": true,
+            "lineRight": true,
             "matrices": [
                 {
                     "font": "Arial",
@@ -16954,7 +16954,7 @@
         },
         {
             "character": "a",
-            "enclosures": 0,
+            "enclosures": 1,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
