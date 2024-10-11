@@ -46,12 +46,21 @@ class _EditScreenState extends State<EditScreen> {
     );
   }
 
-  String verticalLines(Matrix matrix) {
-    return 'VL:${matrix.verticalLineLeft ? 'Y' : 'N'} VR:${matrix.verticalLineRight ? 'Y' : 'N'}';
+  String attributeOfMatrix(final String title, Matrix matrix) {
+    return '$title\n${matrix.cols}x${matrix.rows} E:${widget.artifact.matrixOriginal.enclosures} '
+        '${captionWithYesNo("VL", matrix.verticalLineLeft)} ${captionWithYesNo("VR", matrix.verticalLineRight)} ${captionWithYesNo("P", matrix.isPunctuation())}';
   }
 
-  String verticalLinesTemplate(CharacterDefinition template) {
-    return 'VL:${template.lineLeft ? 'Y' : 'N'} VR:${template.lineRight ? 'Y' : 'N'}';
+  String attributeOfCharacterDefinition(
+    final String title,
+    CharacterDefinition template,
+  ) {
+    return '$title\n40x60 E:${template.enclosures} '
+        '${captionWithYesNo("VL", template.lineLeft)} ${captionWithYesNo("VR", template.lineRight)} ${captionWithYesNo("P", template.isPunctuation)}';
+  }
+
+  String captionWithYesNo(final String caption, final bool value) {
+    return '$caption:${value ? 'Y' : 'N'}';
   }
 
   static Widget _buildArtifactGrid(
@@ -128,7 +137,7 @@ class _EditScreenState extends State<EditScreen> {
     List<Widget> widgets = [
       // Artifact Original
       _buildArtifactGrid(
-        'Artifact\nFound\n${w}x$h E:${widget.artifact.matrixOriginal.enclosures} ${verticalLines(widget.artifact.matrixOriginal)}',
+        attributeOfMatrix('Artifact\nFound', widget.artifact.matrixOriginal),
         Colors.black,
         widget.artifact.matrixOriginal,
         null,
@@ -137,7 +146,10 @@ class _EditScreenState extends State<EditScreen> {
 
       // Artifact Adjusted
       _buildArtifactGrid(
-        'Artifact\nNormalized\n${w}x$h E:${widget.artifact.matrixNormalized.enclosures} ${verticalLines(widget.artifact.matrixNormalized)}',
+        attributeOfMatrix(
+          'Artifact\nNormalized',
+          widget.artifact.matrixNormalized,
+        ),
         Colors.grey.withAlpha(100),
         widget.artifact.matrixNormalized,
         null,
@@ -224,7 +236,7 @@ class _EditScreenState extends State<EditScreen> {
           final templateMatrix = definition.matrices[match.matrixIndex];
 
           title +=
-              '\nTemplate "${match.character}"[${match.matrixIndex}] ${templateMatrix.font}\nScore = ${(match.score * 100).toStringAsFixed(1)}% E:${definition.enclosures}, ${verticalLinesTemplate(definition)}';
+              '\n"${match.character}" [${templateMatrix.font}]\nScore ${(match.score * 100).toStringAsFixed(1)}% ${attributeOfCharacterDefinition('', definition)}';
         }
 
         final Matrix characterMatrix = widget.textify.characterDefinitions
@@ -290,7 +302,7 @@ class _EditScreenState extends State<EditScreen> {
           widget.textify.characterDefinitions.getMatrix(character, matrixIndex);
 
       return _buildArtifactGrid(
-        'Template "$character"[$matrixIndex]${templatedMatrix.font}\n${scoreForThisVariation.toStringAsFixed(2)}%',
+        '"$character" [${templatedMatrix.font}]\nScore ${scoreForThisVariation.toStringAsFixed(2)}%',
         Colors.grey.shade900,
         matrixFound,
         characterMatrix,
