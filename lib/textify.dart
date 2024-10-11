@@ -132,7 +132,7 @@ class Textify {
     const double percentageNeeded = 0.8;
     const int totalChecks = 4;
 
-    final List<CharacterDefinition> qualifiedTemplates = characterDefinitions
+    List<CharacterDefinition> qualifiedTemplates = characterDefinitions
         .definitions
         .where((final CharacterDefinition template) {
       if (supportedCharacters.isNotEmpty &&
@@ -168,6 +168,9 @@ class Textify {
       return matchPercentage >= percentageNeeded;
     }).toList();
 
+    if (qualifiedTemplates.isEmpty) {
+      qualifiedTemplates = characterDefinitions.definitions;
+    }
     // Use _getDistanceScores to calculate the final scores
     final List<ScoreMatch> scores =
         _getDistanceScores(qualifiedTemplates, matrix);
@@ -179,9 +182,8 @@ class Textify {
 
   /// Extracts text from an image.
   ///
-  /// This method processes the input image through an [ImagePipeline] to prepare it
-  /// for text extraction, then uses the [getTextFromMatrix] method to perform
-  /// the actual text recognition.
+  /// This method converts the input image to black and white, transforms it into a matrix,
+  /// and then uses the [getTextFromMatrix] method to perform the actual text recognition.
   ///
   /// Parameters:
   /// - [image]: A [ui.Image] object representing the image from which to extract text.
