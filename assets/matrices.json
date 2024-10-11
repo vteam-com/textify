@@ -375,7 +375,7 @@
         },
         {
             "character": "#",
-            "enclosures": 0,
+            "enclosures": 1,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -937,7 +937,7 @@
         },
         {
             "character": "&",
-            "enclosures": 0,
+            "enclosures": 1,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -8524,7 +8524,7 @@
         },
         {
             "character": "@",
-            "enclosures": 0,
+            "enclosures": 1,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
