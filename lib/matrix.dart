@@ -322,27 +322,28 @@ class Matrix {
           final int srcYInt = srcY.floor();
           resizedGrid.data[y][x] = data[srcYInt][srcXInt];
         } else {
-          // DownScaling: Average the values in the sub-grid
+          // DownScaling: Check for any black pixel in the sub-grid
           final int startX = srcX.floor();
           final int endX = (srcX + xScale).ceil();
-          final startY = srcY.floor();
+          final int startY = srcY.floor();
           final int endY = (srcY + yScale).ceil();
 
-          int blackCount = 0;
-          int totalCount = 0;
+          bool hasBlackPixel = false;
 
           for (int sy = startY; sy < endY && sy < rows; sy++) {
             for (int sx = startX; sx < endX && sx < cols; sx++) {
               if (data[sy][sx]) {
-                blackCount++;
+                hasBlackPixel = true;
+                break;
               }
-              totalCount++;
+            }
+            if (hasBlackPixel) {
+              break;
             }
           }
 
-          // Set the resized grid value based on average
-          resizedGrid.data[y][x] = blackCount * 2 >
-              totalCount; // Threshold: more than half black pixels
+          // Set the resized grid value based on the presence of any black pixel
+          resizedGrid.data[y][x] = hasBlackPixel;
         }
       }
     }

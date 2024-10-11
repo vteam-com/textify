@@ -69,4 +69,31 @@ void main() async {
     expect(instance.characterDefinitions.getDefinition('8')!.enclosures, 2);
     expect(instance.characterDefinitions.getDefinition('9')!.enclosures, 1);
   });
+
+  test('Character Definitions Lines Left', () async {
+    expect(instance.characterDefinitions.getDefinition('B')!.lineLeft, true);
+    expect(instance.characterDefinitions.getDefinition('D')!.lineLeft, true);
+    expect(instance.characterDefinitions.getDefinition('E')!.lineLeft, true);
+    expect(instance.characterDefinitions.getDefinition('F')!.lineLeft, true);
+    expect(instance.characterDefinitions.getDefinition('H')!.lineLeft, true);
+    expect(instance.characterDefinitions.getDefinition('I')!.lineLeft, true);
+    expect(instance.characterDefinitions.getDefinition('J')!.lineLeft, true);
+    expect(instance.characterDefinitions.getDefinition('K')!.lineLeft, true);
+    expect(instance.characterDefinitions.getDefinition('L')!.lineLeft, true);
+    expect(instance.characterDefinitions.getDefinition('M')!.lineLeft, true);
+    expect(instance.characterDefinitions.getDefinition('P')!.lineLeft, true);
+    expect(instance.characterDefinitions.getDefinition('R')!.lineLeft, true);
+    expect(instance.characterDefinitions.getDefinition('T')!.lineLeft, true);
+    expect(instance.characterDefinitions.getDefinition('U')!.lineLeft, true);
+  });
+
+  test('Character Definitions Lines Right', () async {
+    expect(instance.characterDefinitions.getDefinition('H')!.lineRight, true);
+    expect(instance.characterDefinitions.getDefinition('I')!.lineRight, true);
+    expect(instance.characterDefinitions.getDefinition('J')!.lineRight, true);
+    expect(instance.characterDefinitions.getDefinition('L')!.lineRight, true);
+    expect(instance.characterDefinitions.getDefinition('M')!.lineRight, true);
+    expect(instance.characterDefinitions.getDefinition('T')!.lineRight, true);
+    expect(instance.characterDefinitions.getDefinition('U')!.lineRight, true);
+  });
 }

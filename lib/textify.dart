@@ -129,8 +129,8 @@ class Textify {
     final bool hasVerticalLineOnTheRightSide = matrix.verticalLineRight;
     final bool punctuation = matrix.isPunctuation();
 
-    const double percentageNeeded = 0.3;
-    const int totalChecks = 3;
+    const double percentageNeeded = 0.8;
+    const int totalChecks = 4;
 
     final List<CharacterDefinition> qualifiedTemplates = characterDefinitions
         .definitions
@@ -141,15 +141,22 @@ class Textify {
       }
 
       int matchingChecks = 0;
+      // Enclosures
       if (numberOfEnclosure == template.enclosures) {
         matchingChecks++;
       }
+
+      // Punctuation
       if (punctuation == template.isPunctuation) {
         matchingChecks++;
       }
+
+      // Left Line
       if (hasVerticalLineOnTheLeftSide == template.lineLeft) {
         matchingChecks++;
       }
+
+      // Right Line
       if (hasVerticalLineOnTheRightSide == template.lineRight) {
         matchingChecks++;
       }
