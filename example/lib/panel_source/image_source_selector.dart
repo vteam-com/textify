@@ -62,20 +62,24 @@ class ImageSourceSelectorState extends State<ImageSourceSelector>
     return Builder(
       builder: (BuildContext context) {
         return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            TabBar(
-              controller: _tabController,
-              tabs: tabViews.map((e) => Tab(text: e)).toList(),
-              onTap: (index) {
-                _tabController.animateTo(index);
-                _saveLastTab(index);
-                widget.onSourceChanged(
-                  _imageSelected,
-                  _expectedText,
-                  _fontName,
-                  _includeSpaceDetection,
-                );
-              },
+            SizedBox(
+              width: 400,
+              child: TabBar(
+                controller: _tabController,
+                tabs: tabViews.map((e) => Tab(text: e)).toList(),
+                onTap: (index) {
+                  _tabController.animateTo(index);
+                  _saveLastTab(index);
+                  widget.onSourceChanged(
+                    _imageSelected,
+                    _expectedText,
+                    _fontName,
+                    _includeSpaceDetection,
+                  );
+                },
+              ),
             ),
             IntrinsicHeight(
               child: _buildContent(),

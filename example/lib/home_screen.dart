@@ -5,12 +5,10 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:textify/matrix.dart';
 import 'package:textify/textify.dart';
-
-import 'image_sources/image_source_selector.dart';
-import 'image_sources/panel_content.dart';
-import 'show_steps/matched_artifacts.dart';
-import 'show_steps/show_findings.dart';
-import 'widgets/gap.dart';
+import 'panel_artifacts/display_bands_and_artifacts.dart';
+import 'panel_results/matched_artifacts.dart';
+import 'panel_source/image_source_selector.dart';
+import 'panel_source/panel_content.dart';
 import 'widgets/image_viewer.dart';
 
 ///
@@ -90,18 +88,32 @@ class _HomeScreenState extends State<HomeScreen> {
                 //
                 // Input Source
                 //
-                _buildExpansionPanel(
+                buildExpansionPanel(
                   titleLeft: 'TEXTIFY',
                   titleCenter: 'Source',
                   titleRight: '',
                   isExpanded: _isExpandedSource,
-                  content: _buildImageSourceSelector(),
+                  content: ImageSourceSelector(
+                    transformationController: _transformationController,
+                    onSourceChanged: (
+                      final ui.Image? newImage,
+                      final List<String> expectedText,
+                      final String fontName,
+                      final bool includeSpaceDetection,
+                    ) {
+                      _imageSource = newImage;
+                      _charactersExpectedToBeFoundInTheImage = expectedText;
+                      _fontName = fontName;
+                      _textify.includeSpaceDetections = includeSpaceDetection;
+                      _convertImageToText();
+                    },
+                  ),
                 ),
 
                 //
-                // Input image in high contrast
+                // Input optimized image
                 //
-                _buildExpansionPanel(
+                buildExpansionPanel(
                   titleLeft: 'High Contrast',
                   titleCenter: _getDimensionOfImageSource(_imageSource),
                   titleRight: '',
@@ -113,17 +125,18 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
 
                 //
-                // Bands of Artifact
+                // Bands and Artifacts
                 //
-                _buildExpansionPanel(
+                buildExpansionPanel(
                   titleLeft: '${_textify.bands.length} Bands',
                   titleCenter: '${_textify.count} Artifacts',
                   titleRight:
                       '${NumberFormat.decimalPattern().format(_textify.duration)}ms',
                   isExpanded: _isExpandedArtifactFound,
-                  content: _buildArtifactFound(
+                  content: buildArtifactFound(
                     _textify,
                     _cleanUpArtifactFound,
+                    _transformationController,
                     () {
                       setState(() {
                         _cleanUpArtifactFound = !_cleanUpArtifactFound;
@@ -133,9 +146,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
 
                 //
-                // Results
+                // Results / Text
                 //
-                _buildExpansionPanel(
+                buildExpansionPanel(
                   titleLeft: 'Results',
                   titleCenter: '$percentage%',
                   titleRight: '',
@@ -150,140 +163,6 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildActionButtons(
-    final Function onToggleCleanup,
-    final bool cleanUpArtifacts,
-  ) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        OutlinedButton(
-          onPressed: () {
-            _transformationController.value =
-                _transformationController.value.scaled(1 / 1.5);
-          },
-          child: const Text('Zoom -'),
-        ),
-        gap(),
-        OutlinedButton(
-          onPressed: () {
-            _transformationController.value =
-                _transformationController.value.scaled(1.5);
-          },
-          child: const Text('Zoom +'),
-        ),
-        gap(),
-        OutlinedButton(
-          onPressed: () {
-            _transformationController.value = Matrix4.identity();
-          },
-          child: const Text('Center'),
-        ),
-        gap(),
-        OutlinedButton(
-          onPressed: () {
-            onToggleCleanup();
-          },
-          child: Text(cleanUpArtifacts ? 'Original' : 'Normalized'),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildArtifactFound(
-    final Textify textify,
-    final bool cleanUpArtifacts,
-    final Function onToggleCleanup,
-  ) {
-    return PanelContent(
-      center: CustomInteractiveViewer(
-        transformationController: _transformationController,
-        child: ShowFindings(
-          textify: textify,
-          applyPacking: cleanUpArtifacts,
-        ),
-      ),
-      top: _buildActionButtons(
-        onToggleCleanup,
-        cleanUpArtifacts,
-      ),
-    );
-  }
-
-  ExpansionPanel _buildExpansionPanel({
-    required final String titleLeft,
-    required final String titleCenter,
-    required final String titleRight,
-    required final bool isExpanded,
-    required final Widget content,
-  }) {
-    return ExpansionPanel(
-      canTapOnHeader: true,
-      isExpanded: isExpanded,
-      headerBuilder: (final BuildContext context, final bool isExpanded) =>
-          _buildPanelHeader(titleLeft, titleCenter, titleRight),
-      body: Container(
-        color: const ui.Color.fromARGB(255, 0, 24, 36),
-        padding: const EdgeInsets.all(8.0),
-        child: content,
-      ),
-    );
-  }
-
-  Widget _buildImageSourceSelector() {
-    return ImageSourceSelector(
-      transformationController: _transformationController,
-      onSourceChanged: (
-        final ui.Image? newImage,
-        final List<String> expectedText,
-        final String fontName,
-        final bool includeSpaceDetection,
-      ) {
-        _imageSource = newImage;
-        _charactersExpectedToBeFoundInTheImage = expectedText;
-        _fontName = fontName;
-        _textify.includeSpaceDetections = includeSpaceDetection;
-        _convertImageToText();
-      },
-    );
-  }
-
-  Widget _buildPanelHeader(
-    final String left,
-    final String center,
-    final String right,
-  ) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 8.0, right: 8.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          Expanded(
-            child: Text(
-              left,
-              textAlign: TextAlign.left,
-              style: const TextStyle(fontSize: 20),
-            ),
-          ),
-          Expanded(
-            child: Text(
-              center,
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 20),
-            ),
-          ),
-          Expanded(
-            child: Text(
-              right,
-              textAlign: TextAlign.right,
-              style: const TextStyle(fontSize: 20),
-            ),
-          ),
-        ],
       ),
     );
   }

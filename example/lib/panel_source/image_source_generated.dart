@@ -2,7 +2,7 @@ import 'dart:math';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:textify_dashboard/image_sources/update_character_definitions.dart';
+import 'package:textify_dashboard/panel_source/update_character_definitions.dart';
 import 'package:textify_dashboard/widgets/image_viewer.dart';
 
 import '../../widgets/gap.dart';
