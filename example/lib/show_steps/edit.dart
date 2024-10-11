@@ -6,6 +6,7 @@ import 'package:textify/matrix.dart';
 import 'package:textify/score_match.dart';
 
 import 'package:textify/textify.dart';
+import 'package:textify_dashoard/widgets/paint_grid.dart';
 
 class EditScreen extends StatefulWidget {
   const EditScreen({
@@ -45,47 +46,6 @@ class _EditScreenState extends State<EditScreen> {
     );
   }
 
-  static Widget buildColoredText(String multiLineText) {
-    return RichText(
-      text: TextSpan(
-        style: const TextStyle(
-          fontFamily: 'Courier',
-          fontSize: 8,
-        ),
-        children: multiLineText.split('\n').expand((line) {
-          return line.split('').map((char) {
-            switch (char) {
-              case '.':
-                return TextSpan(
-                  text: char,
-                  style: const TextStyle(color: Colors.grey),
-                );
-              case '=':
-                return TextSpan(
-                  text: char,
-                  style: TextStyle(color: Colors.green.shade200),
-                );
-              case '#':
-                return TextSpan(
-                  text: char,
-                  style: TextStyle(color: Colors.orange.shade200),
-                );
-              case '*':
-                return TextSpan(
-                  text: char,
-                  style: TextStyle(color: Colors.blue.shade200),
-                );
-              default:
-                return TextSpan(text: char);
-            }
-          }).toList()
-            ..add(const TextSpan(text: '\n'));
-        }).toList(),
-      ),
-      textScaler: const TextScaler.linear(1.0),
-    );
-  }
-
   String verticalLines(Matrix matrix) {
     return 'VL:${matrix.verticalLineLeft ? 'Y' : 'N'} VR:${matrix.verticalLineRight ? 'Y' : 'N'}';
   }
@@ -97,7 +57,8 @@ class _EditScreenState extends State<EditScreen> {
   static Widget _buildArtifactGrid(
     final String title,
     final Color headerBackgroundColor,
-    final multiLineText,
+    final Matrix matrix1,
+    final Matrix? matrix2,
     final textForClipboard,
   ) {
     return Container(
@@ -120,7 +81,11 @@ class _EditScreenState extends State<EditScreen> {
               },
             ),
           ),
-          buildColoredText(multiLineText),
+          DisplayMatrix(
+            matrix1: matrix1,
+            matrix2: matrix2,
+            pixelSize: 4,
+          ),
         ],
       ),
     );
@@ -165,7 +130,8 @@ class _EditScreenState extends State<EditScreen> {
       _buildArtifactGrid(
         'Artifact\nBand #${widget.artifact.bandId}',
         Colors.black,
-        widget.artifact.toText(onChar: '*'),
+        widget.artifact.matrixOriginal,
+        null,
         widget.artifact.toText(forCode: true),
       ),
 
@@ -173,7 +139,8 @@ class _EditScreenState extends State<EditScreen> {
       _buildArtifactGrid(
         'Artifact\nNormalized\n${w}x$h E:${widget.artifact.matrixNormalized.enclosures} ${verticalLines(widget.artifact.matrixNormalized)}',
         Colors.grey.withAlpha(100),
-        widget.artifact.getResizedString(w: w, h: h, onChar: '*'),
+        widget.artifact.matrixNormalized,
+        null,
         widget.artifact.getResizedString(w: w, h: h, forCode: true),
       ),
 
@@ -251,7 +218,6 @@ class _EditScreenState extends State<EditScreen> {
           headerColor = Colors.green.withAlpha(100);
         }
 
-        List<String> overlayGridText = [];
         final CharacterDefinition? definition =
             widget.textify.characterDefinitions.getDefinition(match.character);
         if (definition != null) {
@@ -259,12 +225,10 @@ class _EditScreenState extends State<EditScreen> {
 
           title +=
               '\nTeamplate "${match.character}"[${match.matrixIndex}] ${templateMatrix.font}\nScore = ${(match.score * 100).toStringAsFixed(1)}% E:${definition.enclosures}, ${verticalLinesTemplate(definition)}';
-
-          overlayGridText = Matrix.getStringListOfOverladedGrids(
-            matrixNormalized,
-            templateMatrix,
-          );
         }
+
+        final Matrix characterMatrix = widget.textify.characterDefinitions
+            .getMatrix(match.character, match.matrixIndex);
 
         widgets.add(
           Column(
@@ -272,12 +236,9 @@ class _EditScreenState extends State<EditScreen> {
               _buildArtifactGrid(
                 title,
                 headerColor,
-                overlayGridText.join('\n'),
-                _getMultiLineTextForTemplate(
-                  match.character,
-                  false,
-                  true,
-                ),
+                matrixNormalized,
+                characterMatrix,
+                characterMatrix..gridToString(forCode: true),
               ),
               ..._buildVariations(
                   match.character,
@@ -318,39 +279,23 @@ class _EditScreenState extends State<EditScreen> {
     if (definition != null && matrixIndex < definition.matrices.length) {
       final templatedMatrix = definition.matrices[matrixIndex];
 
-      List<String> overlayGridText = [];
-      overlayGridText = Matrix.getStringListOfOverladedGrids(
-        matrixFound,
-        templatedMatrix,
-      );
-
       final double scoreForThisVariation = Matrix.hammingDistancePercentage(
             matrixFound,
             templatedMatrix,
           ) *
           100;
+
+      final Matrix characterMatrix =
+          widget.textify.characterDefinitions.getMatrix(character, matrixIndex);
+
       return _buildArtifactGrid(
         'Template "$character"[$matrixIndex]${templatedMatrix.font}\n${scoreForThisVariation.toStringAsFixed(2)}%',
         Colors.grey.shade900,
-        overlayGridText.join('\n'),
-        _getMultiLineTextForTemplate(
-          character,
-          false,
-          true,
-        ),
+        matrixFound,
+        characterMatrix,
+        characterMatrix..gridToString(forCode: true),
       );
     }
     return null;
-  }
-
-  String _getMultiLineTextForTemplate(
-    final String character,
-    final bool resize,
-    final bool forCode,
-  ) {
-    final List<String> textTemplate =
-        widget.textify.characterDefinitions.getTemplateAsString(character);
-    return Matrix.fromAsciiDefinition(textTemplate)
-        .gridToString(forCode: forCode);
   }
 }

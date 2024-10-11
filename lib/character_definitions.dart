@@ -61,28 +61,40 @@ class CharacterDefinitions {
         otherCharacters;
   }
 
-  /// Retrieves the template as a list of strings for a given character.
+  /// Retrieves a specific [Matrix] for a given character.
   ///
-  /// [character] The character to get the template for.
+  /// This method fetches a character definition and returns the matrix at the specified index.
+  /// If the character definition doesn't exist or the index is out of bounds, an empty matrix is returned.
   ///
-  /// Returns a list of strings representing the character's template.
-  /// For space character, returns a predefined template.
+  /// Parameters:
+  /// - [character]: A [String] representing the character for which to retrieve the matrix.
+  ///   This should be a single character, typically.
+  /// - [matriceIndex]: An [int] specifying the index of the desired matrix within the character's
+  ///   definition. Different indices may represent variations or different representations of the character.
   ///
-  /// Throws an [ArgumentError] if no template is found for the character.
-  List<String> getTemplateAsString(final String character) {
-    if (character == ' ') {
-      return List.generate(
-        60,
-        (_) => '........................................',
-      );
+  /// Returns:
+  /// - A [Matrix] object representing the character at the specified index.
+  /// - Returns an empty [Matrix] if:
+  ///   - No definition is found for the character.
+  ///   - The matriceIndex is negative.
+  ///   - The matriceIndex is out of bounds for the character's matrices.
+  ///
+  /// Example:
+  /// ```dart
+  /// final Matrix aMatrix = getMatrix('A', 0);
+  /// final Matrix emptyMatrix = getMatrix('?', 5); // Assuming '?' is undefined or index 5 is out of bounds
+  /// ```
+  Matrix getMatrix(
+    final String character,
+    final int matriceIndex,
+  ) {
+    final CharacterDefinition? definition = getDefinition(character);
+    if (definition == null ||
+        matriceIndex < 0 ||
+        matriceIndex >= definition.matrices.length) {
+      return Matrix();
     }
-
-    final definition = getDefinition(character);
-    if (definition == null || definition.matrices.isEmpty) {
-      throw ArgumentError('No template found for character: $character');
-    }
-
-    return definition.matrices.first.gridToStrings();
+    return definition.matrices[matriceIndex];
   }
 
   /// Loads character definitions from a JSON file.
