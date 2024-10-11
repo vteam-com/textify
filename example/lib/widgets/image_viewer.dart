@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'dart:ui' as ui;
 
 import 'package:flutter/widgets.dart';
@@ -42,14 +43,79 @@ Widget buildInteractiveImageViewer(
   final TransformationController? transformationController,
 ) {
   return PanelContent(
-    center: InteractiveViewer(
+    center: CustomInteractiveViewer(
       transformationController: transformationController,
-      constrained: false,
-      minScale: 0.1,
-      maxScale: 50,
       child: ImageViewer(
         image: iamgeToDiplay,
       ),
     ),
   );
+}
+
+class PanningGestureRecognizer extends PanGestureRecognizer {
+  @override
+  void addPointer(PointerDownEvent event) {
+    if (event.buttons == kPrimaryButton) {
+      // Only start tracking when the primary mouse button is pressed
+      startTrackingPointer(event.pointer);
+      resolve(GestureDisposition.accepted);
+    } else {
+      stopTrackingPointer(event.pointer);
+    }
+  }
+}
+
+class CustomInteractiveViewer extends StatefulWidget {
+  final Widget child;
+  final TransformationController? transformationController;
+
+  final bool constrained;
+  final double minScale;
+  final double maxScale;
+
+  const CustomInteractiveViewer({
+    super.key,
+    required this.child,
+    this.transformationController,
+    this.constrained = false,
+    this.minScale = 0.01,
+    this.maxScale = 50,
+    //        minScale: 0.1,
+    // maxScale: 50,
+  });
+
+  @override
+  CustomInteractiveViewerState createState() => CustomInteractiveViewerState();
+}
+
+class CustomInteractiveViewerState extends State<CustomInteractiveViewer> {
+  bool _isPanning = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Listener(
+      onPointerDown: (event) {
+        if (event.buttons == kPrimaryButton) {
+          setState(() {
+            _isPanning = true;
+          });
+        }
+      },
+      onPointerUp: (event) {
+        setState(() {
+          _isPanning = false;
+        });
+      },
+      child: InteractiveViewer(
+        transformationController: widget.transformationController,
+        panEnabled: _isPanning,
+        scaleEnabled: true,
+        panAxis: PanAxis.free,
+        constrained: widget.constrained,
+        minScale: widget.minScale,
+        maxScale: widget.maxScale,
+        child: widget.child,
+      ),
+    );
+  }
 }

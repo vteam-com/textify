@@ -2,6 +2,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:textify_dashoard/widgets/image_viewer.dart';
 
 import 'debouce.dart';
 import 'panel_content.dart';
@@ -87,11 +88,8 @@ class _ImageSourceSamplesState extends State<ImageSourceSamples> {
               }
             : null,
       ),
-      center: InteractiveViewer(
+      center: CustomInteractiveViewer(
         transformationController: widget.transformationController,
-        constrained: false,
-        minScale: 0.1,
-        maxScale: 50,
         child: Image.asset(
           getSampleAssetName(_currentIndex),
           fit: BoxFit.contain,

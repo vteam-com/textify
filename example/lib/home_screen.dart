@@ -195,11 +195,8 @@ class _HomeScreenState extends State<HomeScreen> {
     final Function onToggleCleanup,
   ) {
     return PanelContent(
-      center: InteractiveViewer(
+      center: CustomInteractiveViewer(
         transformationController: _transformationController,
-        constrained: false,
-        minScale: 0.1,
-        maxScale: 50,
         child: ShowFindings(
           textify: textify,
           applyPacking: cleanUpArtifacts,

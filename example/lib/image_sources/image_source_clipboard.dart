@@ -74,11 +74,8 @@ class _ImageSourceClipboardState extends State<ImageSourceClipboard> {
   Widget _buildDisplayImage() {
     return _image == null
         ? const Center(child: Text('No image pasted'))
-        : InteractiveViewer(
+        : CustomInteractiveViewer(
             transformationController: widget.transformationController,
-            constrained: false,
-            minScale: 0.1,
-            maxScale: 50,
             child: ImageViewer(
               image: _image!,
             ),

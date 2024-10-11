@@ -3,6 +3,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:textify_dashoard/image_sources/update_character_definitions.dart';
+import 'package:textify_dashoard/widgets/image_viewer.dart';
 
 import '../../widgets/gap.dart';
 import 'debouce.dart';
@@ -90,10 +91,7 @@ class _ImageSourceGeneratedState extends State<ImageSourceGenerated> {
             top: _buildActionButtons(),
             center: _imageGenerated == null
                 ? Center(child: Text('Loading...'))
-                : InteractiveViewer(
-                    constrained: false,
-                    minScale: 0.1,
-                    maxScale: 50,
+                : CustomInteractiveViewer(
                     transformationController: widget.transformationController,
                     child: RawImage(
                       image: _imageGenerated,
