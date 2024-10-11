@@ -40,7 +40,7 @@ class _ImageSourceSamplesState extends State<ImageSourceSamples> {
     ),
     ImageData(
       'back-on-white-the_example_text.png',
-      'THE EXAMPLE TEXT',
+      'THEEXAMPLETEXT',
     ),
     ImageData(
       'classy.png',

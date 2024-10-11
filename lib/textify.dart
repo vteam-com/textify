@@ -537,18 +537,21 @@ class Textify {
             y,
           );
 
-          // Extract artifact information from the connected points
-          final Artifact artifactFound = _extractArtifact(
-            binaryImages,
-            connectedPoints,
-          );
+          // drop anything that looks like a 1 or 2 pixel
+          if (connectedPoints.length > 2) {
+            // Extract artifact information from the connected points
+            final Artifact artifactFound = _extractArtifact(
+              binaryImages,
+              connectedPoints,
+            );
 
-          if (excludeLongLines &&
-              artifactFound.matrixOriginal.isConsideredLine()) {
-            // discard lines
-          } else {
-            // Add the found artifact to the list
-            artifacts.add(artifactFound);
+            if (excludeLongLines &&
+                artifactFound.matrixOriginal.isConsideredLine()) {
+              // discard lines
+            } else {
+              // Add the found artifact to the list
+              artifacts.add(artifactFound);
+            }
           }
         }
       }
