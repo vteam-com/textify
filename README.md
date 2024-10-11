@@ -7,7 +7,7 @@ Textify is a Dart package that provides utilities for working with text represen
 ## Features
 
 - Extracts text from clean digital images
-- Supports standard fonts like [Arial, Courier, Helvetica, Times New Roman]
+- Supports standard fonts like "Arial", "Courier", "Helvetica", "Times New Roman"
 - Fully cross-platform
 - Pure Dart and Flutter implementation
 - Offline functionality

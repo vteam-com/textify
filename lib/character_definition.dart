@@ -6,7 +6,19 @@ import 'package:textify/matrix.dart';
 class CharacterDefinition {
   /// Creates a new [CharacterDefinition] instance.
   ///
-  /// [character] is required. All other parameters are optional and have default values.
+  /// Parameters:
+  /// - [character]: The character this definition represents. This parameter is required.
+  /// - [enclosures]: The number of enclosures (e.g., brackets, parentheses) associated with this character. Defaults to 0.
+  /// - [isAmount]: Indicates whether this character is typically used in monetary amounts. Defaults to false.
+  /// - [isDate]: Indicates whether this character is commonly used in date representations. Defaults to false.
+  /// - [isDigit]: Indicates whether this character is a numerical digit. Defaults to false.
+  /// - [isLetter]: Indicates whether this character is an alphabetic letter. Defaults to false.
+  /// - [isPunctuation]: Indicates whether this character is a punctuation mark. Defaults to false.
+  /// - [lineLeft]: Indicates whether this character typically has a line to its left (e.g., in handwriting). Defaults to false.
+  /// - [lineRight]: Indicates whether this character typically has a line to its right (e.g., in handwriting). Defaults to false.
+  /// - [matrices]: A list of matrices representing the visual pattern of this character. Defaults to an empty list.
+  ///
+  /// All parameters except [character] are optional and have default values.
   CharacterDefinition({
     required this.character,
     this.enclosures = 0,
@@ -22,7 +34,8 @@ class CharacterDefinition {
 
   /// Creates a [CharacterDefinition] from a JSON map.
   ///
-  /// [json] is a map containing key-value pairs representing the properties
+  /// Parameters:
+  /// - [json] is a map containing key-value pairs representing the properties
   /// of a CharacterDefinition. The keys should match the property names of
   /// the CharacterDefinition class, and the values should be of the appropriate types.
   ///
