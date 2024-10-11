@@ -2,6 +2,7 @@ import 'package:intl/intl.dart';
 import 'dart:ui' as ui;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:textify/matrix.dart';
 import 'package:textify/textify.dart';
 
@@ -47,6 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
       await _textify.init();
       _convertImageToText();
     });
+    _loadLastPreferences();
   }
 
   @override
@@ -80,6 +82,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       _isExpandedResults = isExpanded;
                   }
                 });
+                _savePreferrences();
               },
               children: [
                 //
@@ -332,5 +335,22 @@ class _HomeScreenState extends State<HomeScreen> {
         _textFound = _textify.textFound;
       });
     }
+  }
+
+  Future<void> _loadLastPreferences() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    _isExpandedSource = prefs.getBool('expanded_source') ?? true;
+    _isExpandedArtifactFound = prefs.getBool('expanded_found') ?? true;
+    _isExpandedHightContrast = prefs.getBool('expanded_contrast') ?? true;
+    _isExpandedResults = prefs.getBool('expanded_results') ?? true;
+  }
+
+  Future<void> _savePreferrences() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    await prefs.setBool('expanded_source', _isExpandedSource);
+    await prefs.setBool('expanded_found', _isExpandedArtifactFound);
+    await prefs.setBool('expanded_contrast', _isExpandedHightContrast);
+    await prefs.setBool('expanded_results', _isExpandedResults);
   }
 }
