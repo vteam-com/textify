@@ -102,15 +102,12 @@ class Artifact {
   ///
   /// Returns:
   /// The resized matrix.
-  Matrix resize(final int width, final int height) {
-    _matrixNormalized.setGrid(
-      matrixOriginal
-          .createNormalizeMatrix(
-            width,
-            height,
-          )
-          .data,
+  Matrix updateMatrixNormalizedFromOriginal(final int width, final int height) {
+    final Matrix newSizedMatrix = matrixOriginal.createNormalizeMatrix(
+      width,
+      height,
     );
+    _matrixNormalized.setGrid(newSizedMatrix.data);
     return _matrixNormalized;
   }
 

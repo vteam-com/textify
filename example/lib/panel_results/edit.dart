@@ -102,7 +102,7 @@ class _EditScreenState extends State<EditScreen> {
 
   Widget _buildContent(final BuildContext context) {
     final List<ScoreMatch> scoreMatches =
-        widget.textify.getMatchingScores(widget.artifact);
+        widget.textify.getMatchingScoresOfNormalizedMatrix(widget.artifact);
 
     final ScoreMatch scoreOfExpectedCharacter = scoreMatches.firstWhere(
       (scoreMatch) => scoreMatch.character == widget.characterExpected,

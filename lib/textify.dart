@@ -103,7 +103,7 @@ class Textify {
   /// [artifact] is the artifact to find matches for.
   /// [supportedCharacters] is an optional string of characters to limit the search to.
   /// Returns a list of [ScoreMatch] objects sorted by descending score.
-  List<ScoreMatch> getMatchingScores(
+  List<ScoreMatch> getMatchingScoresOfNormalizedMatrix(
     final Artifact artifact, [
     final String supportedCharacters = '',
   ]) {
@@ -445,8 +445,8 @@ class Textify {
     for (final artifact in this.artifacts) {
       bool foundBand = false;
 
-      for (Band band in bands) {
-        Rect boundingBox = Band.getBoundingBox(band.artifacts);
+      for (final Band band in bands) {
+        final Rect boundingBox = Band.getBoundingBox(band.artifacts);
         if (_isOverlappingVertically(
           artifact.rectangleOriginal,
           boundingBox,
@@ -629,12 +629,12 @@ class Textify {
   ///   This method relies on the `getMatchingScores` function to perform the
   ///   actual character matching and scoring. The implementation of
   ///   `getMatchingScores` is crucial for the accuracy of this method.
-  String _getCharacterFromArtifacts(
+  String _getCharacterFromArtifactNormalizedMatrix(
     final Artifact artifact, [
     final String supportedCharacters = '',
   ]) {
     final List<ScoreMatch> scores =
-        getMatchingScores(artifact, supportedCharacters);
+        getMatchingScoresOfNormalizedMatrix(artifact, supportedCharacters);
 
     return scores.isNotEmpty ? scores.first.character : '';
   }
@@ -744,16 +744,18 @@ class Textify {
 
     final List<String> linesFound = [];
 
-    for (final band in bands) {
+    for (final Band band in bands) {
       String line = '';
 
       for (final Artifact artifact in band.artifacts) {
-        artifact.resize(
+        artifact.updateMatrixNormalizedFromOriginal(
           templateWidth,
           templateHeight,
         );
-        artifact.characterMatched =
-            _getCharacterFromArtifacts(artifact, supportedCharacters);
+        artifact.characterMatched = _getCharacterFromArtifactNormalizedMatrix(
+          artifact,
+          supportedCharacters,
+        );
 
         line += artifact.characterMatched;
       }
