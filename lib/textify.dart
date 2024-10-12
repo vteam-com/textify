@@ -224,7 +224,7 @@ class Textify {
     /// Start
     processBegin = DateTime.now();
 
-    findArtifactsFromBinaryImage(imageAsMatrix);
+    identifyArtifactsAndBandsInBanaryImage(imageAsMatrix);
 
     final String result = _getTextFromArtifacts(
       supportedCharacters: supportedCharacters,
@@ -254,7 +254,7 @@ class Textify {
   ///
   /// Note: This method assumes that the input [Matrix] is a valid binary image.
   /// Behavior may be undefined for non-binary input.
-  void findArtifactsFromBinaryImage(final Matrix imageAsBinary) {
+  void identifyArtifactsAndBandsInBanaryImage(final Matrix imageAsBinary) {
     // (1) Find artifact using flood fill
     _findArtifacts(imageAsBinary);
 

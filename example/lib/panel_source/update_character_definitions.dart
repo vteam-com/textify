@@ -2,6 +2,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:textify/artifact.dart';
+import 'package:textify/character_definition.dart';
 import 'package:textify/matrix.dart';
 import 'package:textify/textify.dart';
 import 'package:textify_dashboard/panel_source/image_source_generated.dart';
@@ -279,7 +280,7 @@ class CharacterGenerationBodyState extends State<CharacterGenerationBody> {
     final Matrix imageAsMatrix = await Matrix.fromImage(imageOptimized);
 
     // Find artifacts from the binary image
-    textify.findArtifactsFromBinaryImage(imageAsMatrix);
+    textify.identifyArtifactsAndBandsInBanaryImage(imageAsMatrix);
 
     // If there is only one band (expected for a single character)
     if (textify.bands.length == 1) {
@@ -298,7 +299,10 @@ class CharacterGenerationBodyState extends State<CharacterGenerationBody> {
 
         // Create a normalized matrix for the character definition
         final Matrix matrix =
-            targetArtifact.matrixOriginal.createNormalizeMatrix(40, 60);
+            targetArtifact.matrixOriginal.createNormalizeMatrix(
+          CharacterDefinition.templateWidth,
+          CharacterDefinition.templateHeight,
+        );
 
         // Update the character definition with the new matrix
         final wasNewDefinition =
