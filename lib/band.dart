@@ -107,7 +107,7 @@ class Band {
   /// ensuring they are in the correct sequence as they appear in the band.
   void sortLeftToRight() {
     artifacts.sort(
-      (a, b) => a.rectangleAdjusted.left.compareTo(b.rectangleAdjusted.left),
+      (a, b) => a.rectangleOriginal.left.compareTo(b.rectangleOriginal.left),
     );
   }
 
