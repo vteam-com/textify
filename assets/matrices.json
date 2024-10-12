@@ -656,7 +656,7 @@
         },
         {
             "character": "$",
-            "enclosures": 0,
+            "enclosures": 2,
             "isAmount": true,
             "isDate": false,
             "isDigit": false,
@@ -937,7 +937,7 @@
         },
         {
             "character": "&",
-            "enclosures": 1,
+            "enclosures": 2,
             "isAmount": false,
             "isDate": false,
             "isDigit": false,
@@ -17241,7 +17241,7 @@
             "isDigit": false,
             "isLetter": false,
             "isPunctuation": false,
-            "lineLeft": false,
+            "lineLeft": true,
             "lineRight": false,
             "matrices": [
                 {
@@ -17804,7 +17804,7 @@
             "isLetter": false,
             "isPunctuation": false,
             "lineLeft": false,
-            "lineRight": false,
+            "lineRight": true,
             "matrices": [
                 {
                     "font": "Arial",
@@ -18927,7 +18927,7 @@
             "isDigit": false,
             "isLetter": false,
             "isPunctuation": false,
-            "lineLeft": false,
+            "lineLeft": true,
             "lineRight": false,
             "matrices": [
                 {
@@ -19208,8 +19208,8 @@
             "isDigit": false,
             "isLetter": true,
             "isPunctuation": false,
-            "lineLeft": false,
-            "lineRight": false,
+            "lineLeft": true,
+            "lineRight": true,
             "matrices": [
                 {
                     "font": "Arial",
@@ -19490,7 +19490,7 @@
             "isLetter": true,
             "isPunctuation": false,
             "lineLeft": false,
-            "lineRight": false,
+            "lineRight": true,
             "matrices": [
                 {
                     "font": "Arial",
@@ -19770,7 +19770,7 @@
             "isDigit": false,
             "isLetter": false,
             "isPunctuation": false,
-            "lineLeft": false,
+            "lineLeft": true,
             "lineRight": false,
             "matrices": [
                 {
@@ -20614,7 +20614,7 @@
             "isLetter": true,
             "isPunctuation": false,
             "lineLeft": true,
-            "lineRight": false,
+            "lineRight": true,
             "matrices": [
                 {
                     "font": "Arial",
@@ -21175,7 +21175,7 @@
             "isDigit": false,
             "isLetter": false,
             "isPunctuation": false,
-            "lineLeft": false,
+            "lineLeft": true,
             "lineRight": false,
             "matrices": [
                 {
@@ -21457,7 +21457,7 @@
             "isLetter": false,
             "isPunctuation": false,
             "lineLeft": false,
-            "lineRight": false,
+            "lineRight": true,
             "matrices": [
                 {
                     "font": "Arial",
@@ -21737,7 +21737,7 @@
             "isDigit": false,
             "isLetter": false,
             "isPunctuation": false,
-            "lineLeft": false,
+            "lineLeft": true,
             "lineRight": false,
             "matrices": [
                 {
@@ -22300,7 +22300,7 @@
             "isLetter": false,
             "isPunctuation": false,
             "lineLeft": false,
-            "lineRight": false,
+            "lineRight": true,
             "matrices": [
                 {
                     "font": "Arial",
@@ -22580,8 +22580,8 @@
             "isDigit": false,
             "isLetter": false,
             "isPunctuation": false,
-            "lineLeft": false,
-            "lineRight": false,
+            "lineLeft": true,
+            "lineRight": true,
             "matrices": [
                 {
                     "font": "Arial",

@@ -117,7 +117,7 @@ class Textify {
     final bool hasVerticalLineOnTheRightSide = matrix.verticalLineRight;
     final bool punctuation = matrix.isPunctuation();
 
-    const double percentageNeeded = 0.8;
+    const double percentageNeeded = 0.5;
     const int totalChecks = 4;
 
     List<CharacterDefinition> qualifiedTemplates = characterDefinitions
