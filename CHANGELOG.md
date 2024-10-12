@@ -4,6 +4,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.5] - 2024-10-12
+
+### Changed
+
+- Update Matrices.json to hit 100% match for the 4 fontds at size 40
+- refactor clean up code
+
 ## [0.1.4] - 2024-10-10
 
 ### Changed
