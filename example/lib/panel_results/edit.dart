@@ -153,7 +153,7 @@ class _EditScreenState extends State<EditScreen> {
         Colors.grey.withAlpha(100),
         widget.artifact.matrixNormalized,
         null,
-        widget.artifact.getResizedString(w: w, h: h, forCode: true),
+        widget.artifact.matrixNormalized.gridToString(forCode: true),
       ),
 
       // Expected templates and matches

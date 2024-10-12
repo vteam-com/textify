@@ -71,32 +71,6 @@ class Artifact {
     );
   }
 
-  /// Returns a string representation of the resized artifact.
-  ///
-  /// Parameters:
-  /// - w: The target width for resizing.
-  /// - h: The target height for resizing.
-  /// - onChar: The character to use for 'on' pixels (default: '#').
-  /// - forCode: Whether the output is intended for code representation (default: false).
-  ///
-  /// Returns:
-  /// A string representation of the resized artifact.
-  String getResizedString({
-    required final int w,
-    required final int h,
-    final String onChar = '#',
-    final bool forCode = false,
-  }) {
-    _matrixNormalized.data = matrixOriginal.createNormalizeMatrix(w, h).data;
-    _matrixNormalized.cols = w;
-    _matrixNormalized.rows = h;
-
-    return _matrixNormalized.gridToString(
-      forCode: forCode,
-      onChar: onChar,
-    );
-  }
-
   /// Checks if the artifact is empty (contains no 'on' pixels).
   bool get isEmpty {
     return _matrix.isEmpty;
