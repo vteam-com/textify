@@ -275,12 +275,16 @@ class _ImageSourceGeneratedState extends State<ImageSourceGenerated> {
     return false;
   }
 
+  String reduceSpaces(String input) {
+    return input.replaceAll(RegExp(r'\s+'), ' ');
+  }
+
   void notify() {
     debouncer.run(() {
       final List<String> expectedLinesOfText = [
-        _textControllerLine1.text,
-        _textControllerLine2.text,
-        _textControllerLine3.text,
+        reduceSpaces(_textControllerLine1.text),
+        reduceSpaces(_textControllerLine2.text),
+        reduceSpaces(_textControllerLine3.text),
       ];
 
       widget.onImageChanged(
