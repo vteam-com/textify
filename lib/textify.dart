@@ -111,7 +111,7 @@ class Textify {
       return [ScoreMatch(character: ' ', matrixIndex: 0, score: 1)];
     }
 
-    final matrix = artifact.matrixNormalized;
+    final Matrix matrix = artifact.matrixNormalized;
     final int numberOfEnclosure = matrix.enclosures;
     final bool hasVerticalLineOnTheLeftSide = matrix.verticalLineLeft;
     final bool hasVerticalLineOnTheRightSide = matrix.verticalLineRight;
@@ -408,17 +408,17 @@ class Textify {
       (maxY - minY) + 1,
     );
 
-    // Extract the sub-grid from the binary image
-    final Matrix subGrid = Matrix.extractSubGrid(
-      binaryImage: binaryImage,
-      rect: rectangle,
-    );
-
     // Create and return the Artifact object
     final Artifact artifact = Artifact();
     artifact.rectangleOriginal = rectangle;
     artifact.rectangleAdjusted = rectangle;
-    artifact.matrixOriginal = subGrid;
+
+    // Extract the sub-grid from the binary image
+    artifact.matrixOriginal = Matrix.extractSubGrid(
+      binaryImage: binaryImage,
+      rect: rectangle,
+    );
+    artifact.matrixNormalized.setGrid(artifact.matrixOriginal.data);
 
     return artifact;
   }
