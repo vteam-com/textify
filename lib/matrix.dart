@@ -774,7 +774,7 @@ class Matrix {
   /// between line-like structures and other shapes is important.
   bool isConsideredLine() {
     final double ar = aspectRatioOfContent();
-    if (ar < 0.1 || ar > 50) {
+    if (ar < 0.09 || ar > 50) {
       return true;
     }
     return false;
