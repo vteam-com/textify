@@ -28,7 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   ui.Image? _imageSource;
   String _fontName = '';
-  List<String> _charactersExpectedToBeFoundInTheImage = [];
+  List<String> _stringsExpectedToBeFoundInTheImage = [];
   bool _cleanUpArtifactFound = false;
   String _textFound = '';
 
@@ -54,10 +54,19 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
-    final String percentage = getPercentageOfMatches(
-      _charactersExpectedToBeFoundInTheImage,
-      _textFound,
-    ).toStringAsFixed(0);
+
+    final textFoundSingleString = _textFound.replaceAll('\n', '');
+
+    String percentage = '${textFoundSingleString.length} characters ';
+
+    if (_stringsExpectedToBeFoundInTheImage.isNotEmpty) {
+      percentage += ' ';
+      percentage += compareStringPercentage(
+        _stringsExpectedToBeFoundInTheImage.join(),
+        _textFound.replaceAll('\n', ''),
+      ).toStringAsFixed(0);
+      percentage += '%';
+    }
 
     return Scaffold(
       backgroundColor: colorScheme.primaryContainer,
@@ -102,7 +111,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       final bool includeSpaceDetection,
                     ) {
                       _imageSource = newImage;
-                      _charactersExpectedToBeFoundInTheImage = expectedText;
+                      _stringsExpectedToBeFoundInTheImage = expectedText
+                          .where((str) => str.isNotEmpty)
+                          .toList(); // remove empty entries
                       _fontName = fontName;
                       _textify.includeSpaceDetections = includeSpaceDetection;
                       _convertImageToText();
@@ -150,12 +161,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 //
                 buildExpansionPanel(
                   titleLeft: 'Results',
-                  titleCenter: '$percentage%',
+                  titleCenter: percentage,
                   titleRight: '',
                   isExpanded: _isExpandedResults,
                   content: MatchedArtifacts(
                     font: _fontName,
-                    expectedStrings: _charactersExpectedToBeFoundInTheImage,
+                    expectedStrings: _stringsExpectedToBeFoundInTheImage,
                     textify: _textify,
                   ),
                 ),

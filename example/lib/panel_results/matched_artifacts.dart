@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:textify/textify.dart';
 import 'package:textify_dashboard/panel_source/panel_content.dart';
@@ -139,28 +137,6 @@ class MatchedArtifacts extends StatelessWidget {
   }
 }
 
-double getPercentageOfMatches(List<String> expectedStrings, String textFound) {
-  if (expectedStrings.isEmpty) {
-    return 0;
-  }
-
-  List<String> stringsFound = textFound.split('\n');
-
-  double totalPercentages = 0;
-
-  // Implement distance matching
-  for (int i = 0; i < expectedStrings.length && i < stringsFound.length; i++) {
-    String expected = expectedStrings[i];
-    String found = stringsFound[i];
-
-    double singleResult = compareStringInPercentage(expected, found);
-    totalPercentages += singleResult;
-  }
-
-  double percentage = totalPercentages / expectedStrings.length;
-  return percentage;
-}
-
 /// Compares two strings and returns their similarity as a percentage.
 ///
 /// This function uses the Levenshtein distance algorithm to calculate the
@@ -186,85 +162,22 @@ double getPercentageOfMatches(List<String> expectedStrings, String textFound) {
 /// Returns:
 ///   A double value representing the similarity percentage between the two
 ///   strings, clamped between 0.0 and 100.0.
-double compareStringInPercentage(final String s1, final String s2) {
-  if (s1 == s2) {
+double compareStringPercentage(String str1, String str2) {
+  if (str1 == str2) {
     return 100.0;
   }
-  if (s1.isEmpty || s2.isEmpty) {
+  if (str1.isEmpty || str2.isEmpty) {
     return 0.0;
   }
 
-  final int len1 = s1.length;
-  final int len2 = s2.length;
+  int minLength = str1.length < str2.length ? str1.length : str2.length;
+  int matchCount = 0;
 
-  List<int> prevRow = List<int>.generate(len2 + 1, (i) => i);
-  List<int> currentRow = List<int>.filled(len2 + 1, 0);
-
-  for (int i = 0; i < len1; i++) {
-    currentRow[0] = i + 1;
-
-    for (int j = 0; j < len2; j++) {
-      int insertCost = currentRow[j] + 1;
-      int deleteCost = prevRow[j + 1] + 1;
-      int replaceCost = prevRow[j] + (s1[i] != s2[j] ? 1 : 0);
-
-      currentRow[j + 1] = [insertCost, deleteCost, replaceCost].reduce(min);
-    }
-
-    // swap
-    final List<int> temp = prevRow;
-    prevRow = currentRow;
-    currentRow = temp;
-  }
-
-  int levenshteinDistance = prevRow[len2];
-  int maxLength = max(len1, len2);
-
-  return ((1 - levenshteinDistance / maxLength) * 100).clamp(0.0, 100.0);
-}
-
-int damerauLevenshteinDistance(String source, String target) {
-  if (source == target) {
-    return 0;
-  }
-  if (source.isEmpty) {
-    return target.length;
-  }
-  if (target.isEmpty) {
-    return source.length;
-  }
-
-  List<List<int>> matrix = List.generate(
-    source.length + 1,
-    (i) => List.generate(target.length + 1, (j) => 0),
-  );
-
-  for (int i = 0; i <= source.length; i++) {
-    matrix[i][0] = i;
-  }
-  for (int j = 0; j <= target.length; j++) {
-    matrix[0][j] = j;
-  }
-
-  for (int i = 1; i <= source.length; i++) {
-    for (int j = 1; j <= target.length; j++) {
-      int cost = source[i - 1] == target[j - 1] ? 0 : 1;
-
-      matrix[i][j] = [
-        matrix[i - 1][j] + 1, // Deletion
-        matrix[i][j - 1] + 1, // Insertion
-        matrix[i - 1][j - 1] + cost, // Substitution
-      ].reduce((curr, next) => curr < next ? curr : next);
-
-      if (i > 1 &&
-          j > 1 &&
-          source[i - 1] == target[j - 2] &&
-          source[i - 2] == target[j - 1]) {
-        matrix[i][j] =
-            min(matrix[i][j], matrix[i - 2][j - 2] + cost); // Transposition
-      }
+  for (int i = 0; i < minLength; i++) {
+    if (str1[i] == str2[i]) {
+      matchCount++;
     }
   }
 
-  return matrix[source.length][target.length];
+  return (matchCount / str1.length) * 100;
 }
