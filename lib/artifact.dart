@@ -13,57 +13,22 @@ class Artifact {
   String characterMatched = '';
 
   /// The original matrix representation of the artifact.
-  final Matrix _matrixOriginal = Matrix();
+  final Matrix _matrix = Matrix();
 
-  /// A normalized version of the matrix representation.
-  final Matrix _matrixNormalized = Matrix();
-
-  /// Returns:
-  /// A string representation ths artifact.
-  @override
-  String toString() {
-    return '"$characterMatched" Rect:${_matrixOriginal.rectangle.toString()} Area: $area}';
-  }
+  /// Gets the original matrix representation of the artifact.
+  Matrix get matrix => _matrix;
 
   /// The area of the artifact, calculated from its matrix representation.
-  int get area => _matrixOriginal.area;
+  int get area => _matrix.area;
 
   /// Checks if the artifact is empty (contains no 'on' pixels).
   bool get isEmpty {
-    return _matrixOriginal.isEmpty;
+    return _matrix.isEmpty;
   }
 
   /// Checks if the artifact is not empty (contains at least one 'on' pixel).
   bool get isNotEmpty {
     return !isEmpty;
-  }
-
-  /// Gets the original matrix representation of the artifact.
-  Matrix get matrixOriginal => _matrixOriginal;
-
-  /// Sets the original matrix representation of the artifact.
-  set matrixOriginal(final Matrix value) {
-    _matrixOriginal.setGrid(value.data);
-  }
-
-  /// Gets the normalized matrix representation of the artifact.
-  Matrix get matrixNormalized => _matrixNormalized;
-
-  /// Resizes the artifact to the specified width and height.
-  ///
-  /// Parameters:
-  /// - width: The target width.
-  /// - height: The target height.
-  ///
-  /// Returns:
-  /// The resized matrix.
-  Matrix updateMatrixNormalizedFromOriginal(final int width, final int height) {
-    final Matrix newSizedMatrix = matrixOriginal.createNormalizeMatrix(
-      width,
-      height,
-    );
-    _matrixNormalized.setGrid(newSizedMatrix.data);
-    return _matrixNormalized;
   }
 
   /// Converts the artifact to a text representation.
@@ -78,7 +43,7 @@ class Artifact {
     final String onChar = '#',
     final bool forCode = false,
   }) {
-    return _matrixOriginal.gridToString(
+    return _matrix.gridToString(
       forCode: forCode,
       onChar: onChar,
     );
@@ -103,20 +68,20 @@ class Artifact {
     // Create a new rectangle that encompasses both artifacts
     final Rect newRect = Rect.fromLTRB(
       min(
-        this._matrixNormalized.rectangle.left,
-        toMerge._matrixNormalized.rectangle.left,
+        this._matrix.rectangle.left,
+        toMerge._matrix.rectangle.left,
       ),
       min(
-        this._matrixNormalized.rectangle.top,
-        toMerge._matrixNormalized.rectangle.top,
+        this._matrix.rectangle.top,
+        toMerge._matrix.rectangle.top,
       ),
       max(
-        this._matrixNormalized.rectangle.right,
-        toMerge._matrixNormalized.rectangle.right,
+        this._matrix.rectangle.right,
+        toMerge._matrix.rectangle.right,
       ),
       max(
-        this._matrixNormalized.rectangle.bottom,
-        toMerge._matrixNormalized.rectangle.bottom,
+        this._matrix.rectangle.bottom,
+        toMerge._matrix.rectangle.bottom,
       ),
     );
 
@@ -125,22 +90,27 @@ class Artifact {
 
     // Copy both grids onto the new grid
     Matrix.copyGrid(
-      this.matrixOriginal,
+      this.matrix,
       newGrid,
-      (this._matrixNormalized.rectangle.left - newRect.left).toInt(),
-      (this._matrixNormalized.rectangle.top - newRect.top).toInt(),
+      (this._matrix.rectangle.left - newRect.left).toInt(),
+      (this._matrix.rectangle.top - newRect.top).toInt(),
     );
 
     Matrix.copyGrid(
-      toMerge.matrixOriginal,
+      toMerge.matrix,
       newGrid,
-      (toMerge._matrixNormalized.rectangle.left - newRect.left).toInt(),
-      (toMerge._matrixNormalized.rectangle.top - newRect.top).toInt(),
+      (toMerge._matrix.rectangle.left - newRect.left).toInt(),
+      (toMerge._matrix.rectangle.top - newRect.top).toInt(),
     );
-    this.matrixOriginal = newGrid;
-    this.matrixOriginal.rectangle = this
-        .matrixOriginal
-        .rectangle
-        .expandToInclude(toMerge.matrixOriginal.rectangle);
+    this.matrix.setGrid(newGrid.data);
+    this.matrix.rectangle =
+        this.matrix.rectangle.expandToInclude(toMerge.matrix.rectangle);
+  }
+
+  /// Returns:
+  /// A string representation ths artifact.
+  @override
+  String toString() {
+    return '"$characterMatched" Rect:${_matrix.rectangle.toString()} Area: $area}';
   }
 }

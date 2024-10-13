@@ -100,7 +100,7 @@ class Textify {
   ///
   /// Returns:
   ///   An [int] representing the number of items in the list.
-  int get count => _artifactsToProcess.length;
+  int get count => artifactsFound.length;
 
   /// Finds matching character scores for a given artifact.
   ///
@@ -111,7 +111,7 @@ class Textify {
     final Artifact artifact, [
     final String supportedCharacters = '',
   ]) {
-    final Matrix matrix = artifact.matrixNormalized;
+    final Matrix matrix = artifact.matrix;
     final int numberOfEnclosure = matrix.enclosures;
     final bool hasVerticalLineOnTheLeftSide = matrix.verticalLineLeft;
     final bool hasVerticalLineOnTheRightSide = matrix.verticalLineRight;
@@ -159,9 +159,13 @@ class Textify {
     if (qualifiedTemplates.isEmpty) {
       qualifiedTemplates = characterDefinitions.definitions;
     }
+
+    final Matrix resizedMatrix =
+        matrix.createNormalizeMatrix(templateWidth, templateHeight);
+
     // Calculate the final scores
     final List<ScoreMatch> scores =
-        _getDistanceScores(qualifiedTemplates, matrix);
+        _getDistanceScores(qualifiedTemplates, resizedMatrix);
 
     // Sort scores in descending order (higher score is better)
     scores.sort((a, b) => b.score.compareTo(a.score));
@@ -301,8 +305,8 @@ class Textify {
         final Artifact next = _artifactsToProcess[j];
 
         if (_areArtifactsConnected(
-          current.matrixOriginal.rectangle,
-          next.matrixOriginal.rectangle,
+          current.matrix.rectangle,
+          next.matrix.rectangle,
           verticalThreshold,
           horizontalThreshold,
         )) {
@@ -410,15 +414,15 @@ class Textify {
 
     // Create and return the Artifact object
     final Artifact artifact = Artifact();
-    artifact.matrixOriginal.rectangle = rectangle;
-    artifact.matrixNormalized.rectangle = rectangle;
+    artifact.matrix.rectangle = rectangle;
 
     // Extract the sub-grid from the binary image
-    artifact.matrixOriginal = Matrix.extractSubGrid(
-      binaryImage: binaryImage,
-      rect: rectangle,
+    artifact.matrix.setGrid(
+      Matrix.extractSubGrid(
+        binaryImage: binaryImage,
+        rect: rectangle,
+      ).data,
     );
-    artifact.matrixNormalized.setGrid(artifact.matrixOriginal.data);
 
     return artifact;
   }
@@ -436,8 +440,7 @@ class Textify {
   void _assignAllArtifactsToBands() {
     // Sort artifacts by the top y-position of their rectangles
     this._artifactsToProcess.sort(
-          (a, b) => a.matrixOriginal.rectangle.top
-              .compareTo(b.matrixOriginal.rectangle.top),
+          (a, b) => a.matrix.rectangle.top.compareTo(b.matrix.rectangle.top),
         );
 
     this.bands.clear();
@@ -446,10 +449,9 @@ class Textify {
       bool foundBand = false;
 
       for (final Band band in bands) {
-        final Rect boundingBox = Band.getBoundingBoxNormalized(band.artifacts);
         if (_isOverlappingVertically(
-          artifact.matrixOriginal.rectangle,
-          boundingBox,
+          artifact.matrix.rectangle,
+          Band.getBoundingBoxOrignal(band.artifacts),
           band.rectangle.height * (10 / 100),
         )) {
           band.addArtifact(artifact);
@@ -548,8 +550,7 @@ class Textify {
 
           // drop anything that looks like a 1 or 2 pixel
           if (connectedPoints.length > 2) {
-            if (excludeLongLines &&
-                artifactFound.matrixOriginal.isConsideredLine()) {
+            if (excludeLongLines && artifactFound.matrix.isConsideredLine()) {
               // discard lines
             } else {
               final Artifact artifactForWork = _extractArtifact(
@@ -757,10 +758,6 @@ class Textify {
       String line = '';
 
       for (final Artifact artifact in band.artifacts) {
-        artifact.updateMatrixNormalizedFromOriginal(
-          templateWidth,
-          templateHeight,
-        );
         artifact.characterMatched = _getCharacterFromArtifactNormalizedMatrix(
           artifact,
           supportedCharacters,
@@ -811,8 +808,7 @@ class Textify {
           continue;
         }
 
-        if (artifactA.matrixNormalized.rectangle
-            .overlaps(artifactB.matrixNormalized.rectangle)) {
+        if (artifactA.matrix.rectangle.overlaps(artifactB.matrix.rectangle)) {
           artifactA.mergeArtifact(artifactB);
           toRemove.add(artifactB);
         }

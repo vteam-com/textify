@@ -72,10 +72,10 @@ class Band {
 
     for (int i = 1; i < artifacts.length; i++) {
       final artifact = artifacts[i];
-      final double kerning = artifact.matrixNormalized.rectangle.left -
-          artifacts[i - 1].matrixNormalized.rectangle.right;
+      final double kerning = artifact.matrix.rectangle.left -
+          artifacts[i - 1].matrix.rectangle.right;
       totalKerning += kerning;
-      totalWidth += artifact.matrixNormalized.rectangle.width;
+      totalWidth += artifact.matrix.rectangle.width;
     }
     _averageWidth = totalWidth / count;
     _averageKerning = totalKerning / count;
@@ -109,8 +109,7 @@ class Band {
   /// ensuring they are in the correct sequence as they appear in the band.
   void sortLeftToRight() {
     artifacts.sort(
-      (a, b) => a.matrixOriginal.rectangle.left
-          .compareTo(b.matrixOriginal.rectangle.left),
+      (a, b) => a.matrix.rectangle.left.compareTo(b.matrix.rectangle.left),
     );
   }
 
@@ -137,11 +136,11 @@ class Band {
       if (indexOfArtifact > 0) {
         // Left
         final Artifact artifactLeft = this.artifacts[indexOfArtifact - 1];
-        final double x1 = artifactLeft.matrixOriginal.rectangle.right;
+        final double x1 = artifactLeft.matrix.rectangle.right;
 
         // Right
         final Artifact artifactRight = this.artifacts[indexOfArtifact];
-        final double x2 = artifactRight.matrixOriginal.rectangle.left;
+        final double x2 = artifactRight.matrix.rectangle.left;
 
         final double kerning = x2 - x1;
 
@@ -156,10 +155,10 @@ class Band {
       final indexOfArtifact = this.artifacts.indexOf(artifactOnTheRightSide);
       insetArtifactForSpace(
         indexOfArtifact,
-        artifactOnTheRightSide.matrixOriginal.rectangle.left -
+        artifactOnTheRightSide.matrix.rectangle.left -
             averageWidth -
             averageKerning,
-        artifactOnTheRightSide.matrixOriginal.rectangle.left - averageKerning,
+        artifactOnTheRightSide.matrix.rectangle.left - averageKerning,
       );
     }
   }
@@ -187,18 +186,19 @@ class Band {
     final Artifact artifactSpace = Artifact();
     artifactSpace.characterMatched = ' ';
 
-    artifactSpace.matrixOriginal.rectangle = Rect.fromLTRB(
+    artifactSpace.matrix.rectangle = Rect.fromLTRB(
       x1,
       rectangle.top,
       x2,
       rectangle.bottom,
     );
-    artifactSpace.matrixNormalized.rectangle =
-        artifactSpace.matrixOriginal.rectangle;
+    artifactSpace.matrix.rectangle = artifactSpace.matrix.rectangle;
 
-    artifactSpace.matrixOriginal = Matrix(
-      artifactSpace.matrixOriginal.rectangle.width.toInt(),
-      artifactSpace.matrixOriginal.rectangle.height.toInt(),
+    artifactSpace.matrix.setGrid(
+      Matrix(
+        artifactSpace.matrix.rectangle.width.toInt(),
+        artifactSpace.matrix.rectangle.height.toInt(),
+      ).data,
     );
     this.artifacts.insert(indexOfArtifact, artifactSpace);
   }
@@ -220,20 +220,18 @@ class Band {
     double left = this.rectangle.left;
 
     for (final Artifact artifact in artifacts) {
-      artifact.matrixOriginal.padTopBottom(
-        paddingTop:
-            (artifact.matrixOriginal.rectangle.top - rectangle.top).toInt(),
+      artifact.matrix.padTopBottom(
+        paddingTop: (artifact.matrix.rectangle.top - rectangle.top).toInt(),
         paddingBottom:
-            (rectangle.bottom - artifact.matrixOriginal.rectangle.bottom)
-                .toInt(),
+            (rectangle.bottom - artifact.matrix.rectangle.bottom).toInt(),
       );
 
-      final double dx = left - artifact.matrixOriginal.rectangle.left;
-      final double dy = rectangle.top - artifact.matrixOriginal.rectangle.top;
-      artifact.matrixNormalized.rectangle =
-          artifact.matrixOriginal.rectangle.shift(Offset(dx, dy));
-      artifact.matrixOriginal.rectangle = artifact.matrixNormalized.rectangle;
-      left += artifact.matrixNormalized.rectangle.width;
+      final double dx = left - artifact.matrix.rectangle.left;
+      final double dy = rectangle.top - artifact.matrix.rectangle.top;
+      artifact.matrix.rectangle =
+          artifact.matrix.rectangle.shift(Offset(dx, dy));
+      artifact.matrix.rectangle = artifact.matrix.rectangle;
+      left += artifact.matrix.rectangle.width;
       left += kerningWidth;
     }
   }
@@ -256,7 +254,7 @@ class Band {
   /// to invalidate the cache when necessary.
   Rect get rectangle {
     if (_rectangle == Rect.zero) {
-      _rectangle = getBoundingBoxNormalized(this.artifacts);
+      _rectangle = getBoundingBoxOrignal(this.artifacts);
     }
     return _rectangle;
   }
@@ -273,25 +271,7 @@ class Band {
     double maxY = double.negativeInfinity;
 
     for (final Artifact artifact in artifacts) {
-      final Rect rect = artifact.matrixOriginal.rectangle;
-      minX = min(minX, rect.left);
-      minY = min(minY, rect.top);
-      maxX = max(maxX, rect.right);
-      maxY = max(maxY, rect.bottom);
-    }
-
-    return Rect.fromLTRB(minX, minY, maxX, maxY);
-  }
-
-  /// Return the unified bounding box for all normalized artifacts in the band
-  static Rect getBoundingBoxNormalized(final List<Artifact> artifacts) {
-    double minX = double.infinity;
-    double minY = double.infinity;
-    double maxX = double.negativeInfinity;
-    double maxY = double.negativeInfinity;
-
-    for (final Artifact artifact in artifacts) {
-      final Rect rect = artifact.matrixNormalized.rectangle;
+      final Rect rect = artifact.matrix.rectangle;
       minX = min(minX, rect.left);
       minY = min(minY, rect.top);
       maxX = max(maxX, rect.right);

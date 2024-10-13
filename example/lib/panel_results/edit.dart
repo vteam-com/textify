@@ -47,7 +47,7 @@ class _EditScreenState extends State<EditScreen> {
   }
 
   String attributeOfMatrix(final String title, Matrix matrix) {
-    return '$title\n${matrix.cols}x${matrix.rows} E:${widget.artifact.matrixOriginal.enclosures} '
+    return '$title\n${matrix.cols}x${matrix.rows} E:${widget.artifact.matrix.enclosures} '
         '${captionWithYesNo("VL", matrix.verticalLineLeft)} ${captionWithYesNo("VR", matrix.verticalLineRight)} ${captionWithYesNo("P", matrix.isPunctuation())}';
   }
 
@@ -134,12 +134,14 @@ class _EditScreenState extends State<EditScreen> {
     final int w = widget.textify.templateWidth;
     final int h = widget.textify.templateHeight;
 
+    final normalized = widget.artifact.matrix.createNormalizeMatrix(w, h);
+
     List<Widget> widgets = [
       // Artifact Original
       _buildArtifactGrid(
-        attributeOfMatrix('Artifact\nFound', widget.artifact.matrixOriginal),
+        attributeOfMatrix('Artifact\nFound', widget.artifact.matrix),
         Colors.black,
-        widget.artifact.matrixOriginal,
+        widget.artifact.matrix,
         null,
         widget.artifact.toText(forCode: true),
       ),
@@ -148,12 +150,12 @@ class _EditScreenState extends State<EditScreen> {
       _buildArtifactGrid(
         attributeOfMatrix(
           'Artifact\nNormalized',
-          widget.artifact.matrixNormalized,
+          normalized,
         ),
         Colors.grey.withAlpha(100),
-        widget.artifact.matrixNormalized,
+        normalized,
         null,
-        widget.artifact.matrixNormalized.gridToString(forCode: true),
+        normalized.gridToString(forCode: true),
       ),
 
       // Expected templates and matches
@@ -162,7 +164,7 @@ class _EditScreenState extends State<EditScreen> {
         w,
         h,
         // Artifact found
-        widget.artifact.matrixNormalized,
+        normalized,
 
         // Expected Character
         widget.characterExpected,

@@ -17,7 +17,7 @@ class DisplayArtifacts extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     if (applyPacking) {
       for (final Band band in textify.bands) {
-        _paintBand(canvas: canvas, band: band, originalOrNormalized: false);
+        _paintBand(canvas: canvas, band: band, backgroundColor: Colors.black);
         _paintArtifactsInRow(
           canvas: canvas,
           artifacts: band.artifacts,
@@ -111,14 +111,14 @@ class DisplayArtifacts extends CustomPainter {
       paintMatrix(
         canvas,
         colors[id % colors.length],
-        artifact.matrixNormalized.rectangle.left.toInt(),
-        artifact.matrixNormalized.rectangle.top.toInt(),
-        artifact.matrixOriginal,
+        artifact.matrix.rectangle.left.toInt(),
+        artifact.matrix.rectangle.top.toInt(),
+        artifact.matrix,
       );
       _drawText(
         canvas,
-        artifact.matrixNormalized.rectangle.left,
-        artifact.matrixNormalized.rectangle.top,
+        artifact.matrix.rectangle.left,
+        artifact.matrix.rectangle.top,
         id.toString(),
         8,
       );
@@ -147,9 +147,9 @@ class DisplayArtifacts extends CustomPainter {
       paintMatrix(
         canvas,
         colors[index++ % colors.length],
-        artifact.matrixOriginal.rectangle.left.toInt(),
-        artifact.matrixOriginal.rectangle.top.toInt(),
-        artifact.matrixOriginal,
+        artifact.matrix.rectangle.left.toInt(),
+        artifact.matrix.rectangle.top.toInt(),
+        artifact.matrix,
       );
     }
   }
@@ -157,18 +157,16 @@ class DisplayArtifacts extends CustomPainter {
   void _paintBand({
     required final Canvas canvas,
     required final Band band,
-    required final bool originalOrNormalized,
+    required final Color backgroundColor,
   }) {
     final String caption = _getBandTitle(band);
-    final Rect bandRect = originalOrNormalized
-        ? Band.getBoundingBoxOrignal(band.artifacts)
-        : Band.getBoundingBoxNormalized(band.artifacts);
+    final Rect bandRect = Band.getBoundingBoxOrignal(band.artifacts);
 
     // main region in blue
     _drawRectangle(
       canvas,
       bandRect,
-      originalOrNormalized ? Colors.transparent : Colors.black,
+      backgroundColor,
       Colors.white.withAlpha(100),
     );
 

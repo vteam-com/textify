@@ -179,7 +179,7 @@ class CharacterGenerationBodyState extends State<CharacterGenerationBody> {
                               ? Colors.green
                               : Colors.orange,
                         ),
-                        artifact.matrixOriginal.gridToString(),
+                        artifact.matrix.gridToString(),
                       ),
                     ),
                   );
@@ -289,7 +289,7 @@ class CharacterGenerationBodyState extends State<CharacterGenerationBody> {
 
       // Filter out artifacts with empty matrices (spaces)
       final artifactsInTheFirstBandNoSpaces = artifactsInTheFirstBand
-          .where((Artifact artifact) => artifact.matrixOriginal.isNotEmpty)
+          .where((Artifact artifact) => artifact.matrix.isNotEmpty)
           .toList();
 
       // If there are exactly three artifacts (expected for a single character)
@@ -298,8 +298,7 @@ class CharacterGenerationBodyState extends State<CharacterGenerationBody> {
             1]; // The middle artifact is the target
 
         // Create a normalized matrix for the character definition
-        final Matrix matrix =
-            targetArtifact.matrixOriginal.createNormalizeMatrix(
+        final Matrix matrix = targetArtifact.matrix.createNormalizeMatrix(
           CharacterDefinition.templateWidth,
           CharacterDefinition.templateHeight,
         );

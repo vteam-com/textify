@@ -57,7 +57,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     final textFoundSingleString = _textFound.replaceAll('\n', '');
 
-    String percentage = '${textFoundSingleString.length} characters ';
+    String percentage = '${textFoundSingleString.length} characters';
 
     if (_stringsExpectedToBeFoundInTheImage.isNotEmpty) {
       percentage += ' ';
