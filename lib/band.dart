@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/widgets.dart';
 import 'package:textify/artifact.dart';
 import 'package:textify/matrix.dart';
@@ -254,29 +256,47 @@ class Band {
   /// to invalidate the cache when necessary.
   Rect get rectangle {
     if (_rectangle == Rect.zero) {
-      _rectangle = getBoundingBox(this.artifacts);
+      _rectangle = getBoundingBoxNormalized(this.artifacts);
     }
     return _rectangle;
   }
 
   /// Return the unified bounding box for all artifacts in the band
-  static Rect getBoundingBox(final List<Artifact> artifacts) {
+  static Rect getBoundingBoxOrignal(final List<Artifact> artifacts) {
     if (artifacts.isEmpty) {
       return Rect.zero;
     }
 
-    double minX = artifacts
-        .map((a) => a.matrixNormalized.rectangle.left)
-        .reduce((a, b) => a < b ? a : b);
-    double minY = artifacts
-        .map((a) => a.matrixNormalized.rectangle.top)
-        .reduce((a, b) => a < b ? a : b);
-    double maxX = artifacts
-        .map((a) => a.matrixNormalized.rectangle.right)
-        .reduce((a, b) => a > b ? a : b);
-    double maxY = artifacts
-        .map((a) => a.matrixNormalized.rectangle.bottom)
-        .reduce((a, b) => a > b ? a : b);
+    double minX = double.infinity;
+    double minY = double.infinity;
+    double maxX = double.negativeInfinity;
+    double maxY = double.negativeInfinity;
+
+    for (final Artifact artifact in artifacts) {
+      final Rect rect = artifact.matrixOriginal.rectangle;
+      minX = min(minX, rect.left);
+      minY = min(minY, rect.top);
+      maxX = max(maxX, rect.right);
+      maxY = max(maxY, rect.bottom);
+    }
+
+    return Rect.fromLTRB(minX, minY, maxX, maxY);
+  }
+
+  /// Return the unified bounding box for all normalized artifacts in the band
+  static Rect getBoundingBoxNormalized(final List<Artifact> artifacts) {
+    double minX = double.infinity;
+    double minY = double.infinity;
+    double maxX = double.negativeInfinity;
+    double maxY = double.negativeInfinity;
+
+    for (final Artifact artifact in artifacts) {
+      final Rect rect = artifact.matrixNormalized.rectangle;
+      minX = min(minX, rect.left);
+      minY = min(minY, rect.top);
+      maxX = max(maxX, rect.right);
+      maxY = max(maxY, rect.bottom);
+    }
 
     return Rect.fromLTRB(minX, minY, maxX, maxY);
   }

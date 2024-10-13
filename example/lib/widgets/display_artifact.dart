@@ -15,25 +15,55 @@ class DisplayArtifacts extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    if (applyPacking) {
-      _paintAsRows(canvas, size);
-    } else {
-      // Paints the bands and artifacts on the canvas in their original positions.
-      _paintArtifactsExactlyWhereTheyAreFound(canvas, textify.artifacts);
+    for (final Band band in textify.bands) {
+      if (applyPacking) {
+        _paintBand(canvas: canvas, band: band, originalOrNormalized: false);
+        _paintArtifactsInRow(
+          canvas: canvas,
+          artifactsInTheBand: band.artifacts,
+        );
+      } else {
+        // Paints the bands and artifacts on the canvas in their original positions.
+        _paintBand(canvas: canvas, band: band, originalOrNormalized: true);
+        _paintArtifactsExactlyWhereTheyAreFound(
+          canvas,
+          band.artifacts,
+        );
+      }
     }
   }
 
   @override
   bool shouldRepaint(DisplayArtifacts oldDelegate) => false;
 
+  /// Draws a rectangle with a background color and a border on the given canvas.
+  ///
+  /// Parameters:
+  /// - [canvas]: The canvas on which to draw the rectangle.
+  /// - [bandRect]: The [Rect] defining the position and size of the rectangle.
+  /// - [backgroundColor]: The [Color] to fill the rectangle with.
+  /// - [borderColor]: The [Color] of the rectangle's border.
+  /// - [borderWidth]: The width of the border. Defaults to 2.0.
   void _drawRectangle(
-    Canvas canvas,
-    Rect bandRect,
-    Color background,
-  ) {
-    final paintRect = Paint();
-    paintRect.color = background;
-    canvas.drawRect(bandRect, paintRect);
+    final Canvas canvas,
+    final Rect bandRect,
+    final Color backgroundColor,
+    final Color borderColor, {
+    final double borderWidth = 1.0,
+  }) {
+    // Draw the filled rectangle
+    final Paint fillPaint = Paint();
+    fillPaint.color = backgroundColor;
+    fillPaint.isAntiAlias = false;
+    canvas.drawRect(bandRect, fillPaint);
+
+    // Draw the border
+    final Paint borderPaint = Paint();
+    borderPaint.color = borderColor;
+    borderPaint.style = PaintingStyle.stroke;
+    borderPaint.strokeWidth = borderWidth;
+    borderPaint.isAntiAlias = false;
+    canvas.drawRect(bandRect, borderPaint);
   }
 
   void _drawText(
@@ -125,43 +155,22 @@ class DisplayArtifacts extends CustomPainter {
     }
   }
 
-  /// Organizes artifacts into bands and adjusts their positions.
-  ///
-  /// This method sorts the artifacts by band and left position, then arranges
-  /// them into bands with specified spacing. It updates the positions of the
-  /// artifacts and populates the `bands` list with the calculated band rectangles.
-  ///
-  /// The method performs the following steps:
-  /// 1. Sorts artifacts by band and left position.
-  /// 2. Iterates through sorted artifacts, grouping them into bands.
-  /// 3. Positions artifacts within each band, maintaining horizontal spacing.
-  /// 4. Creates new bands as needed, with vertical spacing between bands.
-  /// 5. Updates the `bands` list with the final calculated band rectangles.
-  ///
-  /// If either the artifact list or the bands list is empty, the method returns
-  /// without making any changes.
-  ///
-  /// Note: This method assumes that the `list` property contains the artifacts to be
-  /// packed, and it will update the `bands` property with the new band data.
-  void _paintAsRows(Canvas canvas, Size size) {
-    for (final Band band in textify.bands) {
-      _paintBand(canvas: canvas, band: band);
-      _paintArtifactsInRow(canvas: canvas, artifactsInTheBand: band.artifacts);
-    }
-  }
-
   void _paintBand({
     required final Canvas canvas,
     required final Band band,
+    required final bool originalOrNormalized,
   }) {
     final String caption = _getBandTitle(band);
-    final Rect bandRect = Band.getBoundingBox(band.artifacts);
+    final Rect bandRect = originalOrNormalized
+        ? Band.getBoundingBoxOrignal(band.artifacts)
+        : Band.getBoundingBoxNormalized(band.artifacts);
 
     // main region in blue
     _drawRectangle(
       canvas,
       bandRect,
-      Colors.black.withAlpha(200),
+      originalOrNormalized ? Colors.transparent : Colors.black,
+      Colors.white.withAlpha(100),
     );
 
     // information about the band

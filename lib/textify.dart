@@ -442,11 +442,11 @@ class Textify {
 
     this.bands.clear();
 
-    for (final artifact in this.artifacts) {
+    for (final Artifact artifact in this.artifacts) {
       bool foundBand = false;
 
       for (final Band band in bands) {
-        final Rect boundingBox = Band.getBoundingBox(band.artifacts);
+        final Rect boundingBox = Band.getBoundingBoxNormalized(band.artifacts);
         if (_isOverlappingVertically(
           artifact.matrixOriginal.rectangle,
           boundingBox,
@@ -785,14 +785,14 @@ class Textify {
     final Set<Artifact> toRemove = {};
 
     for (int i = 0; i < n; i++) {
-      final artifactA = artifacts[i];
+      final Artifact artifactA = artifacts[i];
       if (toRemove.contains(artifactA)) {
         // already merged
         continue;
       }
 
       for (int j = i + 1; j < n; j++) {
-        final artifactB = artifacts[j];
+        final Artifact artifactB = artifacts[j];
         if (toRemove.contains(artifactB)) {
           // already merged
           continue;
