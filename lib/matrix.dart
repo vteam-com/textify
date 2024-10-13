@@ -29,6 +29,32 @@ class Matrix {
     rows = height.toInt();
   }
 
+  /// Creates a new [Matrix] instance from an existing [Matrix].
+  ///
+  /// This factory method creates a new [Matrix] instance based on the provided [value] matrix.
+  /// It copies the grid data and the rectangle properties from the input matrix.
+  ///
+  /// Parameters:
+  /// - [value]: The source [Matrix] instance to copy from.
+  ///
+  /// Returns:
+  /// A new [Matrix] instance with the same grid data and rectangle as the input matrix.
+  ///
+  /// Note: This method creates a shallow copy of the grid data. If deep copying of the data
+  /// is required, consider implementing a separate deep copy method.
+  ///
+  /// Example:
+  /// ```dart
+  /// Matrix original = Matrix(/* ... */);
+  /// Matrix copy = Matrix.fromMatrix(original);
+  /// ```
+  factory Matrix.fromMatrix(Matrix value) {
+    final matrix = Matrix();
+    matrix.setGrid(value.data);
+    matrix.rectangle = value.rectangle;
+    return matrix;
+  }
+
   /// Creates a Matrix from an ASCII representation.
   ///
   /// [template] A list of strings where '#' represents true and any other character represents false.
