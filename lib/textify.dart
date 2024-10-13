@@ -19,6 +19,9 @@ class Textify {
   /// List of text bands identified in the image.
   final List<Band> bands = [];
 
+  /// List of diescovred artifacts on the image
+  final List<Artifact> artifactsFound = [];
+
   /// List of artifacts (potential characters) identified in the image.
   final List<Artifact> artifacts = [];
 
@@ -65,6 +68,7 @@ class Textify {
   /// Clears all stored data, resetting the Textify instance.
   void clear() {
     artifacts.clear();
+    artifactsFound.clear();
     bands.clear();
     textFound = '';
   }
@@ -528,20 +532,27 @@ class Textify {
             y,
           );
 
+          // Extract artifact information from the connected points
+          final Artifact artifactFound = _extractArtifact(
+            binaryImages,
+            connectedPoints,
+          );
+
+          artifactsFound.add(artifactFound);
+
           // drop anything that looks like a 1 or 2 pixel
           if (connectedPoints.length > 2) {
-            // Extract artifact information from the connected points
-            final Artifact artifactFound = _extractArtifact(
-              binaryImages,
-              connectedPoints,
-            );
-
             if (excludeLongLines &&
                 artifactFound.matrixOriginal.isConsideredLine()) {
               // discard lines
             } else {
+              final Artifact artifactForWork = _extractArtifact(
+                binaryImages,
+                connectedPoints,
+              );
+
               // Add the found artifact to the list
-              artifacts.add(artifactFound);
+              artifacts.add(artifactForWork);
             }
           }
         }

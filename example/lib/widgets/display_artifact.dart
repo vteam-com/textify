@@ -15,21 +15,19 @@ class DisplayArtifacts extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    for (final Band band in textify.bands) {
-      if (applyPacking) {
+    if (applyPacking) {
+      for (final Band band in textify.bands) {
         _paintBand(canvas: canvas, band: band, originalOrNormalized: false);
         _paintArtifactsInRow(
           canvas: canvas,
-          artifactsInTheBand: band.artifacts,
-        );
-      } else {
-        // Paints the bands and artifacts on the canvas in their original positions.
-        _paintBand(canvas: canvas, band: band, originalOrNormalized: true);
-        _paintArtifactsExactlyWhereTheyAreFound(
-          canvas,
-          band.artifacts,
+          artifacts: band.artifacts,
         );
       }
+    } else {
+      _paintArtifactsExactlyWhereTheyAreFound(
+        canvas,
+        textify.artifactsFound,
+      );
     }
   }
 
@@ -100,7 +98,7 @@ class DisplayArtifacts extends CustomPainter {
 
   void _paintArtifactsInRow({
     required final Canvas canvas,
-    required final List<Artifact> artifactsInTheBand,
+    required final List<Artifact> artifacts,
   }) {
     List<Color> colors = [
       Colors.blue.shade300,
@@ -109,7 +107,7 @@ class DisplayArtifacts extends CustomPainter {
 
     // artifact in that band
     int id = 1;
-    for (final Artifact artifact in artifactsInTheBand) {
+    for (final Artifact artifact in artifacts) {
       paintMatrix(
         canvas,
         colors[id % colors.length],
@@ -130,7 +128,7 @@ class DisplayArtifacts extends CustomPainter {
 
   void _paintArtifactsExactlyWhereTheyAreFound(
     Canvas canvas,
-    List<Artifact> artifactsInTheBand,
+    List<Artifact> artifacts,
   ) {
     // Rainbow colors
     List<Color> colors = [
@@ -144,10 +142,11 @@ class DisplayArtifacts extends CustomPainter {
     ];
 
     // artifact in that band
-    for (Artifact artifact in artifactsInTheBand) {
+    int index = 0;
+    for (Artifact artifact in artifacts) {
       paintMatrix(
         canvas,
-        colors[textify.artifacts.indexOf(artifact) % colors.length],
+        colors[index++ % colors.length],
         artifact.matrixOriginal.rectangle.left.toInt(),
         artifact.matrixOriginal.rectangle.top.toInt(),
         artifact.matrixOriginal,
