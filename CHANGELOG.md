@@ -4,6 +4,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.6] - 2024-10-13
+
+### Changed
+
+- Improve Band assignement of artifacts
+- Major refactoring
+  
 ## [0.1.5] - 2024-10-12
 
 ### Changed
