@@ -159,7 +159,7 @@ class Textify {
     if (qualifiedTemplates.isEmpty) {
       qualifiedTemplates = characterDefinitions.definitions;
     }
-    // Use _getDistanceScores to calculate the final scores
+    // Calculate the final scores
     final List<ScoreMatch> scores =
         _getDistanceScores(qualifiedTemplates, matrix);
 
@@ -434,7 +434,6 @@ class Textify {
   /// The method uses a vertical tolerance to determine if an artifact belongs
   /// to an existing band.
   void _groupArtifactsIntoBands() {
-    final double verticalTolerance = 10;
     // Sort artifacts by the top y-position of their rectangles
     this.artifacts.sort(
           (a, b) => a.rectangleOriginal.top.compareTo(b.rectangleOriginal.top),
@@ -450,7 +449,7 @@ class Textify {
         if (_isOverlappingVertically(
           artifact.rectangleOriginal,
           boundingBox,
-          verticalTolerance,
+          band.rectangle.height * (10 / 100),
         )) {
           band.addArtifact(artifact);
           foundBand = true;
@@ -459,7 +458,7 @@ class Textify {
       }
 
       if (!foundBand) {
-        Band newBand = Band();
+        final Band newBand = Band();
         newBand.addArtifact(artifact);
         bands.add(newBand);
       }
@@ -649,27 +648,25 @@ class Textify {
   /// @param scores An output list that will be populated with ScoreMatch objects.
   static List<ScoreMatch> _getDistanceScores(
     List<CharacterDefinition> templates,
-    Matrix normalizedArtifact,
+    Matrix inputMatrix,
   ) {
     final List<ScoreMatch> scores = [];
     // Iterate through each template in the map
     for (final CharacterDefinition template in templates) {
-      if (normalizedArtifact.isNotEmpty) {
-        // Calculate the similarity score and create a ScoreMatch object
-        for (int i = 0; i < template.matrices.length; i++) {
-          final Matrix matrix = template.matrices[i];
-          final ScoreMatch scoreMatch = ScoreMatch(
-            character: template.character,
-            matrixIndex: i,
-            score: Matrix.hammingDistancePercentage(
-              normalizedArtifact,
-              matrix,
-            ),
-          );
+      // Calculate the similarity score and create a ScoreMatch object
+      for (int i = 0; i < template.matrices.length; i++) {
+        final Matrix matrix = template.matrices[i];
+        final ScoreMatch scoreMatch = ScoreMatch(
+          character: template.character,
+          matrixIndex: i,
+          score: Matrix.hammingDistancePercentage(
+            inputMatrix,
+            matrix,
+          ),
+        );
 
-          // Add the ScoreMatch to the scores list
-          scores.add(scoreMatch);
-        }
+        // Add the ScoreMatch to the scores list
+        scores.add(scoreMatch);
       }
     }
 
@@ -691,7 +688,7 @@ class Textify {
 
         for (final matrix in template1.matrices) {
           totalScore1 += Matrix.hammingDistancePercentage(
-            normalizedArtifact,
+            inputMatrix,
             matrix,
           );
         }
@@ -699,7 +696,7 @@ class Textify {
 
         for (final matrix in template2.matrices) {
           totalScore2 += Matrix.hammingDistancePercentage(
-            normalizedArtifact,
+            inputMatrix,
             matrix,
           );
         }
@@ -738,8 +735,6 @@ class Textify {
   ///   A String containing the extracted text, with attempts made to preserve
   ///   the original layout through the use of spaces between rows.
   String _getTextFromArtifacts({final String supportedCharacters = ''}) {
-    // First group connected artifacts(Characters) into their bands to form words
-
     textFound = '';
 
     final List<String> linesFound = [];

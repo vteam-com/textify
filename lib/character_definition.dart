@@ -87,16 +87,16 @@ class CharacterDefinition {
   /// The number of enclosures for this character.
   final int enclosures;
 
-  /// Indicates if this character is used in amounts.
+  /// Indicates if this character is used in monetary amounts.
   final bool isAmount;
 
-  /// Indicates if this character is used in dates.
+  /// Indicates if this character is commonly used in date representations.
   final bool isDate;
 
-  /// Indicates if this character is a digit.
+  /// Indicates if this character is a numerical digit.
   final bool isDigit;
 
-  /// Indicates if this character is a letter.
+  /// Indicates if this character is an alphabetic letter.
   final bool isLetter;
 
   /// Indicates if this character is a punctuation mark.
@@ -108,10 +108,13 @@ class CharacterDefinition {
   /// Indicates if the character has a right vertical line as part of its shape.
   final bool lineRight;
 
-  /// List of matrices representing this character.
+  /// List of matrices representing this character's visual pattern.
   final List<Matrix> matrices;
 
   /// Converts this [CharacterDefinition] to a JSON map.
+  ///
+  /// Returns a Map<String, dynamic> representation of the CharacterDefinition,
+  /// where each key is a property name and each value is the corresponding property value.
   Map<String, dynamic> toJson() {
     return {
       'character': character,
@@ -128,5 +131,8 @@ class CharacterDefinition {
   }
 
   /// Converts this [CharacterDefinition] to a JSON string.
+  ///
+  /// Returns a String containing a JSON representation of the CharacterDefinition.
+  /// This method uses [toJson] to create a map and then encodes it to a JSON string.
   String toJsonString() => jsonEncode(toJson());
 }

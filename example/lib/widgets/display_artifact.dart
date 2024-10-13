@@ -154,8 +154,8 @@ class DisplayArtifacts extends CustomPainter {
     required final Canvas canvas,
     required final Band band,
   }) {
-    final caption = _getBandTitle(band);
-    final bandRect = Band.getBoundingBox(band.artifacts);
+    final String caption = _getBandTitle(band);
+    final Rect bandRect = Band.getBoundingBox(band.artifacts);
 
     // main region in blue
     _drawRectangle(
