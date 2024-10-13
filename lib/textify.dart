@@ -449,11 +449,13 @@ class Textify {
       bool foundBand = false;
 
       for (final Band band in bands) {
-        if (_isOverlappingVertically(
+        // final double tolerance = band.rectangle.height * (10 / 100);
+
+        final double overlap = _calculateVerticalOverlapPercentage(
+          band.rectangle,
           artifact.matrix.rectangle,
-          Band.getBoundingBoxOrignal(band.artifacts),
-          band.rectangle.height * (10 / 100),
-        )) {
+        );
+        if (overlap > 80) {
           band.addArtifact(artifact);
           toRemove.add(artifact);
           foundBand = true;
@@ -474,35 +476,59 @@ class Textify {
     assert(_artifactsToProcess.isEmpty);
   }
 
-  /// Determines if two rectangles overlap vertically within a specified tolerance.
+  /// Calculates the percentage of vertical overlap between two rectangles.
   ///
-  /// This function checks if the [artifactRectangle] overlaps vertically with the
-  /// [bandBoundingBox], considering a [verticalTolerance] to allow for small gaps
-  /// or slight overlaps.
+  /// This function determines how much two rectangles overlap vertically and
+  /// expresses this overlap as a percentage of their combined heights.
   ///
   /// Parameters:
-  ///   - bandBoundingBox: The bounding box of the band (usually a larger area).
-  ///   - artifactRectangle: The rectangle of the artifact to check for overlap.
-  ///   - verticalTolerance: A tolerance value to allow for small gaps or overlaps.
-  ///     This value extends the effective vertical range of the bandBoundingBox.
+  ///   - rect1: The first rectangle to compare.
+  ///   - rect2: The second rectangle to compare.
   ///
   /// Returns:
-  ///   true if the rectangles overlap vertically within the specified tolerance,
-  ///   false otherwise.
+  ///   A double representing the percentage of vertical overlap.
+  ///   The value ranges from 0.0 (no overlap) to 100.0 (complete overlap).
   ///
-  /// The overlap condition is met if:
-  ///   1. The bottom of the artifact is at or below the top of the band
-  ///      (considering the tolerance), AND
-  ///   2. The top of the artifact is at or above the bottom of the band
-  ///      (considering the tolerance).
-  bool _isOverlappingVertically(
-    final Rect bandBoundingBox,
-    final Rect artifactRectangle,
-    final double verticalTolerance,
+  /// The calculation is performed as follows:
+  /// 1. Ensure rect1 is the higher rectangle (smaller top value).
+  /// 2. Check for no overlap condition.
+  /// 3. Calculate the height of the overlapping region.
+  /// 4. Calculate the total height of both rectangles combined.
+  /// 5. Compute the overlap percentage as (overlap height / total height) * 100.
+  ///
+  /// Note: This function considers the combined height of both rectangles as the base
+  /// for percentage calculation. If you need the percentage relative to one of the
+  /// rectangles, you'll need to modify the calculation.
+  ///
+  /// Example:
+  ///   Rect rect1 = Rect.fromLTRB(0, 0, 10, 30);
+  ///   Rect rect2 = Rect.fromLTRB(0, 20, 10, 50);
+  ///   double overlap = calculateVerticalOverlapPercentage(rect1, rect2);
+  ///   print('Overlap: ${overlap.toStringAsFixed(2)}%');
+  double _calculateVerticalOverlapPercentage(
+    final Rect rect1,
+    final Rect rect2,
   ) {
-    return (artifactRectangle.bottom >=
-            bandBoundingBox.top - verticalTolerance &&
-        artifactRectangle.top <= bandBoundingBox.bottom + verticalTolerance);
+    // Ensure rect1 is the higher rectangle (smaller top value)
+    if (rect2.top < rect1.top) {
+      return _calculateVerticalOverlapPercentage(rect2, rect1);
+    }
+
+    // Check if there's no overlap
+    if (rect1.bottom <= rect2.top) {
+      return 0.0;
+    }
+
+    // Calculate the overlap
+    double overlapStart = rect2.top;
+    double overlapEnd = min(rect1.bottom, rect2.bottom);
+    double overlapHeight = overlapEnd - overlapStart;
+
+    // Calculate the height of the shorter rectangle
+    double shorterHeight = min(rect1.height, rect2.height);
+
+    // Calculate and return the percentage
+    return (overlapHeight / shorterHeight) * 100;
   }
 
   /// Identifies and extracts artifacts from a binary image.

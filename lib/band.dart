@@ -99,7 +99,6 @@ class Band {
   /// subsequent calculations or rendering operations.
   void addArtifact(final Artifact artifact) {
     // reset the cached rectangle each time an artifact is added or removed
-    _rectangle = Rect.zero;
     this.artifacts.add(artifact);
   }
 
@@ -236,11 +235,6 @@ class Band {
     }
   }
 
-  /// The cached bounding rectangle of this object.
-  ///
-  /// This is lazily initialized and cached for performance reasons.
-  Rect _rectangle = Rect.zero;
-
   /// Gets the bounding rectangle of this object.
   ///
   /// This getter uses lazy initialization to compute the bounding box
@@ -253,14 +247,11 @@ class Band {
   /// value may become outdated. In such cases, consider adding a method
   /// to invalidate the cache when necessary.
   Rect get rectangle {
-    if (_rectangle == Rect.zero) {
-      _rectangle = getBoundingBoxOrignal(this.artifacts);
-    }
-    return _rectangle;
+    return getBoundingBox(this.artifacts);
   }
 
   /// Return the unified bounding box for all artifacts in the band
-  static Rect getBoundingBoxOrignal(final List<Artifact> artifacts) {
+  static Rect getBoundingBox(final List<Artifact> artifacts) {
     if (artifacts.isEmpty) {
       return Rect.zero;
     }

@@ -29,7 +29,7 @@ class _ImageSourceSamplesState extends State<ImageSourceSamples> {
   final List<ImageData> imageFileData = [
     ImageData(
       'generated_odd_colors.png',
-      'ABCDEFGHI\nJKLMNOPQR\nSTUVWXYZ 0123456789',
+      'ABCDEFGHI\nJKLMNOPQR\nSTUVWXYZ\n0123456789',
     ),
     ImageData(
       'black-on-white-rounded.png',
