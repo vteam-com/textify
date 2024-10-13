@@ -21,7 +21,7 @@ class Matrix {
     final num height = 0,
     final bool value = false,
   ]) {
-    data = List.generate(
+    _data = List.generate(
       height.toInt(),
       (_) => List.filled(width.toInt(), false),
     );
@@ -36,7 +36,7 @@ class Matrix {
     final Matrix matrix = Matrix();
     matrix.rows = template.length;
     matrix.cols = template[0].length;
-    matrix.data = List.generate(
+    matrix._data = List.generate(
       matrix.rows,
       (y) => List.generate(matrix.cols, (x) => template[y][x] == '#'),
     );
@@ -65,7 +65,7 @@ class Matrix {
     matrix.cols = width;
 
     for (int y = 0; y < matrix.rows; y++) {
-      matrix.data
+      matrix._data
           .add(inputList.sublist(y * matrix.cols, (y + 1) * matrix.cols));
     }
     return matrix;
@@ -79,7 +79,7 @@ class Matrix {
     matrix.font = json['font'];
     matrix.rows = json['rows'];
     matrix.cols = json['cols'];
-    matrix.data = (json['data'] as List<dynamic>).map((row) {
+    matrix._data = (json['data'] as List<dynamic>).map((row) {
       return row.toString().split('').map((cell) => cell == '#').toList();
     }).toList();
     return matrix;
@@ -132,7 +132,10 @@ class Matrix {
   int cols = 0;
 
   /// The 2D list representing the boolean grid.
-  List<List<bool>> data = [];
+  List<List<bool>> _data = [];
+
+  /// Getter for data
+  List<List<bool>> get data => _data;
 
   /// The number of rows in the matrix.
   int rows = 0;
@@ -162,7 +165,7 @@ class Matrix {
   /// Returns false if the coordinates are out of bounds.
   bool cellGet(final int x, final int y) {
     if (_isValidXY(x, y)) {
-      return data[y][x];
+      return _data[y][x];
     }
     return false;
   }
@@ -172,7 +175,7 @@ class Matrix {
   /// Does nothing if the coordinates are out of bounds.
   void cellSet(final int x, final int y, bool value) {
     if (_isValidXY(x, y)) {
-      data[y][x] = value;
+      _data[y][x] = value;
     }
   }
 
@@ -186,7 +189,7 @@ class Matrix {
     for (int y = 0; y < source.rows; y++) {
       for (int x = 0; x < source.cols; x++) {
         if (y + offsetY < target.rows && x + offsetX < target.cols) {
-          target.data[y + offsetY][x + offsetX] |= source.data[y][x];
+          target._data[y + offsetY][x + offsetX] |= source._data[y][x];
         }
       }
     }
@@ -215,12 +218,12 @@ class Matrix {
     int rightCol = cols - 1;
 
     // Find top row with content
-    while (topRow < rows && !data[topRow].contains(true)) {
+    while (topRow < rows && !_data[topRow].contains(true)) {
       topRow++;
     }
 
     // Find bottom row with content
-    while (bottomRow > topRow && !data[bottomRow].contains(true)) {
+    while (bottomRow > topRow && !_data[bottomRow].contains(true)) {
       bottomRow--;
     }
 
@@ -228,7 +231,7 @@ class Matrix {
     outer:
     while (leftCol < cols) {
       for (int i = topRow; i <= bottomRow; i++) {
-        if (data[i][leftCol]) {
+        if (_data[i][leftCol]) {
           break outer;
         }
       }
@@ -239,7 +242,7 @@ class Matrix {
     outer:
     while (rightCol > leftCol) {
       for (int i = topRow; i <= bottomRow; i++) {
-        if (data[i][rightCol]) {
+        if (_data[i][rightCol]) {
           break outer;
         }
       }
@@ -250,7 +253,7 @@ class Matrix {
     return Matrix.fromBoolMatrix(
       List.generate(
         bottomRow - topRow + 1,
-        (i) => data[i + topRow].sublist(leftCol, rightCol + 1),
+        (i) => _data[i + topRow].sublist(leftCol, rightCol + 1),
       ),
     );
   }
@@ -265,13 +268,13 @@ class Matrix {
     // help resizing by ensuring there's a border
     if (isPunctuation()) {
       // do not crop and center
-      return _createWrapGridWithFalse().createResizedGrid(
+      return _createWrapGridWithFalse()._createResizedGrid(
         desiredWidth,
         desiredHeight,
       );
     } else {
       // Resize
-      return trim()._createWrapGridWithFalse().createResizedGrid(
+      return trim()._createWrapGridWithFalse()._createResizedGrid(
             desiredWidth,
             desiredHeight,
           );
@@ -302,7 +305,7 @@ class Matrix {
   /// Resizing strategy:
   /// - For upscaling (target size larger than original), it uses nearest-neighbor interpolation.
   /// - For downscaling (target size smaller than original), it averages the values in each sub-grid.
-  Matrix createResizedGrid(final int targetWidth, final int targetHeight) {
+  Matrix _createResizedGrid(final int targetWidth, final int targetHeight) {
     // Initialize the resized grid
     final Matrix resizedGrid = Matrix(targetWidth, targetHeight);
 
@@ -320,7 +323,7 @@ class Matrix {
           // UpScaling: Use nearest-neighbor interpolation
           final int srcXInt = srcX.floor();
           final int srcYInt = srcY.floor();
-          resizedGrid.data[y][x] = data[srcYInt][srcXInt];
+          resizedGrid._data[y][x] = _data[srcYInt][srcXInt];
         } else {
           // DownScaling: Check for any black pixel in the sub-grid
           final int startX = srcX.floor();
@@ -332,7 +335,7 @@ class Matrix {
 
           for (int sy = startY; sy < endY && sy < rows; sy++) {
             for (int sx = startX; sx < endX && sx < cols; sx++) {
-              if (data[sy][sx]) {
+              if (_data[sy][sx]) {
                 hasBlackPixel = true;
                 break;
               }
@@ -343,7 +346,7 @@ class Matrix {
           }
 
           // Set the resized grid value based on the presence of any black pixel
-          resizedGrid.data[y][x] = hasBlackPixel;
+          resizedGrid._data[y][x] = hasBlackPixel;
         }
       }
     }
@@ -371,13 +374,13 @@ class Matrix {
     final blankLine = List.filled(cols, false);
 
     for (int add = 0; add < paddingTop; add++) {
-      this.data.insert(0, blankLine);
+      this._data.insert(0, blankLine);
     }
 
     for (int add = 0; add < paddingBottom; add++) {
-      this.data.add(blankLine);
+      this._data.add(blankLine);
     }
-    this.rows = data.length;
+    this.rows = _data.length;
   }
 
   /// Creates a new Matrix with a false border wrapping around the original matrix.
@@ -420,7 +423,7 @@ class Matrix {
     // Copy the original grid into the center of the new grid
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < cols; c++) {
-        newGrid.data[r + 1][c + 1] = data[r][c];
+        newGrid._data[r + 1][c + 1] = _data[r][c];
       }
     }
 
@@ -513,9 +516,6 @@ class Matrix {
     return getContentRect().size;
   }
 
-  /// cache the content rect
-  Rect _contentRect = Rect.zero;
-
   /// Calculates the bounding rectangle of the content in the matrix.
   ///
   /// This method finds the smallest rectangle that encompasses all true cells
@@ -534,41 +534,33 @@ class Matrix {
   /// - The right and bottom coordinates are exclusive (i.e., they point to
   ///   the cell just after the last true cell in each direction).
   Rect getContentRect() {
-    if (data.isEmpty || data[0].isEmpty) {
-      _contentRect = Rect.zero;
-      return _contentRect;
-    }
+    int minX = cols;
+    int maxX = -1;
+    int minY = rows;
+    int maxY = -1;
 
-    if (_contentRect == Rect.zero) {
-      int minX = cols;
-      int maxX = -1;
-      int minY = rows;
-      int maxY = -1;
-
-      for (int y = 0; y < rows; y++) {
-        for (int x = 0; x < cols; x++) {
-          if (data[y][x]) {
-            minX = min(minX, x);
-            maxX = max(maxX, x);
-            minY = min(minY, y);
-            maxY = max(maxY, y);
-          }
+    for (int y = 0; y < rows; y++) {
+      for (int x = 0; x < cols; x++) {
+        if (_data[y][x]) {
+          minX = min(minX, x);
+          maxX = max(maxX, x);
+          minY = min(minY, y);
+          maxY = max(maxY, y);
         }
       }
-
-      // If no content found, return Rect.zero
-      if (maxX == -1 || maxY == -1) {
-        _contentRect = Rect.zero;
-      } else {
-        _contentRect = Rect.fromLTRB(
-          minX.toDouble(),
-          minY.toDouble(),
-          (maxX + 1).toDouble(),
-          (maxY + 1).toDouble(),
-        );
-      }
     }
-    return _contentRect;
+
+    // If no content found, return Rect.zero
+    if (maxX == -1 || maxY == -1) {
+      return Rect.zero;
+    } else {
+      return Rect.fromLTRB(
+        minX.toDouble(),
+        minY.toDouble(),
+        (maxX + 1).toDouble(),
+        (maxY + 1).toDouble(),
+      );
+    }
   }
 
   /// Creates a string representation of two overlaid matrices.
@@ -612,8 +604,8 @@ class Matrix {
       String overlappedRow = '';
 
       for (int col = 0; col < width; col++) {
-        final bool cell1 = grid1.data[row][col];
-        final bool cell2 = grid2.data[row][col];
+        final bool cell1 = grid1._data[row][col];
+        final bool cell2 = grid2._data[row][col];
 
         if (cell1 && cell2) {
           overlappedRow += '=';
@@ -738,9 +730,9 @@ class Matrix {
 
     for (int y = 0; y < inputGrid.rows; y++) {
       for (int x = 0; x < inputGrid.cols; x++) {
-        if (inputGrid.data[y][x] || templateGrid.data[y][x]) {
+        if (inputGrid._data[y][x] || templateGrid._data[y][x]) {
           totalPixels++;
-          if (inputGrid.data[y][x] == templateGrid.data[y][x]) {
+          if (inputGrid._data[y][x] == templateGrid._data[y][x]) {
             matchingPixels++;
           }
         }
@@ -815,7 +807,7 @@ class Matrix {
     // Compare each cell
     for (int y = 0; y < a.rows; y++) {
       for (int x = 0; x < a.cols; x++) {
-        if (a.data[y][x] != b.data[y][x]) {
+        if (a._data[y][x] != b._data[y][x]) {
           return false;
         }
       }
@@ -855,23 +847,23 @@ class Matrix {
     if (grid.isEmpty || grid[0].isEmpty) {
       rows = 0;
       cols = 0;
-      data = [];
+      _data = [];
       return;
     }
+    // Ensure all rows have the same length
+    assert(
+      _data.every((row) => row.length == cols),
+      'All rows in the grid must have the same length',
+    );
 
     rows = grid.length;
     cols = grid[0].length;
 
     // Create a deep copy of the grid
-    data = List.generate(
+    // _data = grid;
+    _data = List.generate(
       rows,
       (i) => List<bool>.from(grid[i]),
-    );
-
-    // Ensure all rows have the same length
-    assert(
-      data.every((row) => row.length == cols),
-      'All rows in the grid must have the same length',
     );
   }
 
@@ -904,7 +896,7 @@ class Matrix {
       'font': font,
       'rows': rows,
       'cols': cols,
-      'data': data.map((row) {
+      'data': _data.map((row) {
         return row.map((cell) => cell ? '#' : '.').join();
       }).toList(),
     };
@@ -981,7 +973,7 @@ class Matrix {
 
     for (int y = 0; y < rows; y++) {
       for (int x = 0; x < cols; x++) {
-        if (!grid.data[y][x] && !visited.data[y][x]) {
+        if (!grid._data[y][x] && !visited._data[y][x]) {
           int regionSize = _exploreRegion(grid, visited, x, y);
           if (regionSize >= minRegionSize &&
               _isEnclosedRegion(grid, x, y, regionSize)) {
@@ -1020,7 +1012,7 @@ class Matrix {
     int cols = grid.cols;
     Queue<List<int>> queue = Queue();
     queue.add([startX, startY]);
-    visited.data[startY][startX] = true;
+    visited._data[startY][startX] = true;
     int regionSize = 0;
 
     // Directions for exploring adjacent cells (up, down, left, right)
@@ -1045,10 +1037,10 @@ class Matrix {
             newX < cols &&
             newY >= 0 &&
             newY < rows &&
-            !grid.data[newY][newX] &&
-            !visited.data[newY][newX]) {
+            !grid._data[newY][newX] &&
+            !visited._data[newY][newX]) {
           queue.add([newX, newY]);
-          visited.data[newY][newX] = true;
+          visited._data[newY][newX] = true;
         }
       }
     }
@@ -1111,7 +1103,7 @@ class Matrix {
 
         final String key = '$newX,$newY';
         // If the cell is explorable and not visited, add it to the queue
-        if (!grid.data[newY][newX] && !visited.contains(key)) {
+        if (!grid._data[newY][newX] && !visited.contains(key)) {
           queue.add([newX, newY]);
           visited.add(key);
         }
@@ -1160,7 +1152,7 @@ class Matrix {
     for (int x = 0; x < matrix.cols; x++) {
       for (int y = 0; y < matrix.rows; y++) {
         // If the current cell is filled and not visited
-        if (matrix.data[y][x] && !visited.data[y][x]) {
+        if (matrix._data[y][x] && !visited._data[y][x]) {
           // Check if a valid vertical line exists starting from this cell
           if (_isValidVerticalLineLeft(
             minVerticalLine,
@@ -1208,7 +1200,7 @@ class Matrix {
     for (int x = matrix.cols - 1; x >= 0; x--) {
       for (int y = 0; y < matrix.rows; y++) {
         // If the current cell is filled and not visited
-        if (matrix.data[y][x] && !visited.data[y][x]) {
+        if (matrix._data[y][x] && !visited._data[y][x]) {
           // Check if a valid vertical line exists starting from this cell
           if (_isValidVerticalLineRight(
             minVerticalLine,
@@ -1242,8 +1234,8 @@ class Matrix {
     int lineLength = 0;
 
     // Ensure no filled pixels on the immediate left side at any point
-    while (y < rows && matrix.data[y][x]) {
-      visited.data[y][x] = true;
+    while (y < rows && matrix._data[y][x]) {
+      visited._data[y][x] = true;
       lineLength++;
 
       // If there's a filled pixel to the left of any point in the line, it's invalid
@@ -1287,8 +1279,8 @@ class Matrix {
     int lineLength = 0;
 
     // Traverse downwards from the starting point
-    while (y < rows && matrix.data[y][x]) {
-      visited.data[y][x] = true;
+    while (y < rows && matrix._data[y][x]) {
+      visited._data[y][x] = true;
       lineLength++;
 
       // Check if there's a filled pixel to the left of the current point

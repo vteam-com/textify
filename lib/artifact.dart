@@ -86,9 +86,7 @@ class Artifact {
 
   /// Sets the original matrix representation of the artifact.
   set matrixOriginal(final Matrix value) {
-    _matrix.data = value.data;
-    _matrix.cols = value.cols;
-    _matrix.rows = value.rows;
+    _matrix.setGrid(value.data);
   }
 
   /// Gets the normalized matrix representation of the artifact.
