@@ -107,10 +107,6 @@ class Textify {
     final Artifact artifact, [
     final String supportedCharacters = '',
   ]) {
-    if (artifact.characterMatched == ' ') {
-      return [ScoreMatch(character: ' ', matrixIndex: 0, score: 1)];
-    }
-
     final Matrix matrix = artifact.matrixNormalized;
     final int numberOfEnclosure = matrix.enclosures;
     final bool hasVerticalLineOnTheLeftSide = matrix.verticalLineLeft;
