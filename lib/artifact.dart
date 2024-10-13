@@ -28,43 +28,6 @@ class Artifact {
   /// The area of the artifact, calculated from its matrix representation.
   int get area => _matrixOriginal.area;
 
-  /// Adjusts the artifact's height to fit within a given rectangle while maintaining its relative position.
-  ///
-  /// This method resizes the artifact vertically to match the height of the provided rectangle.
-  /// If the original data is taller than the target rectangle, it will be cropped.
-  /// If it's shorter, padding will be added to maintain the relative position.
-  ///
-  /// Parameters:
-  /// - targetRect: The rectangle representing the area the artifact should fit into.
-  void fitToRectangleHeight(final Rect targetRect) {
-    final int newHeight = targetRect.height.toInt();
-
-    if (_matrixNormalized.rectangle.height == newHeight) {
-      return; // Early return if no change needed
-    }
-
-    final List<List<bool>> originalData = matrixOriginal.data;
-    final int currentWidth = matrixOriginal.cols;
-
-    // Calculate the relative position of the artifact within the target rectangle
-    final double relativeTop =
-        (_matrixNormalized.rectangle.top - targetRect.top) / targetRect.height;
-
-    final List<List<bool>> newGrid =
-        _createNewGrid(originalData, newHeight, relativeTop, currentWidth);
-
-    // Update the matrix with the new grid
-    _matrixOriginal.setGrid(newGrid);
-
-    // Adjust the rectangle to maintain relative position within the target rectangle
-    _matrixNormalized.rectangle = Rect.fromLTWH(
-      _matrixNormalized.rectangle.left,
-      targetRect.top,
-      _matrixNormalized.rectangle.width,
-      targetRect.height,
-    );
-  }
-
   /// Checks if the artifact is empty (contains no 'on' pixels).
   bool get isEmpty {
     return _matrixOriginal.isEmpty;
@@ -119,78 +82,6 @@ class Artifact {
       forCode: forCode,
       onChar: onChar,
     );
-  }
-
-  /// Creates a new grid based on the original data and the new height.
-  ///
-  /// This method decides whether to crop or pad the grid based on the new height.
-  ///
-  /// Parameters:
-  /// - originalData: The original boolean matrix data.
-  /// - newHeight: The target height for the new grid.
-  /// - relativeTop: The relative top position of the artifact within the target rectangle.
-  /// - currentWidth: The current width of the grid.
-  ///
-  /// Returns:
-  /// A new List<List<bool>> representing the adjusted grid.
-  List<List<bool>> _createNewGrid(
-    final List<List<bool>> originalData,
-    final int newHeight,
-    final double relativeTop,
-    final int currentWidth,
-  ) {
-    if (originalData.length > newHeight) {
-      return _cropGrid(originalData, newHeight, relativeTop);
-    } else {
-      return _padGrid(originalData, newHeight, relativeTop, currentWidth);
-    }
-  }
-
-  /// Crops the original grid to fit the new height.
-  ///
-  /// Parameters:
-  /// - originalData: The original boolean matrix data.
-  /// - newHeight: The target height for the new grid.
-  /// - relativeTop: The relative top position of the artifact within the target rectangle.
-  ///
-  /// Returns:
-  /// A new List<List<bool>> representing the cropped grid.
-  List<List<bool>> _cropGrid(
-    final List<List<bool>> originalData,
-    final int newHeight,
-    final double relativeTop,
-  ) {
-    int startRow = (relativeTop * originalData.length).round();
-    startRow = startRow.clamp(0, originalData.length - newHeight);
-    return originalData.sublist(startRow, startRow + newHeight);
-  }
-
-  /// Pads the original grid to fit the new height.
-  ///
-  /// Parameters:
-  /// - originalData: The original boolean matrix data.
-  /// - newHeight: The target height for the new grid.
-  /// - relativeTop: The relative top position of the artifact within the target rectangle.
-  /// - currentWidth: The current width of the grid.
-  ///
-  /// Returns:
-  /// A new List<List<bool>> representing the padded grid.
-  List<List<bool>> _padGrid(
-    final List<List<bool>> originalData,
-    final int newHeight,
-    final double relativeTop,
-    final int currentWidth,
-  ) {
-    final int topPadding =
-        (relativeTop * newHeight).round().clamp(0, newHeight);
-    final int bottomPadding =
-        (newHeight - originalData.length - topPadding).clamp(0, newHeight);
-
-    return [
-      ...List.generate(topPadding, (_) => List.filled(currentWidth, false)),
-      ...originalData,
-      ...List.generate(bottomPadding, (_) => List.filled(currentWidth, false)),
-    ];
   }
 
   /// Merges the current artifact with another artifact.
