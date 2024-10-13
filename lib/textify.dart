@@ -23,7 +23,7 @@ class Textify {
   final List<Artifact> artifactsFound = [];
 
   /// List of artifacts (potential characters) identified in the image.
-  final List<Artifact> artifacts = [];
+  final List<Artifact> _artifactsToProcess = [];
 
   /// The extracted text from the image.
   String textFound = '';
@@ -67,7 +67,7 @@ class Textify {
 
   /// Clears all stored data, resetting the Textify instance.
   void clear() {
-    artifacts.clear();
+    _artifactsToProcess.clear();
     artifactsFound.clear();
     bands.clear();
     textFound = '';
@@ -100,7 +100,7 @@ class Textify {
   ///
   /// Returns:
   ///   An [int] representing the number of items in the list.
-  int get count => artifacts.length;
+  int get count => _artifactsToProcess.length;
 
   /// Finds matching character scores for a given artifact.
   ///
@@ -265,7 +265,7 @@ class Textify {
     _mergeConnectedArtifacts(verticalThreshold: 20, horizontalThreshold: 4);
 
     // (4) create band based on proximity of artifacts
-    _groupArtifactsIntoBands();
+    _assignAllArtifactsToBands();
 
     // (5) post-process each band for addition clean up of the artifacts in each band
     for (final Band band in bands) {
@@ -294,11 +294,11 @@ class Textify {
   }) {
     final List<Artifact> mergedArtifacts = [];
 
-    for (int i = 0; i < artifacts.length; i++) {
-      final Artifact current = artifacts[i];
+    for (int i = 0; i < _artifactsToProcess.length; i++) {
+      final Artifact current = _artifactsToProcess[i];
 
-      for (int j = i + 1; j < artifacts.length; j++) {
-        final Artifact next = artifacts[j];
+      for (int j = i + 1; j < _artifactsToProcess.length; j++) {
+        final Artifact next = _artifactsToProcess[j];
 
         if (_areArtifactsConnected(
           current.matrixOriginal.rectangle,
@@ -307,7 +307,7 @@ class Textify {
           horizontalThreshold,
         )) {
           current.mergeArtifact(next);
-          artifacts.removeAt(j);
+          _artifactsToProcess.removeAt(j);
           j--; // Adjust index since we removed an artifact
         }
       }
@@ -433,16 +433,16 @@ class Textify {
   ///
   /// The method uses a vertical tolerance to determine if an artifact belongs
   /// to an existing band.
-  void _groupArtifactsIntoBands() {
+  void _assignAllArtifactsToBands() {
     // Sort artifacts by the top y-position of their rectangles
-    this.artifacts.sort(
+    this._artifactsToProcess.sort(
           (a, b) => a.matrixOriginal.rectangle.top
               .compareTo(b.matrixOriginal.rectangle.top),
         );
 
     this.bands.clear();
-
-    for (final Artifact artifact in this.artifacts) {
+    final toRemove = [];
+    for (final Artifact artifact in this._artifactsToProcess) {
       bool foundBand = false;
 
       for (final Band band in bands) {
@@ -453,6 +453,7 @@ class Textify {
           band.rectangle.height * (10 / 100),
         )) {
           band.addArtifact(artifact);
+          toRemove.add(artifact);
           foundBand = true;
           break;
         }
@@ -461,9 +462,14 @@ class Textify {
       if (!foundBand) {
         final Band newBand = Band();
         newBand.addArtifact(artifact);
+        toRemove.add(artifact);
         bands.add(newBand);
       }
     }
+    _artifactsToProcess.removeWhere((artifact) => toRemove.contains(artifact));
+
+    // all artifacts should not be in a band, thus confirm that there's no loose artifacts
+    assert(_artifactsToProcess.isEmpty);
   }
 
   /// Determines if two rectangles overlap vertically within a specified tolerance.
@@ -552,7 +558,7 @@ class Textify {
               );
 
               // Add the found artifact to the list
-              artifacts.add(artifactForWork);
+              _artifactsToProcess.add(artifactForWork);
             }
           }
         }
@@ -787,19 +793,19 @@ class Textify {
   ///
   /// Note: This method modifies the original list of artifacts.
   void _mergeOverlappingArtifacts() {
-    final int n = artifacts.length;
+    final int n = _artifactsToProcess.length;
 
     final Set<Artifact> toRemove = {};
 
     for (int i = 0; i < n; i++) {
-      final Artifact artifactA = artifacts[i];
+      final Artifact artifactA = _artifactsToProcess[i];
       if (toRemove.contains(artifactA)) {
         // already merged
         continue;
       }
 
       for (int j = i + 1; j < n; j++) {
-        final Artifact artifactB = artifacts[j];
+        final Artifact artifactB = _artifactsToProcess[j];
         if (toRemove.contains(artifactB)) {
           // already merged
           continue;
@@ -813,6 +819,6 @@ class Textify {
       }
     }
 
-    artifacts.removeWhere((artifact) => toRemove.contains(artifact));
+    _artifactsToProcess.removeWhere((artifact) => toRemove.contains(artifact));
   }
 }
