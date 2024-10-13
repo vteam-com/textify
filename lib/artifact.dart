@@ -12,14 +12,8 @@ class Artifact {
   /// The character that this artifact matches.
   String characterMatched = '';
 
-  /// The rectangular area that this artifact occupies.
-  Rect rectangleOriginal = Rect.zero;
-
-  /// The rectangular area that this artifact occupies.
-  Rect rectangleAdjusted = Rect.zero;
-
   /// The original matrix representation of the artifact.
-  final Matrix _matrix = Matrix();
+  final Matrix _matrixOriginal = Matrix();
 
   /// A normalized version of the matrix representation.
   final Matrix _matrixNormalized = Matrix();
@@ -28,11 +22,11 @@ class Artifact {
   /// A string representation ths artifact.
   @override
   String toString() {
-    return '"$characterMatched" Rect:${rectangleAdjusted.toString()} Area: $area}';
+    return '"$characterMatched" Rect:${_matrixOriginal.rectangle.toString()} Area: $area}';
   }
 
   /// The area of the artifact, calculated from its matrix representation.
-  int get area => _matrix.area;
+  int get area => _matrixOriginal.area;
 
   /// Adjusts the artifact's height to fit within a given rectangle while maintaining its relative position.
   ///
@@ -45,7 +39,7 @@ class Artifact {
   void fitToRectangleHeight(final Rect targetRect) {
     final int newHeight = targetRect.height.toInt();
 
-    if (rectangleAdjusted.height == newHeight) {
+    if (_matrixNormalized.rectangle.height == newHeight) {
       return; // Early return if no change needed
     }
 
@@ -54,26 +48,26 @@ class Artifact {
 
     // Calculate the relative position of the artifact within the target rectangle
     final double relativeTop =
-        (rectangleAdjusted.top - targetRect.top) / targetRect.height;
+        (_matrixNormalized.rectangle.top - targetRect.top) / targetRect.height;
 
     final List<List<bool>> newGrid =
         _createNewGrid(originalData, newHeight, relativeTop, currentWidth);
 
     // Update the matrix with the new grid
-    _matrix.setGrid(newGrid);
+    _matrixOriginal.setGrid(newGrid);
 
     // Adjust the rectangle to maintain relative position within the target rectangle
-    rectangleAdjusted = Rect.fromLTWH(
-      rectangleAdjusted.left,
+    _matrixNormalized.rectangle = Rect.fromLTWH(
+      _matrixNormalized.rectangle.left,
       targetRect.top,
-      rectangleAdjusted.width,
+      _matrixNormalized.rectangle.width,
       targetRect.height,
     );
   }
 
   /// Checks if the artifact is empty (contains no 'on' pixels).
   bool get isEmpty {
-    return _matrix.isEmpty;
+    return _matrixOriginal.isEmpty;
   }
 
   /// Checks if the artifact is not empty (contains at least one 'on' pixel).
@@ -82,11 +76,11 @@ class Artifact {
   }
 
   /// Gets the original matrix representation of the artifact.
-  Matrix get matrixOriginal => _matrix;
+  Matrix get matrixOriginal => _matrixOriginal;
 
   /// Sets the original matrix representation of the artifact.
   set matrixOriginal(final Matrix value) {
-    _matrix.setGrid(value.data);
+    _matrixOriginal.setGrid(value.data);
   }
 
   /// Gets the normalized matrix representation of the artifact.
@@ -121,7 +115,7 @@ class Artifact {
     final String onChar = '#',
     final bool forCode = false,
   }) {
-    return _matrix.gridToString(
+    return _matrixOriginal.gridToString(
       forCode: forCode,
       onChar: onChar,
     );
@@ -217,10 +211,22 @@ class Artifact {
   void mergeArtifact(final Artifact toMerge) {
     // Create a new rectangle that encompasses both artifacts
     final Rect newRect = Rect.fromLTRB(
-      min(this.rectangleAdjusted.left, toMerge.rectangleAdjusted.left),
-      min(this.rectangleAdjusted.top, toMerge.rectangleAdjusted.top),
-      max(this.rectangleAdjusted.right, toMerge.rectangleAdjusted.right),
-      max(this.rectangleAdjusted.bottom, toMerge.rectangleAdjusted.bottom),
+      min(
+        this._matrixNormalized.rectangle.left,
+        toMerge._matrixNormalized.rectangle.left,
+      ),
+      min(
+        this._matrixNormalized.rectangle.top,
+        toMerge._matrixNormalized.rectangle.top,
+      ),
+      max(
+        this._matrixNormalized.rectangle.right,
+        toMerge._matrixNormalized.rectangle.right,
+      ),
+      max(
+        this._matrixNormalized.rectangle.bottom,
+        toMerge._matrixNormalized.rectangle.bottom,
+      ),
     );
 
     // Merge the grids
@@ -230,18 +236,20 @@ class Artifact {
     Matrix.copyGrid(
       this.matrixOriginal,
       newGrid,
-      (this.rectangleAdjusted.left - newRect.left).toInt(),
-      (this.rectangleAdjusted.top - newRect.top).toInt(),
+      (this._matrixNormalized.rectangle.left - newRect.left).toInt(),
+      (this._matrixNormalized.rectangle.top - newRect.top).toInt(),
     );
 
     Matrix.copyGrid(
       toMerge.matrixOriginal,
       newGrid,
-      (toMerge.rectangleAdjusted.left - newRect.left).toInt(),
-      (toMerge.rectangleAdjusted.top - newRect.top).toInt(),
+      (toMerge._matrixNormalized.rectangle.left - newRect.left).toInt(),
+      (toMerge._matrixNormalized.rectangle.top - newRect.top).toInt(),
     );
     this.matrixOriginal = newGrid;
-    this.rectangleOriginal =
-        this.rectangleOriginal.expandToInclude(toMerge.rectangleOriginal);
+    this.matrixOriginal.rectangle = this
+        .matrixOriginal
+        .rectangle
+        .expandToInclude(toMerge.matrixOriginal.rectangle);
   }
 }

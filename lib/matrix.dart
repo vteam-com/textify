@@ -140,6 +140,9 @@ class Matrix {
   /// The number of rows in the matrix.
   int rows = 0;
 
+  /// the rectangle location of this matrix.
+  Rect rectangle = Rect.zero;
+
   /// The number of enclosure found
   int _enclosures = -1;
 

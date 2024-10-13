@@ -83,14 +83,14 @@ class DisplayArtifacts extends CustomPainter {
       paintMatrix(
         canvas,
         colors[id % colors.length],
-        artifact.rectangleAdjusted.left.toInt(),
-        artifact.rectangleAdjusted.top.toInt(),
+        artifact.matrixNormalized.rectangle.left.toInt(),
+        artifact.matrixNormalized.rectangle.top.toInt(),
         artifact.matrixOriginal,
       );
       _drawText(
         canvas,
-        artifact.rectangleAdjusted.left,
-        artifact.rectangleAdjusted.top,
+        artifact.matrixNormalized.rectangle.left,
+        artifact.matrixNormalized.rectangle.top,
         id.toString(),
         8,
       );
@@ -118,8 +118,8 @@ class DisplayArtifacts extends CustomPainter {
       paintMatrix(
         canvas,
         colors[textify.artifacts.indexOf(artifact) % colors.length],
-        artifact.rectangleOriginal.left.toInt(),
-        artifact.rectangleOriginal.top.toInt(),
+        artifact.matrixOriginal.rectangle.left.toInt(),
+        artifact.matrixOriginal.rectangle.top.toInt(),
         artifact.matrixOriginal,
       );
     }
