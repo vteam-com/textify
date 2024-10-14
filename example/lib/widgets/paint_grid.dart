@@ -124,16 +124,16 @@ void paintOverlay(
     Colors.blue,
     startX,
     startY,
-    matrix2,
+    matrix1,
     pixelSize: pixelSize,
-    background: Colors.transparent,
   );
   paintMatrix(
     canvas,
-    Colors.yellow.withAlpha(150),
+    Colors.yellow.withAlpha(130),
     startX,
     startY,
-    matrix1,
+    matrix2,
     pixelSize: pixelSize,
+    background: Colors.transparent,
   );
 }
