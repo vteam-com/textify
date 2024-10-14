@@ -71,9 +71,6 @@ class _ImageSourceGeneratedState extends State<ImageSourceGenerated> {
 
     loadSavedText().then((_) {
       setState(() {
-        _textControllerLine1.text = imageSettings.defaultTextLine1;
-        _textControllerLine2.text = imageSettings.defaultTextLine2;
-        _textControllerLine3.text = imageSettings.defaultTextLine3;
         inputHasChanged();
       });
     });
@@ -188,6 +185,7 @@ class _ImageSourceGeneratedState extends State<ImageSourceGenerated> {
           onChanged: (String? newValue) {
             if (newValue != null) {
               imageSettings.selectedFont = newValue;
+              saveText('font', newValue);
               inputHasChanged();
             }
           },
@@ -249,6 +247,7 @@ class _ImageSourceGeneratedState extends State<ImageSourceGenerated> {
 
   Future<void> loadSavedText() async {
     final prefs = await SharedPreferences.getInstance();
+    imageSettings.selectedFont = prefs.getString('font') ?? 'Arial';
     final textLine1 =
         prefs.getString('textLine1') ?? imageSettings.defaultTextLine1;
     final textLine2 =
