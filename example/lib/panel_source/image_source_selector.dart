@@ -105,7 +105,9 @@ class ImageSourceSelectorState extends State<ImageSourceSelector>
             if (_tabController.index == 1) {
               _imageSelected = image;
               _expectedText = expectedText;
-              _includeSpaceDetection = true;
+              _includeSpaceDetection =
+                  expectedText.any((string) => string.contains(' '));
+
               if (mounted) {
                 setState(() {
                   widget.onSourceChanged(

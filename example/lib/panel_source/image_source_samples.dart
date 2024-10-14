@@ -37,7 +37,7 @@ class _ImageSourceSamplesState extends State<ImageSourceSamples> {
     ),
     ImageData(
       'black-on-white-typewriter.png',
-      'A B C D E F G H\nI J K L M N O P\nQ R S T U V W X\nY Z',
+      'ABCDEFGH\nIJKLMNOP\nQRSTUVWX\nYZ',
     ),
     ImageData(
       'back-on-white-the_example_text.png',
