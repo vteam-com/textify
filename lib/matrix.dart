@@ -1,9 +1,9 @@
+import 'dart:async';
 import 'dart:collection';
 import 'dart:math';
 import 'dart:typed_data';
 import 'dart:ui';
 import 'dart:ui' as ui;
-import 'package:flutter/foundation.dart';
 
 /// Represents a 2D grid of boolean values, primarily used for image processing
 /// and pattern recognition tasks.
@@ -1464,4 +1464,194 @@ Future<Uint8List> imageToUint8List(final ui.Image? image) async {
   final ByteData? data =
       await image.toByteData(format: ui.ImageByteFormat.rawRgba);
   return data?.buffer.asUint8List() ?? Uint8List(0);
+}
+
+/// Performs an erosion operation on the input image.
+///
+/// This function takes a [ui.Image] and performs an erosion operation on it.
+/// The erosion operation removes pixels from the boundaries of objects in the image.
+///
+/// Parameters:
+/// - [inputImage]: The source image to be eroded.
+///
+/// Returns:
+/// A [Future] that resolves to a [ui.Image] containing the eroded image.
+/// Performs an erosion operation on the input image.
+///
+/// This function takes a [ui.Image] and performs a less aggressive erosion operation on it.
+/// The erosion operation removes pixels from the boundaries of objects in the image,
+/// but only if they have a certain number of white neighbors.
+///
+/// Parameters:
+/// - [inputImage]: The source image to be eroded.
+///
+/// Returns:
+/// A [Future] that resolves to a [ui.Image] containing the eroded image.
+/// Performs an erosion operation on the input image.
+///
+/// This function takes a [ui.Image] and performs a configurable erosion operation on it.
+/// The erosion operation removes pixels from the boundaries of objects in the image,
+/// based on the number of white neighbors each black pixel has.
+///
+/// Parameters:
+/// - [inputImage]: The source image to be eroded.
+/// - [threshold]: The number of white neighbors a black pixel must have to be eroded.
+///   Default is 6. Lower values result in more aggressive erosion.
+///
+/// Returns:
+/// A [Future] that resolves to a [ui.Image] containing the eroded image.
+Future<ui.Image> erode(
+  ui.Image inputImage, {
+  int threshold = 6,
+}) async {
+  final width = inputImage.width;
+  final height = inputImage.height;
+
+  // Get the pixel data of the image
+  final ByteData? byteData =
+      await inputImage.toByteData(format: ui.ImageByteFormat.rawRgba);
+  final pixels = byteData!.buffer.asUint8List();
+
+  // Create an empty list for the eroded pixels
+  final erodedPixels = Uint8List(width * height * 4);
+
+  // Copy the original image to erodedPixels
+  erodedPixels.setAll(0, pixels);
+
+  for (int y = 1; y < height - 1; y++) {
+    for (int x = 1; x < width - 1; x++) {
+      int index = (y * width + x) * 4;
+
+      // Only process black pixels
+      if (_isBlack(pixels, index)) {
+        // Count white neighbors
+        int whiteNeighbors = 0;
+        for (int dy = -1; dy <= 1; dy++) {
+          for (int dx = -1; dx <= 1; dx++) {
+            if (dx == 0 && dy == 0) {
+              continue;
+            } // Skip the center pixel
+            int neighborIndex = ((y + dy) * width + (x + dx)) * 4;
+            if (!_isBlack(pixels, neighborIndex)) {
+              whiteNeighbors++;
+            }
+          }
+        }
+
+        // Erode only if the pixel has more white neighbors than the threshold
+        if (whiteNeighbors >= threshold) {
+          // Set to white
+          erodedPixels[index] = 255; // R
+          erodedPixels[index + 1] = 255; // G
+          erodedPixels[index + 2] = 255; // B
+          erodedPixels[index + 3] = 255; // A
+        }
+      }
+    }
+  }
+
+  return createImageFromPixels(erodedPixels, width, height);
+}
+
+/// Performs a dilation operation on the input image.
+///
+/// This function takes a [ui.Image] and performs a dilation operation on it.
+/// The dilation operation adds pixels to the boundaries of objects in the image.
+///
+/// Parameters:
+/// - [inputImage]: The source image to be dilated.
+///
+/// Returns:
+/// A [Future] that resolves to a [ui.Image] containing the dilated image.
+Future<ui.Image> dilate(ui.Image inputImage) async {
+  final width = inputImage.width;
+  final height = inputImage.height;
+
+  // Get the pixel data of the image
+  final byteData =
+      await inputImage.toByteData(format: ui.ImageByteFormat.rawRgba);
+  final pixels = byteData!.buffer.asUint8List();
+
+  // Create an empty list for the dilated pixels
+  final Uint8List dilatedPixels = Uint8List(width * height * 4);
+
+  for (int y = 1; y < height - 1; y++) {
+    for (int x = 1; x < width - 1; x++) {
+      int index = (y * width + x) * 4;
+      // Check if the current pixel or any of its neighbors are black
+      if (_isBlack(pixels, index) ||
+          _isBlack(pixels, ((y - 1) * width + (x - 1)) * 4) ||
+          _isBlack(pixels, ((y - 1) * width + x) * 4) ||
+          _isBlack(pixels, ((y - 1) * width + (x + 1)) * 4) ||
+          _isBlack(pixels, (y * width + (x - 1)) * 4) ||
+          _isBlack(pixels, (y * width + (x + 1)) * 4) ||
+          _isBlack(pixels, ((y + 1) * width + (x - 1)) * 4) ||
+          _isBlack(pixels, ((y + 1) * width + x) * 4) ||
+          _isBlack(pixels, ((y + 1) * width + (x + 1)) * 4)) {
+        // Set to black
+        dilatedPixels[index] = 0; // R
+        dilatedPixels[index + 1] = 0; // G
+        dilatedPixels[index + 2] = 0; // B
+        dilatedPixels[index + 3] = 255; // A
+      } else {
+        // Set to white
+        dilatedPixels[index] = 255; // R
+        dilatedPixels[index + 1] = 255; // G
+        dilatedPixels[index + 2] = 255; // B
+        dilatedPixels[index + 3] = 255; // A
+      }
+    }
+  }
+
+  return createImageFromPixels(dilatedPixels, width, height);
+}
+
+/// Checks if a pixel is black based on its RGBA values.
+///
+/// This function takes a [Uint8List] representing the pixel data and an [index]
+/// pointing to the start of a pixel's RGBA values. It checks if the pixel is
+/// black by comparing the R, G, and B values to 0.
+///
+/// Parameters:
+/// - [pixels]: The [Uint8List] containing the pixel data.
+/// - [index]: The index pointing to the start of a pixel's RGBA values.
+///
+/// Returns:
+/// A [bool] indicating whether the pixel is black or not.
+bool _isBlack(Uint8List pixels, int index) {
+  return pixels[index] == 0 && pixels[index + 1] == 0 && pixels[index + 2] == 0;
+}
+
+/// Creates a new [ui.Image] from a [Uint8List] of pixel data.
+///
+/// This function takes a [Uint8List] containing the pixel data, the [width],
+/// and the [height] of the image, and creates a new [ui.Image] from it.
+///
+/// Parameters:
+/// - [pixels]: The [Uint8List] containing the pixel data.
+/// - [width]: The width of the image.
+/// - [height]: The height of the image.
+///
+/// Returns:
+/// A [Future] that resolves to a [ui.Image] created from the pixel data.
+Future<ui.Image> createImageFromPixels(
+  Uint8List pixels,
+  int width,
+  int height,
+) async {
+  // Create a new ui.Image from the modified pixels
+  final ui.ImmutableBuffer buffer =
+      await ui.ImmutableBuffer.fromUint8List(pixels);
+
+  // Create a new ui.Image from the modified pixels
+  final ui.ImageDescriptor descriptor = ui.ImageDescriptor.raw(
+    buffer,
+    width: width,
+    height: height,
+    pixelFormat: ui.PixelFormat.rgba8888,
+  );
+  final ui.Codec codec = await descriptor.instantiateCodec();
+  final ui.FrameInfo frameInfo = await codec.getNextFrame();
+
+  return frameInfo.image;
 }

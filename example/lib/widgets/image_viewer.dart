@@ -1,7 +1,7 @@
 import 'dart:ui' as ui;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
-import 'package:textify_dashboard/panel_source/panel_content.dart';
+import 'package:textify_dashboard/panel1_source/panel_content.dart';
 
 class ImageViewer extends StatelessWidget {
   const ImageViewer({super.key, required this.image});

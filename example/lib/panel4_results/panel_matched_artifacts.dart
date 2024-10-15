@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:textify/textify.dart';
-import 'package:textify_dashboard/panel_source/panel_content.dart';
+import 'package:textify_dashboard/panel1_source/panel_content.dart';
 import 'package:textify_dashboard/widgets/gap.dart';
 import 'edit.dart';
 import 'matched_artifact.dart';
 
-class MatchedArtifacts extends StatelessWidget {
-  const MatchedArtifacts({
+class PanelMatchedArtifacts extends StatelessWidget {
+  const PanelMatchedArtifacts({
     super.key,
     required this.textify,
     required this.expectedStrings,

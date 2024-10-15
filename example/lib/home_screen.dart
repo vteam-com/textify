@@ -1,15 +1,14 @@
 import 'dart:ui' as ui;
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:textify/matrix.dart';
 import 'package:textify/textify.dart';
-import 'panel_artifacts/display_bands_and_artifacts.dart';
-import 'panel_results/matched_artifacts.dart';
-import 'panel_source/image_source_selector.dart';
-import 'panel_source/panel_content.dart';
-import 'widgets/image_viewer.dart';
+import 'package:textify_dashboard/panel1_source/image_source_selector.dart';
+import 'package:textify_dashboard/panel1_source/panel_content.dart';
+import 'package:textify_dashboard/panel2_optimized_image/panel_optimized_image.dart';
+import 'package:textify_dashboard/panel3_artifacts/panel_artifacts_found.dart';
+import 'panel4_results/panel_matched_artifacts.dart';
 
 ///
 class HomeScreen extends StatefulWidget {
@@ -25,6 +24,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // The image that will be use for detecting the text
   ui.Image? _imageBlackOnWhite;
+
+  // final int _threshold = 6;
 
   ui.Image? _imageSource;
   String _fontName = '';
@@ -95,7 +96,7 @@ class _HomeScreenState extends State<HomeScreen> {
               },
               children: [
                 //
-                // Input Source
+                // Panel 1 - Input Source
                 //
                 buildExpansionPanel(
                   titleLeft: 'TEXTIFY',
@@ -122,21 +123,21 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
 
                 //
-                // Input optimized image
+                // Panel 2 - Input optimized image
                 //
                 buildExpansionPanel(
                   titleLeft: 'High Contrast',
                   titleCenter: _getDimensionOfImageSource(_imageSource),
                   titleRight: '',
                   isExpanded: _isExpandedOptimized,
-                  content: _buildOptimizedImage(
+                  content: buildOptimizedImage(
                     _imageBlackOnWhite,
                     _transformationController,
                   ),
                 ),
 
                 //
-                // Bands and Artifacts
+                // Panel 3 - Bands and Artifacts
                 //
                 buildExpansionPanel(
                   titleLeft: '${_textify.bands.length} Bands',
@@ -144,7 +145,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   titleRight:
                       '${NumberFormat.decimalPattern().format(_textify.duration)}ms',
                   isExpanded: _isExpandedArtifactFound,
-                  content: buildArtifactFound(
+                  content: panelArtifactFound(
                     _textify,
                     _cleanUpArtifactFound,
                     _transformationController,
@@ -157,14 +158,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
 
                 //
-                // Results / Text
+                // Panel 4 - Results / Text
                 //
                 buildExpansionPanel(
                   titleLeft: 'Results',
                   titleCenter: percentage,
                   titleRight: '',
                   isExpanded: _isExpandedResults,
-                  content: MatchedArtifacts(
+                  content: PanelMatchedArtifacts(
                     font: _fontName,
                     expectedStrings: _stringsExpectedToBeFoundInTheImage,
                     textify: _textify,
@@ -176,18 +177,6 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
     );
-  }
-
-  Widget _buildOptimizedImage(
-    final ui.Image? imageHighContrast,
-    final TransformationController? transformationController,
-  ) {
-    return imageHighContrast == null
-        ? const CupertinoActivityIndicator(radius: 30)
-        : buildInteractiveImageViewer(
-            imageHighContrast,
-            transformationController,
-          );
   }
 
   void _clearState() {
@@ -213,9 +202,15 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     // Convert color image source to a grid of on=ink/off=paper
-    final ui.Image tmpImageBlackOnWhite = await imageToBlackOnWhite(
+    ui.Image tmpImageBlackOnWhite = await imageToBlackOnWhite(
       _imageSource!,
     );
+
+    // tmpImageBlackOnWhite = await erode(
+    //   tmpImageBlackOnWhite,
+    //   threshold: _threshold,
+    // );
+    // tmpImageBlackOnWhite = await dilate(tmpImageBlackOnWhite);
 
     _textify.getTextFromMatrix(
       imageAsMatrix: await Matrix.fromImage(tmpImageBlackOnWhite),

@@ -5,7 +5,7 @@ import 'package:textify/artifact.dart';
 import 'package:textify/character_definition.dart';
 import 'package:textify/matrix.dart';
 import 'package:textify/textify.dart';
-import 'package:textify_dashboard/panel_source/image_source_generated.dart';
+import 'package:textify_dashboard/panel1_source/image_source_generated.dart';
 import 'package:textify_dashboard/widgets/gap.dart';
 
 class CharacterGenerationScreen extends StatelessWidget {
