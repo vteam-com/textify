@@ -986,7 +986,7 @@ class Matrix {
   ///
   /// Note:
   /// - The function assumes the existence of helper methods [_exploreRegion] and [_isEnclosedRegion].
-  /// - A region must have at least 3 cells to be considered a potential loop.
+  /// - A region must have at least 3 cells to be considered a loop.
   /// - The function uses a depth-first search approach to explore regions.
   ///
   /// Time Complexity: O(rows * cols), where each cell is visited at most once.
@@ -1377,7 +1377,7 @@ class Matrix {
 /// Binarize an input image by converting it to black and white based on a brightness threshold.
 ///
 /// This function takes an input [ui.Image] and converts it to a black and white image
-/// where pixels brighter than the specified [threshold] become white, and those below become black.
+/// where pixels brighter than the specified [backgroundBrightNestthreshold_0_255] become white, and those below become black.
 ///
 /// Parameters:
 /// - [inputImage]: The source image to be binarized.
@@ -1391,18 +1391,11 @@ class Matrix {
 /// An [Exception] if it fails to get image data from the input image.
 Future<ui.Image> imageToBlackOnWhite(
   final ui.Image inputImage, {
-  final double threshold = 190,
+  final int backgroundBrightNestthreshold_0_255 = 128,
 }) async {
-  // Get the bytes from the input image
-  final ByteData? byteData =
-      await inputImage.toByteData(format: ui.ImageByteFormat.rawRgba);
-  if (byteData == null) {
-    throw Exception('Failed to get image data');
-  }
-
   final int width = inputImage.width;
   final int height = inputImage.height;
-  final Uint8List pixels = byteData.buffer.asUint8List();
+  final Uint8List pixels = await imageToUint8List(inputImage);
 
   // Create a new Uint8List for the output image
   final Uint8List outputPixels = Uint8List(width * height * 4);
@@ -1411,39 +1404,30 @@ Future<ui.Image> imageToBlackOnWhite(
     final int r = pixels[i];
     final int g = pixels[i + 1];
     final int b = pixels[i + 2];
+    // ignore: unused_local_variable
     final int a = pixels[i + 3];
 
-    // Calculate brightness as the average of R, G, and B
-    final double brightness = (r + g + b) / 3;
+    // Calculate brightness using a weighted average
+    final double brightness = (0.299 * r + 0.587 * g + 0.114 * b);
 
     // If brightness is above the threshold, set pixel to white, otherwise black
-    if (brightness > threshold) {
+    if (brightness > backgroundBrightNestthreshold_0_255) {
+      // make this the background paper
       outputPixels[i] = 255; // R
       outputPixels[i + 1] = 255; // G
       outputPixels[i + 2] = 255; // B
     } else {
+      // make this the foreground ink
       outputPixels[i] = 0; // R
       outputPixels[i + 1] = 0; // G
       outputPixels[i + 2] = 0; // B
     }
 
-    // Keep the alpha channel unchanged
-    outputPixels[i + 3] = a;
+    // remove alpha
+    outputPixels[i + 3] = 255; // A
   }
 
-  // Create a new ui.Image from the modified pixels
-  final ui.ImmutableBuffer buffer =
-      await ui.ImmutableBuffer.fromUint8List(outputPixels);
-  final ui.ImageDescriptor descriptor = ui.ImageDescriptor.raw(
-    buffer,
-    width: width,
-    height: height,
-    pixelFormat: ui.PixelFormat.rgba8888,
-  );
-  final ui.Codec codec = await descriptor.instantiateCodec();
-  final ui.FrameInfo frameInfo = await codec.getNextFrame();
-
-  return frameInfo.image;
+  return await createImageFromPixels(outputPixels, width, height);
 }
 
 /// Converts a [ui.Image] to a [Uint8List] representation.
@@ -1468,30 +1452,11 @@ Future<Uint8List> imageToUint8List(final ui.Image? image) async {
 
 /// Performs an erosion operation on the input image.
 ///
-/// This function takes a [ui.Image] and performs an erosion operation on it.
-/// The erosion operation removes pixels from the boundaries of objects in the image.
-///
-/// Parameters:
-/// - [inputImage]: The source image to be eroded.
-///
-/// Returns:
-/// A [Future] that resolves to a [ui.Image] containing the eroded image.
-/// Performs an erosion operation on the input image.
-///
-/// This function takes a [ui.Image] and performs a less aggressive erosion operation on it.
-/// The erosion operation removes pixels from the boundaries of objects in the image,
-/// but only if they have a certain number of white neighbors.
-///
-/// Parameters:
-/// - [inputImage]: The source image to be eroded.
-///
-/// Returns:
-/// A [Future] that resolves to a [ui.Image] containing the eroded image.
-/// Performs an erosion operation on the input image.
-///
 /// This function takes a [ui.Image] and performs a configurable erosion operation on it.
 /// The erosion operation removes pixels from the boundaries of objects in the image,
-/// based on the number of white neighbors each black pixel has.
+/// based on the number of white neighbors each black pixel has. The erosion is biased
+/// towards the horizontal direction, meaning that horizontal white neighbors have
+/// a higher impact on the erosion than vertical neighbors.
 ///
 /// Parameters:
 /// - [inputImage]: The source image to be eroded.
@@ -1501,125 +1466,180 @@ Future<Uint8List> imageToUint8List(final ui.Image? image) async {
 /// Returns:
 /// A [Future] that resolves to a [ui.Image] containing the eroded image.
 Future<ui.Image> erode(
-  ui.Image inputImage, {
-  int threshold = 6,
+  final ui.Image inputImage, {
+  final int kernelSize = 3,
 }) async {
-  final width = inputImage.width;
-  final height = inputImage.height;
+  final int width = inputImage.width;
+  final int height = inputImage.height;
 
-  // Get the pixel data of the image
+  // Get the pixel data from the input image
   final ByteData? byteData =
       await inputImage.toByteData(format: ui.ImageByteFormat.rawRgba);
-  final pixels = byteData!.buffer.asUint8List();
+  if (byteData == null) {
+    throw Exception('Failed to get image data');
+  }
+  final Uint8List inputPixels = byteData.buffer.asUint8List();
 
-  // Create an empty list for the eroded pixels
-  final erodedPixels = Uint8List(width * height * 4);
+  // Create a new Uint8List for the output image
+  final Uint8List outputPixels = Uint8List(width * height * 4);
 
-  // Copy the original image to erodedPixels
-  erodedPixels.setAll(0, pixels);
+  // Calculate the radius of the kernel
+  final int radius = kernelSize ~/ 2;
 
-  for (int y = 1; y < height - 1; y++) {
-    for (int x = 1; x < width - 1; x++) {
-      int index = (y * width + x) * 4;
+  for (int y = 0; y < height; y++) {
+    for (int x = 0; x < width; x++) {
+      // Initialize the maximum value to black (0)
+      int maxValue = 0;
 
-      // Only process black pixels
-      if (_isBlack(pixels, index)) {
-        // Count white neighbors
-        int whiteNeighbors = 0;
-        for (int dy = -1; dy <= 1; dy++) {
-          for (int dx = -1; dx <= 1; dx++) {
-            if (dx == 0 && dy == 0) {
-              continue;
-            } // Skip the center pixel
-            int neighborIndex = ((y + dy) * width + (x + dx)) * 4;
-            if (!_isBlack(pixels, neighborIndex)) {
-              whiteNeighbors++;
-            }
+      // Check the kernel area
+      for (int ky = -radius; ky <= radius; ky++) {
+        for (int kx = -radius; kx <= radius; kx++) {
+          // Calculate the index of the neighbor pixel
+          int neighborX = x + kx;
+          int neighborY = y + ky;
+
+          // Ensure we stay within bounds
+          if (neighborX >= 0 &&
+              neighborX < width &&
+              neighborY >= 0 &&
+              neighborY < height) {
+            // Get the pixel value (assuming binary image, check the red channel)
+            int pixelIndex = (neighborY * width + neighborX) * 4; // RGBA
+            int r =
+                inputPixels[pixelIndex]; // Assuming grayscale, use red channel
+
+            // Update the maximum value
+            maxValue = max(maxValue, r);
           }
         }
-
-        // Erode only if the pixel has more white neighbors than the threshold
-        if (whiteNeighbors >= threshold) {
-          // Set to white
-          erodedPixels[index] = 255; // R
-          erodedPixels[index + 1] = 255; // G
-          erodedPixels[index + 2] = 255; // B
-          erodedPixels[index + 3] = 255; // A
-        }
       }
+
+      // Set the eroded pixel value in the output image
+      int outputIndex = (y * width + x) * 4;
+      outputPixels[outputIndex] = maxValue; // R
+      outputPixels[outputIndex + 1] = maxValue; // G
+      outputPixels[outputIndex + 2] = maxValue; // B
+      outputPixels[outputIndex + 3] = 255; // A (fully opaque)
     }
   }
 
-  return createImageFromPixels(erodedPixels, width, height);
+  // Create a new ui.Image from the output pixels
+  final ui.ImmutableBuffer buffer =
+      await ui.ImmutableBuffer.fromUint8List(outputPixels);
+  final ui.ImageDescriptor descriptor = ui.ImageDescriptor.raw(
+    buffer,
+    width: width,
+    height: height,
+    pixelFormat: ui.PixelFormat.rgba8888,
+  );
+  final ui.Codec codec = await descriptor.instantiateCodec();
+  final ui.FrameInfo frameInfo = await codec.getNextFrame();
+  return frameInfo.image;
 }
 
 /// Performs a dilation operation on the input image.
 ///
 /// This function takes a [ui.Image] and performs a dilation operation on it.
-/// The dilation operation adds pixels to the boundaries of objects in the image.
+/// The dilation operation expands the black pixels (letters) against the white background.
 ///
 /// Parameters:
-/// - [inputImage]: The source image to be dilated.
+/// - [inputImage]: The source image to be dilated (black and white).
+/// - [kernelSize]: The size of the dilation kernel (must be an odd number).
 ///
 /// Returns:
 /// A [Future] that resolves to a [ui.Image] containing the dilated image.
-Future<ui.Image> dilate(ui.Image inputImage) async {
-  final width = inputImage.width;
-  final height = inputImage.height;
+Future<ui.Image> dilate({
+  required ui.Image inputImage,
+  required int kernelSize,
+}) async {
+  final int width = inputImage.width;
+  final int height = inputImage.height;
 
-  // Get the pixel data of the image
-  final byteData =
+  // Get the pixel data from the input image
+  final ByteData? byteData =
       await inputImage.toByteData(format: ui.ImageByteFormat.rawRgba);
-  final pixels = byteData!.buffer.asUint8List();
+  if (byteData == null) {
+    throw Exception('Failed to get image data');
+  }
+  final Uint8List inputPixels = byteData.buffer.asUint8List();
 
-  // Create an empty list for the dilated pixels
-  final Uint8List dilatedPixels = Uint8List(width * height * 4);
+  // Create a new Uint8List for the output image
+  final Uint8List outputPixels = Uint8List(width * height * 4);
 
-  for (int y = 1; y < height - 1; y++) {
-    for (int x = 1; x < width - 1; x++) {
-      int index = (y * width + x) * 4;
-      // Check if the current pixel or any of its neighbors are black
-      if (_isBlack(pixels, index) ||
-          _isBlack(pixels, ((y - 1) * width + (x - 1)) * 4) ||
-          _isBlack(pixels, ((y - 1) * width + x) * 4) ||
-          _isBlack(pixels, ((y - 1) * width + (x + 1)) * 4) ||
-          _isBlack(pixels, (y * width + (x - 1)) * 4) ||
-          _isBlack(pixels, (y * width + (x + 1)) * 4) ||
-          _isBlack(pixels, ((y + 1) * width + (x - 1)) * 4) ||
-          _isBlack(pixels, ((y + 1) * width + x) * 4) ||
-          _isBlack(pixels, ((y + 1) * width + (x + 1)) * 4)) {
-        // Set to black
-        dilatedPixels[index] = 0; // R
-        dilatedPixels[index + 1] = 0; // G
-        dilatedPixels[index + 2] = 0; // B
-        dilatedPixels[index + 3] = 255; // A
-      } else {
-        // Set to white
-        dilatedPixels[index] = 255; // R
-        dilatedPixels[index + 1] = 255; // G
-        dilatedPixels[index + 2] = 255; // B
-        dilatedPixels[index + 3] = 255; // A
+  // Create the elliptical kernel
+  final List<List<bool>> kernel = _createEllipticalKernel(kernelSize);
+
+  // Apply dilation
+  for (int y = 0; y < height; y++) {
+    for (int x = 0; x < width; x++) {
+      bool hasBlackPixel = false;
+
+      for (int ky = 0; ky < kernelSize; ky++) {
+        for (int kx = 0; kx < kernelSize; kx++) {
+          if (kernel[ky][kx]) {
+            final int px = x + kx - kernelSize ~/ 2;
+            final int py = y + ky - kernelSize ~/ 2;
+
+            if (px >= 0 && px < width && py >= 0 && py < height) {
+              final int index = (py * width + px) * 4;
+              // Check if there's a black pixel in the kernel area
+              if (inputPixels[index] == 0) {
+                hasBlackPixel = true;
+                break;
+              }
+            }
+          }
+        }
+        if (hasBlackPixel) {
+          break;
+        }
+      }
+
+      final int outputIndex = (y * width + x) * 4;
+      final int pixelValue = hasBlackPixel ? 0 : 255;
+      outputPixels[outputIndex] = pixelValue; // R
+      outputPixels[outputIndex + 1] = pixelValue; // G
+      outputPixels[outputIndex + 2] = pixelValue; // B
+      outputPixels[outputIndex + 3] = 255; // Alpha channel
+    }
+  }
+
+  // Create a new ui.Image from the output pixels
+  final ui.ImmutableBuffer buffer =
+      await ui.ImmutableBuffer.fromUint8List(outputPixels);
+  final ui.ImageDescriptor descriptor = ui.ImageDescriptor.raw(
+    buffer,
+    width: width,
+    height: height,
+    pixelFormat: ui.PixelFormat.rgba8888,
+  );
+  final ui.Codec codec = await descriptor.instantiateCodec();
+  final ui.FrameInfo frameInfo = await codec.getNextFrame();
+  return frameInfo.image;
+}
+
+List<List<bool>> _createEllipticalKernel(int size) {
+  final List<List<bool>> kernel = List.generate(
+    size,
+    (_) => List.filled(size, false),
+  );
+
+  final double radiusX = size / 2;
+  final double radiusY = size / 2;
+  final double centerX = size / 2 - 0.5;
+  final double centerY = size / 2 - 0.5;
+
+  for (int y = 0; y < size; y++) {
+    for (int x = 0; x < size; x++) {
+      final double normalizedX = (x - centerX) / radiusX;
+      final double normalizedY = (y - centerY) / radiusY;
+      if (normalizedX * normalizedX + normalizedY * normalizedY <= 1) {
+        kernel[y][x] = true;
       }
     }
   }
 
-  return createImageFromPixels(dilatedPixels, width, height);
-}
-
-/// Checks if a pixel is black based on its RGBA values.
-///
-/// This function takes a [Uint8List] representing the pixel data and an [index]
-/// pointing to the start of a pixel's RGBA values. It checks if the pixel is
-/// black by comparing the R, G, and B values to 0.
-///
-/// Parameters:
-/// - [pixels]: The [Uint8List] containing the pixel data.
-/// - [index]: The index pointing to the start of a pixel's RGBA values.
-///
-/// Returns:
-/// A [bool] indicating whether the pixel is black or not.
-bool _isBlack(Uint8List pixels, int index) {
-  return pixels[index] == 0 && pixels[index + 1] == 0 && pixels[index + 2] == 0;
+  return kernel;
 }
 
 /// Creates a new [ui.Image] from a [Uint8List] of pixel data.

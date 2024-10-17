@@ -5,14 +5,14 @@ class PanelContent extends StatelessWidget {
     super.key,
     this.left,
     this.top,
-    required this.center,
+    this.center,
     this.bottom,
     this.right,
   });
 
   final Widget? left;
   final Widget? top;
-  final Widget center;
+  final Widget? center;
   final Widget? bottom;
   final Widget? right;
 
@@ -46,7 +46,7 @@ class PanelContent extends StatelessWidget {
                     ],
                   ),
                 ),
-                child: center,
+                child: Center(child: center ?? Text('Working...')),
               ),
               if (bottom != null) bottom!,
             ],

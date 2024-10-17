@@ -1,9 +1,11 @@
+import 'dart:math';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:textify/matrix.dart';
 import 'package:textify/textify.dart';
+import 'package:textify_dashboard/panel1_source/debounce.dart';
 import 'package:textify_dashboard/panel1_source/image_source_selector.dart';
 import 'package:textify_dashboard/panel1_source/panel_content.dart';
 import 'package:textify_dashboard/panel2_optimized_image/panel_optimized_image.dart';
@@ -25,7 +27,11 @@ class _HomeScreenState extends State<HomeScreen> {
   // The image that will be use for detecting the text
   ui.Image? _imageBlackOnWhite;
 
-  // final int _threshold = 6;
+  Debouncer debouncer = Debouncer(const Duration(milliseconds: 1000));
+
+  int _grayScale = 190;
+  int _kernelSizeErode = 0;
+  int _kernelSizeDilate = 0;
 
   ui.Image? _imageSource;
   String _fontName = '';
@@ -126,12 +132,30 @@ class _HomeScreenState extends State<HomeScreen> {
                 // Panel 2 - Input optimized image
                 //
                 buildExpansionPanel(
-                  titleLeft: 'High Contrast',
+                  titleLeft: 'Optimized image',
                   titleCenter: _getDimensionOfImageSource(_imageSource),
                   titleRight: '',
                   isExpanded: _isExpandedOptimized,
-                  content: buildOptimizedImage(
+                  content: panelOptimizedImage(
                     _imageBlackOnWhite,
+                    _kernelSizeErode,
+                    _kernelSizeDilate,
+                    _grayScale,
+                    (final int sizeErode, final int sizeDilate, int grayscale) {
+                      setState(
+                        () {
+                          _kernelSizeErode = max(0, sizeErode);
+                          _kernelSizeDilate = max(0, sizeDilate);
+                          _grayScale = max(0, grayscale);
+                          _imageBlackOnWhite = null;
+                          debouncer.run(
+                            () {
+                              _convertImageToText();
+                            },
+                          );
+                        },
+                      );
+                    },
                     _transformationController,
                   ),
                 ),
@@ -204,13 +228,22 @@ class _HomeScreenState extends State<HomeScreen> {
     // Convert color image source to a grid of on=ink/off=paper
     ui.Image tmpImageBlackOnWhite = await imageToBlackOnWhite(
       _imageSource!,
+      backgroundBrightNestthreshold_0_255: _grayScale,
     );
 
-    // tmpImageBlackOnWhite = await erode(
-    //   tmpImageBlackOnWhite,
-    //   threshold: _threshold,
-    // );
-    // tmpImageBlackOnWhite = await dilate(tmpImageBlackOnWhite);
+    if (_kernelSizeErode > 0) {
+      tmpImageBlackOnWhite = await erode(
+        tmpImageBlackOnWhite,
+        kernelSize: _kernelSizeErode,
+      );
+    }
+
+    if (_kernelSizeDilate > 0) {
+      tmpImageBlackOnWhite = await dilate(
+        inputImage: tmpImageBlackOnWhite,
+        kernelSize: _kernelSizeDilate,
+      );
+    }
 
     _textify.getTextFromMatrix(
       imageAsMatrix: await Matrix.fromImage(tmpImageBlackOnWhite),

@@ -1,7 +1,6 @@
 import 'dart:ui' as ui;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
-import 'package:textify_dashboard/panel1_source/panel_content.dart';
 
 class ImageViewer extends StatelessWidget {
   const ImageViewer({super.key, required this.image});
@@ -37,15 +36,16 @@ class ImagePainter extends CustomPainter {
 }
 
 Widget buildInteractiveImageViewer(
-  final ui.Image imageToDisplay,
+  final ui.Image? imageToDisplay,
   final TransformationController? transformationController,
 ) {
-  return PanelContent(
-    center: CustomInteractiveViewer(
-      transformationController: transformationController,
-      child: ImageViewer(
-        image: imageToDisplay,
-      ),
+  if (imageToDisplay == null) {
+    return const SizedBox();
+  }
+  return CustomInteractiveViewer(
+    transformationController: transformationController,
+    child: ImageViewer(
+      image: imageToDisplay,
     ),
   );
 }
