@@ -4,7 +4,14 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.1.7] - 2024-12-15
+## [0.1.8] - 2024-12-15
+
+### Changed
+
+- Update README.md
+- Update documentation [band.dart, matrix.dart]
+
+## [0.1.7] - 2024-12-14
 
 ### Changed
 

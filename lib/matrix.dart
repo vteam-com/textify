@@ -1381,7 +1381,7 @@ class Matrix {
 ///
 /// Parameters:
 /// - [inputImage]: The source image to be binarized.
-/// - [threshold]: Optional. The brightness threshold used to determine black or white pixels.
+/// - [backgroundBrightNestthreshold_0_255]: Optional. The brightness threshold used to determine black or white pixels.
 ///   Defaults to 190. Range is 0-255.
 ///
 /// Returns:
@@ -1452,16 +1452,12 @@ Future<Uint8List> imageToUint8List(final ui.Image? image) async {
 
 /// Performs an erosion operation on the input image.
 ///
-/// This function takes a [ui.Image] and performs a configurable erosion operation on it.
-/// The erosion operation removes pixels from the boundaries of objects in the image,
-/// based on the number of white neighbors each black pixel has. The erosion is biased
-/// towards the horizontal direction, meaning that horizontal white neighbors have
-/// a higher impact on the erosion than vertical neighbors.
+/// This function takes a [ui.Image] and performs an erosion operation on it.
+/// The erosion operation shrinks the black pixels (letters) against the white background.
 ///
 /// Parameters:
-/// - [inputImage]: The source image to be eroded.
-/// - [threshold]: The number of white neighbors a black pixel must have to be eroded.
-///   Default is 6. Lower values result in more aggressive erosion.
+/// - [inputImage]: The source image to be eroded (black and white).
+/// - [kernelSize]: The size of the erosion kernel (must be an odd number).
 ///
 /// Returns:
 /// A [Future] that resolves to a [ui.Image] containing the eroded image.

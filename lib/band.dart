@@ -81,22 +81,11 @@ class Band {
     _averageKerning = totalKerning / count;
   }
 
-  /// Adds an artifact to the collection and resets the cached rectangle.
+  /// Adds the given artifact to the band.
   ///
-  /// This method performs two main actions:
-  /// 1. Resets the cached rectangle to zero.
-  /// 2. Adds the provided artifact to the collection.
-  ///
-  /// Parameters:
-  /// - [artifact]: The Artifact object to be added to the collection.
-  ///
-  /// The method modifies the internal state by:
-  /// - Setting the [_rectangle] to [Rect.zero], invalidating any previously cached rectangle.
-  /// - Adding the new [artifact] to the [artifacts] collection.
-  ///
-  /// Note: This method should be called whenever a new artifact needs to be added to the collection.
-  /// It ensures that the cached rectangle is properly invalidated, which may be important for
-  /// subsequent calculations or rendering operations.
+  /// This method adds the provided [artifact] to the list of artifacts in the band.
+  /// It also resets the cached rectangle, as the addition or removal of an artifact
+  /// can affect the overall layout and dimensions of the band.
   void addArtifact(final Artifact artifact) {
     // reset the cached rectangle each time an artifact is added or removed
     this.artifacts.add(artifact);
