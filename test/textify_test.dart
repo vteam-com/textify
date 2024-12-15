@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'dart:ui' as ui;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:textify/character_definition.dart';
@@ -123,4 +125,20 @@ void main() async {
     expect(instance.characterDefinitions.getDefinition('t')!.lineRight, true);
     expect(instance.characterDefinitions.getDefinition('u')!.lineRight, true);
   });
+
+  test('Convert image to text', () async {
+    final uiImage = await loadImage('assets/test/input_test_image.png');
+    final text = await instance.getTextFromImage(image: uiImage);
+
+    expect(text, 'ABCDEFG\nJKLMN0F\n0123456789');
+  });
+}
+
+Future<ui.Image> loadImage(String assetPath) async {
+  final assetImage = AssetImage(assetPath);
+  final completer = Completer<ui.Image>();
+  assetImage.resolve(ImageConfiguration.empty).addListener(
+        ImageStreamListener((info, _) => completer.complete(info.image)),
+      );
+  return completer.future;
 }

@@ -4,6 +4,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.9] - 2024-12-15
+
+### Added
+
+- Unit test - convert PNG image to text
+
 ## [0.1.8] - 2024-12-15
 
 ### Changed
