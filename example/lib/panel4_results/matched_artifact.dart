@@ -31,7 +31,7 @@ class MatchedArtifact extends StatelessWidget {
       decoration: BoxDecoration(
         border: Border.all(
           color: characterExpected == characterFound
-              ? Theme.of(context).colorScheme.onSurface.withOpacity(0.5)
+              ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5)
               : Colors.orange,
           width: 1.0,
         ),

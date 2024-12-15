@@ -4,6 +4,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.7] - 2024-12-15
+
+### Changed
+
+- Flutter 3.27.0 fix 1 deprecated warning
+- Update packages
+
 ## [0.1.6] - 2024-10-13
 
 ### Changed
