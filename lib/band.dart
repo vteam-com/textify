@@ -241,14 +241,16 @@ class Band {
     return getBoundingBox(this.artifacts);
   }
 
-  /// Computes the bounding rectangle that encloses all the [artifacts] in the provided list.
+  /// Calculates the bounding rectangle that encloses a list of artifacts.
   ///
-  /// If the list of artifacts is empty, this method returns [Rect.zero].
-  /// Otherwise, it iterates through the artifacts, finding the minimum and maximum
-  /// x and y coordinates, and returns a [Rect] that represents the bounding box.
+  /// This static method takes a list of [Artifact] objects and computes the
+  /// minimum and maximum coordinates to define a rectangular bounding box
+  /// that contains all the artifacts.
   ///
-  /// @param artifacts The list of artifacts to compute the bounding box for.
-  /// @return A [Rect] representing the bounding box of the provided artifacts.
+  /// If the input list is empty, this method returns [Rect.zero].
+  ///
+  /// Returns:
+  ///   A [Rect] representing the bounding box of the provided artifacts.
   static Rect getBoundingBox(final List<Artifact> artifacts) {
     if (artifacts.isEmpty) {
       return Rect.zero;
@@ -270,10 +272,14 @@ class Band {
     return Rect.fromLTRB(minX, minY, maxX, maxY);
   }
 
-  /// Counts the number of space characters among the artifacts in this band.
+  /// Returns the count of space characters in the artifacts.
+  ///
+  /// This getter iterates through all artifacts and counts how many
+  /// have a matching character of space ' '. It uses fold to
+  /// accumulate the count efficiently.
   ///
   /// Returns:
-  /// The number of artifacts that match a space character.
+  ///   An integer representing the total number of space characters.
   int get spacesCount => artifacts.fold(
         0,
         (count, a) => a.characterMatched == ' ' ? count + 1 : count,

@@ -31,21 +31,21 @@ Then run:
 flutter pub get
 ```
 
-## Quick Start
+## How to use
+
+Here's a basic example of how to use Textify:
 
 ``` dart
 import 'package:textify/textify.dart';
 
 // load your image
-final ui.Image inputImage = await loadImage('scan.png');
+ui.Image inputImage = await loadImage('scan.png');
 
-// initialize once
-final Textify textify = await Textify().init();
+// instentiate Textify once
+Textify textify = await Textify().init();
 
 // extract text from the image
-String extractedText = await textify.getTextFromImage(  
-  image: inputImage,
-);
+String extractedText = await textify.getTextFromImage(image: inputImage);
 
 print(text);
 
@@ -85,7 +85,7 @@ Any text containing characters outside of this set may not be processed correctl
 #### Font Selection
 
 - Use Helvetica (sans-serif) or Courier (monospace)
-- Keep font size consistent (10-12pt recommended)
+- Keep font size consistent and large (12pt+ size)
 - Maintain uniform character width, especially with Courier
 
 #### Text Spacing Requirements
@@ -95,91 +95,40 @@ Any text containing characters outside of this set may not be processed correctl
 - Use standard line spacing (1.5 recommended)
 - Keep clear margins around text
 
-#### Technical Specifications
+#### Best Practices
 
-- Resolution: Minimum 300 DPI
+- Clean, computer-generated documents
+- Scanned image of high resolution: Minimum 300+ DPI
 - Format: TIFF or PNG preferred
+- Use OCR-friendly fonts
 - High contrast between text and background
 - Clean, white background
 - Black text for optimal readability
-
-#### Best Practices
-
-- Scan documents at 300 DPI or higher
-- Use OCR-friendly fonts
-- Avoid decorative or script fonts
-- Keep text alignment consistent
 - Remove any background noise or artifacts
-
-#### Quick Validation Checklist
-
-- [ ] Text is clearly separated
-- [ ] Fonts are similar to Helvetica, Courier, Times New Roman
-- [ ] Size is consistent throughout
-- [ ] No touching characters
-- [ ] Clean background
-- [ ] High contrast
-- [ ] Proper resolution
-
-## Language Support
-
-Textify is currently designed to work with the English language only. While it may handle some text in other languages that use the supported character set, its functionality is optimized and intended for English text processing.
-
-## Limitations and Requirements
-
-While Textify offers significant advantages, it's essential to understand its limitations:
-
-- Optimized for clean digital images with standard fonts.
-- May struggle with complex layouts or handwritten text.
-- For advanced OCR needs, consider other solutions.
-
-### Requirements for Optimal Performance
-
-- Clean, computer-generated documents
+- Keep text alignment consistent
+- Avoid decorative or script fonts
 - Minimal background noise (e.g., no watermarks)
 - High contrast between text and background
 - No handwritten or italic text
 - Isolated characters (not touching other artifacts)
 
-## Getting Started
+#### Quick Validation Checklist
 
-To use Textify in your Dart project, add it to your `pubspec.yaml` file:
+- [X] Text is clearly separated
+- [X] Fonts are similar to Helvetica, Courier, Times New Roman
+- [X] Size is consistent throughout
+- [X] No touching characters
+- [X] Clean background
+- [X] High contrast
+- [X] Proper resolution
 
-```yaml
-dependencies:
-  textify: ^latest_version
-```
+## Language Support
 
-Then run:
-
-```bash
-flutter pub get
-```
-
-## Usage
-
-Here's a basic example of how to use Textify:
-
-```dart
-import 'dart:ui' as ui;
-import 'package:textify/textify.dart';
-
-void main() async {
-  // Instentiate Textify
-  final Textify textify = await Textify().init();
-
-  // Use your image as source
-  final ui.image imageSource = < standard images >
-
-  final String text = await textify.getTextFromImage(image: imageSource);
-
-  print(text);
-}
-```
-
-Please contribute and report issues on the GitHub repository.
-<https://github.com/vteam-com/textify>
+Textify is currently designed to work with the English language only. While it may handle some text in other languages that use the supported character set, its functionality is optimized and intended for English text processing.
 
 ## Components
 
 ![Call Graph](graph.svg)
+
+Please contribute and report issues on the GitHub repository.
+<https://github.com/vteam-com/textify>
