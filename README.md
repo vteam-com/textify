@@ -16,18 +16,6 @@ Textify addresses common limitations of existing OCR (Optical Character Recognit
 
 Textify overcomes these issues with a lightweight, pure Dart implementation that works seamlessly across all Flutter platforms, including web, without external dependencies.
 
-## Quick Start
-
-``` dart
-import 'package:textify/textify.dart';
-
-// Create a Textify instance
-final textify = Textify();
-
-// Extract text from an image
-final String extractedText = await textify.extractText(imageFile);
-```
-
 ## Installation
 
 Add this to your package's `pubspec.yaml` file:
@@ -41,6 +29,26 @@ Then run:
 
 ```bash
 flutter pub get
+```
+
+## Quick Start
+
+``` dart
+import 'package:textify/textify.dart';
+
+// load your image
+final ui.Image inputImage = await loadImage('scan.png');
+
+// initialize once
+final Textify textify = await Textify().init();
+
+// extract text from the image
+String extractedText = await textify.getTextFromImage(  
+  image: inputImage,
+);
+
+print(text);
+
 ```
 
 ## Features
