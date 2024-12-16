@@ -106,7 +106,9 @@ class Textify {
   ///
   /// [artifact] is the artifact to find matches for.
   /// [supportedCharacters] is an optional string of characters to limit the search to.
-  /// Returns a list of [ScoreMatch] objects sorted by descending score.
+  ///
+  /// Returns:
+  ///   A list of [ScoreMatch] objects sorted by descending score.
   List<ScoreMatch> getMatchingScoresOfNormalizedMatrix(
     final Artifact artifact, [
     final String supportedCharacters = '',
@@ -444,7 +446,8 @@ class Textify {
         );
 
     this.bands.clear();
-    final toRemove = [];
+    final List<Artifact> toRemove = [];
+
     for (final Artifact artifact in this._artifactsToProcess) {
       bool foundBand = false;
 
@@ -455,7 +458,7 @@ class Textify {
           band.rectangle,
           artifact.matrix.rectangle,
         );
-        if (overlap > 80) {
+        if (overlap > 50) {
           band.addArtifact(artifact);
           toRemove.add(artifact);
           foundBand = true;
@@ -501,10 +504,12 @@ class Textify {
   /// rectangles, you'll need to modify the calculation.
   ///
   /// Example:
+  /// ```
   ///   Rect rect1 = Rect.fromLTRB(0, 0, 10, 30);
   ///   Rect rect2 = Rect.fromLTRB(0, 20, 10, 50);
   ///   double overlap = calculateVerticalOverlapPercentage(rect1, rect2);
   ///   print('Overlap: ${overlap.toStringAsFixed(2)}%');
+  /// ```
   double _calculateVerticalOverlapPercentage(
     final Rect rect1,
     final Rect rect2,
@@ -679,14 +684,25 @@ class Textify {
     return scores.isNotEmpty ? scores.first.character : '';
   }
 
-  /// Calculates matching scores for a normalized artifact against a set of character templates.
+  /// Calculates the distance scores between an input matrix and a set of character templates.
   ///
-  /// This function compares a normalized artifact (likely an image or pattern) against
-  /// multiple character templates to find the best matches.
+  /// This method iterates through each character template, calculates the Hamming distance
+  /// percentage between the input matrix and each matrix in the template, and creates a
+  /// [ScoreMatch] object for each comparison. The [ScoreMatch] objects are then sorted in
+  /// descending order by their score.
   ///
-  /// @param templatesToAttemptToMatch A map of character strings to their corresponding template matrices.
-  /// @param normalizedArtifact The normalized artifact to compare against the templates.
-  /// @param scores An output list that will be populated with ScoreMatch objects.
+  /// If there is a tie between the top two [ScoreMatch] objects, a tie-breaker is implemented
+  /// by calculating the average Hamming distance percentage for all matrices in each template
+  /// and swapping the top two [ScoreMatch] objects if the second template has a higher average.
+  ///
+  /// Parameters:
+  ///   [templates]: A list of [CharacterDefinition] objects representing the character templates
+  ///                to compare against.
+  ///   [inputMatrix]: The input matrix to compare against the character templates.
+  ///
+  /// Returns:
+  ///   A list of [ScoreMatch] objects representing the distance scores between the input matrix
+  ///   and the character templates, sorted in descending order by score.
   static List<ScoreMatch> _getDistanceScores(
     List<CharacterDefinition> templates,
     Matrix inputMatrix,

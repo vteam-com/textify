@@ -1,6 +1,11 @@
 /// Keep track of evaluation score of Artifacts against CharacterDefinition templates
 class ScoreMatch {
-  /// Factory method for creating an empty ScoreMatch
+  /// Factory method that creates a new [ScoreMatch] instance with default values:
+  /// - [character] is an empty string
+  /// - [matrixIndex] is -1
+  /// - [score] is 0.0
+  ///
+  /// This can be used to create an "empty" or uninitialized [ScoreMatch] object.
   factory ScoreMatch.empty() {
     return ScoreMatch(
       character: '',
@@ -9,7 +14,10 @@ class ScoreMatch {
     );
   }
 
-  /// Constructor
+  /// Constructs a [ScoreMatch] object with the provided [character], [matrixIndex], and [score].
+  ///
+  /// The [character] represents the matched character, the [matrixIndex] is the index of the
+  /// matching template matrices, and the [score] is the final score in percentage (0..1).
   ScoreMatch({
     required this.character,
     required this.matrixIndex,

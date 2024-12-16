@@ -29,9 +29,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Debouncer debouncer = Debouncer(const Duration(milliseconds: 1000));
 
-  int _grayScale = 190;
-  int _kernelSizeErode = 0;
-  int _kernelSizeDilate = 0;
+  late int _grayScale;
+  late int _kernelSizeErode;
+  late int _kernelSizeDilate;
 
   ui.Image? _imageSource;
   String _fontName = '';
@@ -47,9 +47,17 @@ class _HomeScreenState extends State<HomeScreen> {
   final TransformationController _transformationController =
       TransformationController();
 
+  void _initializeSettings() {
+    _grayScale = 190;
+    _kernelSizeErode = 0;
+    _kernelSizeDilate = 0;
+    _imageBlackOnWhite = null;
+  }
+
   @override
   void initState() {
     super.initState();
+    _initializeSettings();
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await _textify.init();
@@ -155,6 +163,12 @@ class _HomeScreenState extends State<HomeScreen> {
                           );
                         },
                       );
+                    },
+                    () {
+                      // Reset
+                      setState(() {
+                        _initializeSettings();
+                      });
                     },
                     _transformationController,
                   ),

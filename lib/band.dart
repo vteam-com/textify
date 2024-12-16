@@ -112,9 +112,9 @@ class Band {
   /// 3. Creating a list of artifacts that need spaces inserted before them.
   /// 4. Inserting space artifacts at the appropriate positions.
   ///
-  /// The threshold is set at 75% of the average width of artifacts in the band.
+  /// The threshold is set at 50% of the average width of artifacts in the band.
   void identifySpacesInBand() {
-    final double exceeding = this.averageWidth * 0.75; //%
+    final double exceeding = this.averageWidth * 0.50; // in %
 
     final List<Artifact> insertInFrontOfTheseArtifacts = [];
 
@@ -139,9 +139,11 @@ class Band {
       }
     }
 
-    for (final artifactOnTheRightSide in insertInFrontOfTheseArtifacts) {
-      final indexOfArtifact = this.artifacts.indexOf(artifactOnTheRightSide);
-      insetArtifactForSpace(
+    for (final Artifact artifactOnTheRightSide
+        in insertInFrontOfTheseArtifacts) {
+      final int indexOfArtifact =
+          this.artifacts.indexOf(artifactOnTheRightSide);
+      insertArtifactForSpace(
         indexOfArtifact,
         artifactOnTheRightSide.matrix.rectangle.left -
             averageWidth -
@@ -162,11 +164,11 @@ class Band {
   /// - [x2]: The right x-coordinate of the space artifact.
   ///
   /// The created space artifact has the following properties:
-  /// - Character matched is a space (' ').
+  /// - Character matched is a space ' '.
   /// - Band ID is set to the current band's ID.
   /// - Rectangle is set based on the provided x-coordinates and the band's top and bottom.
   /// - A matrix is created based on the dimensions of the rectangle.
-  void insetArtifactForSpace(
+  void insertArtifactForSpace(
     final int indexOfArtifact,
     final double x1,
     final double x2,
@@ -239,7 +241,14 @@ class Band {
     return getBoundingBox(this.artifacts);
   }
 
-  /// Return the unified bounding box for all artifacts in the band
+  /// Computes the bounding rectangle that encloses all the [artifacts] in the provided list.
+  ///
+  /// If the list of artifacts is empty, this method returns [Rect.zero].
+  /// Otherwise, it iterates through the artifacts, finding the minimum and maximum
+  /// x and y coordinates, and returns a [Rect] that represents the bounding box.
+  ///
+  /// @param artifacts The list of artifacts to compute the bounding box for.
+  /// @return A [Rect] representing the bounding box of the provided artifacts.
   static Rect getBoundingBox(final List<Artifact> artifacts) {
     if (artifacts.isEmpty) {
       return Rect.zero;

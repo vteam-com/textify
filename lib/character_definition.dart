@@ -113,7 +113,7 @@ class CharacterDefinition {
 
   /// Converts this [CharacterDefinition] to a JSON map.
   ///
-  /// Returns a Map<String, dynamic> representation of the CharacterDefinition,
+  /// Returns a ```Map<String, dynamic>``` representation of the CharacterDefinition,
   /// where each key is a property name and each value is the corresponding property value.
   Map<String, dynamic> toJson() {
     return {

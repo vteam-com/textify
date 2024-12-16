@@ -57,6 +57,7 @@ flutter pub get
 - Supported for [clean digital images](#input-image---clean-digital-image-guidelines) (no handwriting)
 - Limited character set support
 - No support for special formatting (italic, variable size etc.)
+- Text must be free of images and framing (aka no borders)
 
 ## Supported Characters
 

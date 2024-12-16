@@ -12,24 +12,29 @@ class ThresholdControlWidget extends StatelessWidget {
     required this.kernelSizeDilate,
     required this.grayscaleLevel,
     required this.onChanged,
+    required this.onReset,
   });
   final int kernelSizeErode;
   final int kernelSizeDilate;
   final int grayscaleLevel;
   final Function(int, int, int) onChanged;
+  final Function onReset;
 
   @override
   Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
+      spacing: 40,
       children: [
         _buildGrayscaleButtons(),
-        gap(),
-        gap(),
         _buildErodeButtons(),
-        gap(),
-        gap(),
         _buildDilateButtons(),
+        OutlinedButton(
+          onPressed: () {
+            onReset();
+          },
+          child: Text('Reset'),
+        ),
       ],
     );
   }
@@ -129,6 +134,7 @@ Widget panelOptimizedImage(
   final int kernelSizeDilate,
   final int grayscaleLevel,
   final Function(int, int, int) thresoldsChanged,
+  final Function onReset,
   final TransformationController transformationController,
 ) {
   return PanelContent(
@@ -137,6 +143,7 @@ Widget panelOptimizedImage(
       kernelSizeDilate: kernelSizeDilate,
       grayscaleLevel: grayscaleLevel,
       onChanged: thresoldsChanged,
+      onReset: onReset,
     ),
     center: imageBlackOnWhite == null
         ? null

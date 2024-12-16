@@ -29,7 +29,7 @@ class _ImageSourceSamplesState extends State<ImageSourceSamples> {
   final List<ImageData> imageFileData = [
     ImageData(
       'generated_odd_colors.png',
-      'ABCDEFGHI\nJKLMNOPQR\nSTUVWXYZ\n0123456789',
+      'ABCDEFGHI\nJKLMNOPQR\nSTUVWXYZ 01 23456789',
     ),
     ImageData(
       'black-on-white-rounded.png',
@@ -53,7 +53,7 @@ class _ImageSourceSamplesState extends State<ImageSourceSamples> {
     ),
     ImageData(
       'lines-circles.png',
-      '',
+      'HELLO THIS IS A TEST IN UPPER CASE.\nThis is a normal phrasse with number like 123,456.89\nDATES\n2020-01-02\n2021/03/04\n2022.05.05\nEnds\nHere',
     ),
     ImageData(
       'color-on-white-gummy.png',

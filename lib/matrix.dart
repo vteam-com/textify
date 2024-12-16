@@ -48,7 +48,7 @@ class Matrix {
   /// Matrix original = Matrix(/* ... */);
   /// Matrix copy = Matrix.fromMatrix(original);
   /// ```
-  factory Matrix.fromMatrix(Matrix value) {
+  factory Matrix.fromMatrix(final Matrix value) {
     final matrix = Matrix();
     matrix.setGrid(value.data);
     matrix.rectangle = value.rectangle;
@@ -208,7 +208,18 @@ class Matrix {
     }
   }
 
-  /// Copies the content of one matrix onto another at a specific offset.
+  /// Copies the contents of a source Matrix into a target Matrix, with an optional offset.
+  ///
+  /// This method copies the values from the source Matrix into the target Matrix,
+  /// starting at the specified offset coordinates. If the source Matrix extends
+  /// beyond the bounds of the target Matrix, only the portion that fits within
+  /// the target Matrix will be copied.
+  ///
+  /// Parameters:
+  /// - `source`: The Matrix to copy from.
+  /// - `target`: The Matrix to copy into.
+  /// - `offsetX`: The horizontal offset to apply when copying the source into the target.
+  /// - `offsetY`: The vertical offset to apply when copying the source into the target.
   static void copyGrid(
     final Matrix source,
     final Matrix target,
@@ -287,9 +298,17 @@ class Matrix {
     );
   }
 
-  /// Creates a normalized Matrix with the specified dimensions.
+  /// Creates a new Matrix with the specified desired width and height, by resizing the current Matrix.
   ///
-  /// This method handles resizing and special cases like punctuation.
+  /// If the current Matrix is punctuation, it will not be cropped and will be centered in the new Matrix.
+  /// Otherwise, the current Matrix will be trimmed and then wrapped with false values before being resized.
+  ///
+  /// Parameters:
+  /// - `desiredWidth`: The desired width of the new Matrix.
+  /// - `desiredHeight`: The desired height of the new Matrix.
+  ///
+  /// Returns:
+  /// A new Matrix with the specified dimensions, containing a resized version of the original Matrix's content.
   Matrix createNormalizeMatrix(
     final int desiredWidth,
     final int desiredHeight,
@@ -846,32 +865,17 @@ class Matrix {
     return true;
   }
 
-  /// Sets the internal grid data of the matrix from a 2D list of boolean values.
+  /// Sets the grid of the Matrix object.
   ///
-  /// This method takes a 2D list of boolean values representing the grid data
-  /// and sets the internal `data` list of the matrix accordingly. It also updates
-  /// the `rows` and `cols` properties to match the dimensions of the input grid.
+  /// This method takes a 2D list of boolean values representing the grid of the Matrix.
+  /// It ensures that all rows have the same length, and creates a deep copy of the
+  /// grid to store in the Matrix's internal `_data` field.
+  ///
+  /// If the input grid is empty or has no rows, the Matrix's `rows` and `cols` fields
+  /// are set to 0, and the `_data` field is set to an empty list.
   ///
   /// Parameters:
-  /// - grid: A 2D list of boolean values representing the grid data. Each inner
-  ///   list represents a row, and each boolean value represents a cell in that row.
-  ///
-  /// Throws:
-  /// - [ArgumentError] if the input grid is not rectangular (i.e., not all rows
-  ///   have the same length).
-  ///
-  /// Edge cases:
-  /// - If the input grid is empty or its first row is empty, the method sets
-  ///   `rows` and `cols` to 0 and clears the `data` list.
-  ///
-  /// Implementation details:
-  /// - The method creates a deep copy of the input grid to ensure that changes
-  ///   to the original grid won't affect the internal data.
-  /// - It uses `List.generate` with `List<bool>.from` to create the deep copy.
-  /// - After creating the copy, it verifies that all rows have the same length
-  ///   as `cols`. If not, it throws an `ArgumentError`.
-  /// - If the input grid is valid, it updates the `rows` and `cols` properties
-  ///   based on the dimensions of the input grid.
+  ///   [grid] (List<List<bool>>): The 2D list of boolean values representing the grid.
   void setGrid(final List<List<bool>> grid) {
     if (grid.isEmpty || grid[0].isEmpty) {
       rows = 0;
@@ -1249,9 +1253,22 @@ class Matrix {
     return false;
   }
 
-  /// Checks if the segment starting at (x, y) is a valid vertical line.
-  /// Only considers it a vertical line if there are no filled pixels to the left
-  /// at any point in the line.
+  /// Validates a potential vertical line on the left side of a character.
+  ///
+  /// This function checks if there's a valid vertical line starting from the given
+  /// coordinates (x, y) in the matrix. A valid line must meet the following criteria:
+  /// 1. It must be at least [minVerticalLine] pixels long.
+  /// 2. It must not have any filled pixels immediately to its left.
+  ///
+  /// Parameters:
+  /// - [minVerticalLine]: The minimum length required for a vertical line to be considered valid.
+  /// - [matrix]: The Matrix representing the character or image being analyzed.
+  /// - [x]: The x-coordinate of the starting point of the potential line.
+  /// - [y]: The y-coordinate of the starting point of the potential line.
+  /// - [visited]: A Matrix to keep track of visited pixels.
+  ///
+  /// Returns:
+  /// A boolean value indicating whether a valid vertical line was found (true) or not (false).
   bool _isValidVerticalLineLeft(
     final int minVerticalLine,
     final Matrix matrix,
@@ -1329,7 +1346,19 @@ class Matrix {
     return false;
   }
 
-  /// inspection left side with some tolerance
+  /// Validates the left side of a potential vertical line in the matrix.
+  ///
+  /// This function checks if there are any filled pixels immediately to the left of the
+  /// given coordinates (x, y) in the matrix. If there are no filled pixels, or if the
+  /// starting x-coordinate is 0, the function returns true, indicating a valid left side.
+  ///
+  /// Parameters:
+  /// - [m]: The Matrix representing the character or image being analyzed.
+  /// - [x]: The x-coordinate of the starting point of the potential line.
+  /// - [y]: The y-coordinate of the starting point of the potential line.
+  ///
+  /// Returns:
+  /// A boolean value indicating whether the left side of the potential vertical line is valid (true) or not (false).
   bool _validLeftSideLeft(
     final Matrix m,
     final int x,
@@ -1351,7 +1380,19 @@ class Matrix {
     return false;
   }
 
-  /// inspection right side with some tolerance
+  /// Validates the right side of a potential vertical line in the matrix.
+  ///
+  /// This function checks if there are any filled pixels immediately to the right of the
+  /// given coordinates (x, y) in the matrix. If there are no filled pixels, or if the
+  /// x-coordinate is at the edge of the matrix, the function returns true, indicating a valid right side.
+  ///
+  /// Parameters:
+  /// - [m]: The Matrix representing the character or image being analyzed.
+  /// - [x]: The x-coordinate of the starting point of the potential line.
+  /// - [y]: The y-coordinate of the starting point of the potential line.
+  ///
+  /// Returns:
+  /// A boolean value indicating whether the right side of the potential vertical line is valid (true) or not (false).
   bool _validLeftSideRight(
     final Matrix m,
     final int x,
@@ -1391,7 +1432,7 @@ class Matrix {
 /// An [Exception] if it fails to get image data from the input image.
 Future<ui.Image> imageToBlackOnWhite(
   final ui.Image inputImage, {
-  final int backgroundBrightNestthreshold_0_255 = 128,
+  final int backgroundBrightNestthreshold_0_255 = 190,
 }) async {
   final int width = inputImage.width;
   final int height = inputImage.height;
@@ -1614,7 +1655,21 @@ Future<ui.Image> dilate({
   return frameInfo.image;
 }
 
-List<List<bool>> _createEllipticalKernel(int size) {
+/// Creates an elliptical kernel of the given size.
+///
+/// The kernel is a 2D list of booleans, where `true` values represent the
+/// pixels that are part of the ellipse, and `false` values represent the
+/// pixels that are outside the ellipse.
+///
+/// The ellipse is centered at the center of the kernel, and its major and
+/// minor axes are equal to the size of the kernel.
+///
+/// Parameters:
+/// [size]: The size of the kernel, which determines the size of the ellipse.
+///
+/// Returns:
+/// A 2D list of booleans representing the elliptical kernel.
+List<List<bool>> _createEllipticalKernel(final int size) {
   final List<List<bool>> kernel = List.generate(
     size,
     (_) => List.filled(size, false),
@@ -1651,9 +1706,9 @@ List<List<bool>> _createEllipticalKernel(int size) {
 /// Returns:
 /// A [Future] that resolves to a [ui.Image] created from the pixel data.
 Future<ui.Image> createImageFromPixels(
-  Uint8List pixels,
-  int width,
-  int height,
+  final Uint8List pixels,
+  final int width,
+  final int height,
 ) async {
   // Create a new ui.Image from the modified pixels
   final ui.ImmutableBuffer buffer =

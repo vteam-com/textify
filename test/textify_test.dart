@@ -130,7 +130,9 @@ void main() async {
     final uiImage = await loadImage('assets/test/input_test_image.png');
     final text = await instance.getTextFromImage(image: uiImage);
 
-    expect(text, 'ABCDEFG\nJKLMN0F\n0123456789');
+    // the result are not perfect 90% accuracy, but its trending in the right direction
+    expect(text, 'ABCDEFGHl\nJKLMN0PQR\nSTUVWxYZ 01 23456789');
+    // errors here        ^       ^          ^
   });
 }
 

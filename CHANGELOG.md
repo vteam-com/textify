@@ -4,6 +4,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.0] - 2024-12-16
+
+### Change
+
+- Adjust band tolerance to 50% (was 80%)
+- Adjust word gap to 50% (was 75)
+- Adjust gray scale to 190 (was 128)
+  
 ## [0.1.9] - 2024-12-15
 
 ### Added
