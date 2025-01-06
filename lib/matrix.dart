@@ -622,7 +622,7 @@ class Matrix {
   /// - [grid2]: The second Matrix to be overlaid.
   ///
   /// Returns:
-  /// A List<String> where each string represents a row in the overlaid result.
+  /// A ```List<String>``` where each string represents a row in the overlaid result.
   /// The characters in the resulting strings represent:
   ///   '=' : Both matrices have true in this cell
   ///   '*' : Only grid1 has true in this cell
@@ -727,7 +727,7 @@ class Matrix {
   /// - [offChar]: The character to represent false cells. Default is '.'.
   ///
   /// Returns:
-  /// A List<String> where each string represents a row in the matrix.
+  /// A ```List<String>``` where each string represents a row in the matrix.
   ///
   /// Example:
   /// ```dart
@@ -875,7 +875,7 @@ class Matrix {
   /// are set to 0, and the `_data` field is set to an empty list.
   ///
   /// Parameters:
-  ///   [grid] (List<List<bool>>): The 2D list of boolean values representing the grid.
+  ///   [grid] (```List<List<bool>>```): The 2D list of boolean values representing the grid.
   void setGrid(final List<List<bool>> grid) {
     if (grid.isEmpty || grid[0].isEmpty) {
       rows = 0;
@@ -917,13 +917,15 @@ class Matrix {
   /// '#' and '.' characters.
   ///
   /// Returns:
-  ///   A Map<String, dynamic> that can be serialized to JSON, representing the
+  ///   A ```Map<String, dynamic>``` that can be serialized to JSON, representing the
   ///   current state of the Matrix object.
   ///
   /// Example usage:
+  ///   ```
   ///   Matrix matrix = Matrix(...);
   ///   Map<String, dynamic> jsonMap = matrix.toJson();
   ///   String jsonString = jsonEncode(jsonMap);
+  ///   ```
   Map<String, dynamic> toJson() {
     return {
       'font': font,

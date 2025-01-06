@@ -101,7 +101,7 @@ class CharacterDefinitions {
   ///
   /// [pathToAssetsDefinition] The path to the JSON file containing definitions.
   ///
-  /// Returns a Future<CharacterDefinitions> once loading is complete.
+  /// Returns a ```Future<CharacterDefinitions>``` once loading is complete.
   ///
   /// Throws an exception if loading fails.
   Future<CharacterDefinitions> loadDefinitions([

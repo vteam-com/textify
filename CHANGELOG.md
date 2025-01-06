@@ -4,6 +4,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.1] - 2025-01-06
+
+### Change
+
+- new minimum sdk: >=3.6.0,  flutter: >=3.27.0
+
 ## [0.2.0] - 2024-12-16
 
 ### Change
