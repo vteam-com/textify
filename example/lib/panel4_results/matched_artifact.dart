@@ -28,27 +28,22 @@ class MatchedArtifact extends StatelessWidget {
     final TextStyle redStyle = style.copyWith(color: Colors.orange);
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 1),
+      margin: const EdgeInsets.all(1),
       width: 18,
       decoration: BoxDecoration(
         border: Border.all(
           color: characterExpected == characterCorrected
-              ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5)
-              : Colors.orange,
+              ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2)
+              : Colors.orange.withValues(alpha: 0.5),
           width: 1.0,
         ),
-        borderRadius: BorderRadius.circular(8.0),
+        borderRadius: BorderRadius.circular(4.0),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         spacing: 6,
         children: [
-          Text(
-            characterExpected,
-            style:
-                characterExpected == characterFound ? greenStyle : blackStyle,
-          ),
           Text(
             characterFound,
             style: characterExpected == characterFound ? greenStyle : redStyle,
@@ -60,6 +55,11 @@ class MatchedArtifact extends StatelessWidget {
                   ? greenStyle
                   : redStyle,
             ),
+          Text(
+            characterExpected,
+            style:
+                characterExpected == characterFound ? greenStyle : blackStyle,
+          ),
         ],
       ),
     );

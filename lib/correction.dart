@@ -1,5 +1,4 @@
 import 'dart:math';
-
 import 'package:textify/english_words.dart';
 
 /// Applies dictionary-based correction to the input text. It first tries to match words
@@ -16,7 +15,7 @@ Future<String> applyDictionaryCorrection(
     'S': ['5'],
     'o': ['D', '0'],
     'O': ['D', '0'],
-    '!': ['T', 'i', 'l', '1'],
+    '!': ['T', 'I', 'i', 'l', '1'],
     '@': ['A', 'a'],
   };
 
@@ -96,7 +95,7 @@ Future<String> applyDictionaryCorrection(
   }
 
   cleanedUpText = words.join(' ');
-  return cleanedUpText;
+  return normalizeCassing(cleanedUpText);
 }
 
 /// This function replaces problematic characters in the input string with their digit representations,
@@ -112,23 +111,8 @@ String digitCorrection(final String input) {
     'B': '8',
   };
 
-  // List of digits for quick check
-  const List<String> digits = [
-    '0',
-    '1',
-    '2',
-    '3',
-    '4',
-    '5',
-    '6',
-    '7',
-    '8',
-    '9',
-  ];
-
   // Calculate the proportion of digits in the input string
-  final int digitCount =
-      input.split('').where((char) => digits.contains(char)).length;
+  final int digitCount = input.split('').where((char) => isDigit(char)).length;
   double digitProportion = digitCount / input.length;
 
   // Apply the correction only if the string is mostly composed of digits (e.g., > 50%)
@@ -140,7 +124,7 @@ String digitCorrection(final String input) {
   String correction = '';
   for (int i = 0; i < input.length; i++) {
     String char = input[i];
-    if (digits.contains(char)) {
+    if (isDigit(char)) {
       correction += char;
     } else {
       // Replace problematic characters with their digit representations
@@ -254,10 +238,141 @@ String applyCasingToDifferingChars(String original, String corrected) {
   return result.toString();
 }
 
+/// This function capitalizes the first letter of each sentence in the input string
+/// and converts all other letters to lowercase.
+/// This function capitalizes the first letter of each sentence in the input string,
+/// including after newlines, and converts all other letters to lowercase.
+/// This function capitalizes the first letter of each sentence in the input string,
+/// including after newlines, and converts all other letters to lowercase.
+/// It uses sentenceEndings to identify the end of sentences./// This function capitalizes the first letter of each sentence in the input string,
+/// including after newlines, converts all other letters to lowercase, and ensures
+/// the entire string is uppercase if most of the letters are uppercase.
+/// This function capitalizes the first letter of each sentence in the input string,
+/// including after newlines, converts all other letters to lowercase, and ensures
+/// the entire string is uppercase if most of the letters are uppercase.
+/// Normalizes the casing of the input string.
+/// - Capitalizes the first letter of each sentence, including after newlines.
+/// - Converts all other letters to lowercase unless most of the letters in the sentence are uppercase,
+///   in which case the entire sentence is converted to uppercase.
+/// Normalizes the casing of the input string.
+/// - Capitalizes the first letter of each sentence, including after newlines.
+/// - Converts all other letters to lowercase unless most of the letters in the sentence are uppercase,
+///   in which case the entire sentence is converted to uppercase.
+/// - Preserves newlines in the original string.
+/// Normalizes the casing of the input string.
+/// - Capitalizes the first letter of each sentence, ignoring leading non-letter characters.
+/// - Converts all other letters to lowercase unless most of the letters in the sentence are uppercase,
+///   in which case the entire sentence is converted to uppercase.
+/// - Preserves newlines in the original string.
+String normalizeCassing(final String input) {
+  if (input.isEmpty) {
+    return input;
+  }
+
+  // Define sentence-ending characters
+  const List<String> sentenceEndings = ['.', '!', '?', '\n'];
+
+  StringBuffer result = StringBuffer();
+  StringBuffer currentSentence = StringBuffer();
+  int uppercaseCount = 0;
+  int letterCount = 0;
+
+  /// Process the current sentence buffer
+  void processCurrentSentence() {
+    if (currentSentence.isEmpty) {
+      return;
+    }
+
+    String sentence = currentSentence.toString();
+
+    // If most letters in the sentence are uppercase, convert the whole sentence to uppercase
+    if (letterCount > 0 && uppercaseCount / letterCount > 0.5) {
+      result.write(sentence.toUpperCase());
+    } else {
+      // Find the first letter in the sentence to capitalize
+      int firstLetterIndex = sentence.split('').indexWhere(
+            (char) => isLetter(char),
+          ); // Check for letters
+
+      if (firstLetterIndex != -1) {
+        // Capitalize the first letter and lowercase the rest
+        result.write(
+          sentence.substring(0, firstLetterIndex),
+        ); // Non-letter prefix
+        result.write(sentence[firstLetterIndex]);
+        result.write(sentence.substring(firstLetterIndex + 1).toLowerCase());
+      } else {
+        // No letters found, just append the sentence
+        result.write(sentence);
+      }
+    }
+
+    // Clear sentence buffers
+    currentSentence.clear();
+    uppercaseCount = 0;
+    letterCount = 0;
+  }
+
+  for (int i = 0; i < input.length; i++) {
+    String char = input[i];
+
+    if (char == '\n') {
+      // Process the current sentence and add the newline
+      processCurrentSentence();
+      result.write('\n');
+    } else {
+      currentSentence.write(char);
+
+      // Update uppercase and letter counts
+      if (char.trim().isNotEmpty) {
+        if (isUpperCase(char)) {
+          uppercaseCount++;
+        }
+        if (isLetter(char)) {
+          letterCount++;
+        }
+      }
+
+      // If the character is a sentence-ending character, process the sentence
+      if (sentenceEndings.contains(char)) {
+        processCurrentSentence();
+      }
+    }
+  }
+
+  // Process any remaining sentence
+  processCurrentSentence();
+
+  return result.toString();
+}
+
 /// Checks whether the given string is all uppercase.
 ///
 /// This function takes a [String] and returns `true` if the string contains only
 /// uppercase characters, and `false` otherwise.
 bool isUpperCase(String str) {
   return str == str.toUpperCase();
+}
+
+/// Return true if its a digit from 0 to 9
+bool isDigit(final String char) {
+  const List<String> digits = [
+    '0',
+    '1',
+    '2',
+    '3',
+    '4',
+    '5',
+    '6',
+    '7',
+    '8',
+    '9',
+  ];
+  return digits.contains(char);
+}
+
+/// Return true if the character is a letter
+bool isLetter(final String char) {
+  // use this trick to see if the character can have different casing
+  return char.toLowerCase() != char.toUpperCase();
 }

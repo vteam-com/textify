@@ -28,7 +28,7 @@ class ImageSourceSamples extends StatefulWidget {
 class _ImageSourceSamplesState extends State<ImageSourceSamples> {
   final List<ImageData> imageFileData = [
     ImageData(
-      'generated_odd_colors.png',
+      'generated-odd-colors.png',
       'ABCDEFGHI\nJKLMNOPQR\nSTUVWXYZ 01 23456789',
     ),
     ImageData(
@@ -66,6 +66,10 @@ class _ImageSourceSamplesState extends State<ImageSourceSamples> {
     ImageData(
       'bank-statement-template-27.webp',
       '',
+    ),
+    ImageData(
+      'the-quick-brown-fox.png',
+      "''The quick brown fox jumps over the lazy dog''",
     ),
   ];
 

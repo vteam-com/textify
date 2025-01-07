@@ -231,9 +231,9 @@ class _PanelMatchedArtifactsState extends State<PanelMatchedArtifacts> {
         crossAxisAlignment: CrossAxisAlignment.end,
         spacing: 10,
         children: [
-          const Text('Expected: '),
           const Text('Found: '),
           if (widget.textify.applyDictionary) const Text('Corrected: '),
+          const Text('Expected: '),
         ],
       ),
     );

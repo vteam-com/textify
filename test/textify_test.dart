@@ -141,7 +141,7 @@ void main() async {
     await myExpectWord('', '');
     await myExpectWord('Hell0', 'Hello');
     await myExpectWord('B0rder', 'Border');
-    await myExpectWord('Hello W0rld', 'Hello World');
+    await myExpectWord('Hello W0rld', 'Hello world');
     await myExpectWord('ls', 'Is');
     await myExpectWord('lS', 'IS');
     await myExpectWord('ln', 'In');
@@ -149,7 +149,7 @@ void main() async {
     await myExpectWord('Date', 'Date');
     await myExpectWord('D@te', 'Date');
     await myExpectWord('D@tes', 'Dates');
-    await myExpectWord('Bathr0Om', 'BathrOOm');
+    await myExpectWord('Bathr0Om', 'Bathroom');
     // await myExpectWord('l23456', '123456');
 
     // expect(
@@ -164,7 +164,7 @@ void main() async {
     //   reason: 'Should correct lowercase L to uppercase I in letter context',
     // );
 
-    await myExpectWord('5pecial Ca5e', 'Special Case');
+    await myExpectWord('5pecial Ca5e', 'Special case');
   });
 
   test('Digit Correction', () async {
