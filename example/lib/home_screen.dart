@@ -70,18 +70,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
-    final textFoundSingleString = _textFound.replaceAll('\n', '');
-
-    String percentage = '${textFoundSingleString.length} characters';
-
-    if (_stringsExpectedToBeFoundInTheImage.isNotEmpty) {
-      percentage += ' ';
-      percentage += compareStringPercentage(
-        _stringsExpectedToBeFoundInTheImage.join(),
-        _textFound.replaceAll('\n', ''),
-      ).toStringAsFixed(0);
-      percentage += '%';
-    }
+    final String textFoundSingleString = _textFound.replaceAll('\n', '');
 
     return Scaffold(
       backgroundColor: colorScheme.primaryContainer,
@@ -145,11 +134,15 @@ class _HomeScreenState extends State<HomeScreen> {
                   titleRight: '',
                   isExpanded: _isExpandedOptimized,
                   content: panelOptimizedImage(
-                    _imageBlackOnWhite,
-                    _kernelSizeErode,
-                    _kernelSizeDilate,
-                    _grayScale,
-                    (final int sizeErode, final int sizeDilate, int grayscale) {
+                    imageBlackOnWhite: _imageBlackOnWhite,
+                    kernelSizeErode: _kernelSizeErode,
+                    kernelSizeDilate: _kernelSizeDilate,
+                    grayscaleLevel: _grayScale,
+                    thresoldsChanged: (
+                      final int sizeErode,
+                      final int sizeDilate,
+                      int grayscale,
+                    ) {
                       setState(
                         () {
                           _kernelSizeErode = max(0, sizeErode);
@@ -164,13 +157,13 @@ class _HomeScreenState extends State<HomeScreen> {
                         },
                       );
                     },
-                    () {
+                    onReset: () {
                       // Reset
                       setState(() {
                         _initializeSettings();
                       });
                     },
-                    _transformationController,
+                    transformationController: _transformationController,
                   ),
                 ),
 
@@ -200,13 +193,18 @@ class _HomeScreenState extends State<HomeScreen> {
                 //
                 buildExpansionPanel(
                   titleLeft: 'Results',
-                  titleCenter: percentage,
+                  titleCenter: getPercentageText(textFoundSingleString),
                   titleRight: '',
                   isExpanded: _isExpandedResults,
                   content: PanelMatchedArtifacts(
                     font: _fontName,
                     expectedStrings: _stringsExpectedToBeFoundInTheImage,
                     textify: _textify,
+                    onSettingsChanged: () {
+                      setState(() {
+                        _convertImageToText();
+                      });
+                    },
                   ),
                 ),
               ],
@@ -215,6 +213,20 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
     );
+  }
+
+  String getPercentageText(String textFoundSingleString) {
+    String percentage = '${textFoundSingleString.length} characters';
+
+    if (_stringsExpectedToBeFoundInTheImage.isNotEmpty) {
+      percentage += ' ';
+      percentage += compareStringPercentage(
+        _stringsExpectedToBeFoundInTheImage.join(),
+        _textFound.replaceAll('\n', ''),
+      ).toStringAsFixed(0);
+      percentage += '%';
+    }
+    return percentage;
   }
 
   void _clearState() {
@@ -259,14 +271,14 @@ class _HomeScreenState extends State<HomeScreen> {
       );
     }
 
-    _textify.getTextFromMatrix(
+    final String theTextFound = await _textify.getTextFromMatrix(
       imageAsMatrix: await Matrix.fromImage(tmpImageBlackOnWhite),
     );
 
     if (mounted) {
       setState(() {
         _imageBlackOnWhite = tmpImageBlackOnWhite;
-        _textFound = _textify.textFound;
+        _textFound = theTextFound;
       });
     }
   }

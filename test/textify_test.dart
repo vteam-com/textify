@@ -3,6 +3,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:textify/character_definition.dart';
+import 'package:textify/correction.dart';
 
 import 'package:textify/textify.dart';
 
@@ -127,13 +128,62 @@ void main() async {
   });
 
   test('Convert image to text', () async {
-    final uiImage = await loadImage('assets/test/input_test_image.png');
-    final text = await instance.getTextFromImage(image: uiImage);
+    final ui.Image uiImage =
+        await loadImage('assets/test/input_test_image.png');
+    final String text = await instance.getTextFromImage(image: uiImage);
 
     // the result are not perfect 90% accuracy, but its trending in the right direction
     expect(text, 'ABCDEFGHl\nJKLMN0PQR\nSTUVWxYZ 01 23456789');
     // errors here        ^       ^          ^
   });
+
+  test('Dictionary Correction', () async {
+    await myExpectWord('', '');
+    await myExpectWord('Hell0', 'Hello');
+    await myExpectWord('B0rder', 'Border');
+    await myExpectWord('Hello W0rld', 'Hello World');
+    await myExpectWord('ls', 'Is');
+    await myExpectWord('lS', 'IS');
+    await myExpectWord('ln', 'In');
+    await myExpectWord('lN', 'IN');
+    await myExpectWord('Date', 'Date');
+    await myExpectWord('D@te', 'Date');
+    await myExpectWord('D@tes', 'Dates');
+    await myExpectWord('Bathr0Om', 'BathrOOm');
+    // await myExpectWord('l23456', '123456');
+
+    // expect(
+    //   await Textify.applyDictionaryCorrection(dictionary, '0O0O'),
+    //   equals('0000'),
+    //   reason: 'Should normalize O to 0 when in number context',
+    // );
+
+    // expect(
+    //   await Textify.applyDictionaryCorrection(dictionary, 'ABCDEFGHl'),
+    //   equals('ABCDEFGHI'),
+    //   reason: 'Should correct lowercase L to uppercase I in letter context',
+    // );
+
+    await myExpectWord('5pecial Ca5e', 'Special Case');
+  });
+
+  test('Digit Correction', () async {
+    expect(digitCorrection(''), '');
+    expect(digitCorrection('0123456789'), '');
+    expect(digitCorrection('O123456789'), '0123456789');
+    expect(digitCorrection('ol23456789'), '0123456789');
+  });
+}
+
+Future<void> myExpectWord(
+  final String input,
+  final String expected,
+) async {
+  expect(
+    await applyDictionaryCorrection(input),
+    equals(expected),
+    reason: 'INPUT WAS  "$input"',
+  );
 }
 
 Future<ui.Image> loadImage(String assetPath) async {

@@ -10,7 +10,10 @@ digraph "" {
   "/lib/textify.dart" [label="textify"];
   "/lib/matrix.dart" [label="matrix"];
   "/lib/character_definitions.dart" [label="character_definitions"];
+  "/lib/correction.dart" [label="correction"];
+  "/lib/english_words.dart" [label="english_words"];
   "/test/textify_test.dart" -> "/lib/character_definition.dart";
+  "/test/textify_test.dart" -> "/lib/correction.dart";
   "/test/textify_test.dart" -> "/lib/textify.dart";
   "/lib/band.dart" -> "/lib/artifact.dart";
   "/lib/band.dart" -> "/lib/matrix.dart";
@@ -19,9 +22,11 @@ digraph "" {
   "/lib/textify.dart" -> "/lib/artifact.dart";
   "/lib/textify.dart" -> "/lib/band.dart";
   "/lib/textify.dart" -> "/lib/character_definitions.dart";
+  "/lib/textify.dart" -> "/lib/correction.dart";
   "/lib/textify.dart" -> "/lib/matrix.dart";
   "/lib/textify.dart" -> "/lib/score_match.dart";
   "/lib/character_definitions.dart" -> "/lib/character_definition.dart";
   "/lib/character_definitions.dart" -> "/lib/matrix.dart";
   "/lib/character_definitions.dart" -> "/lib/character_definition.dart" [style=dashed];
+  "/lib/correction.dart" -> "/lib/english_words.dart";
 }

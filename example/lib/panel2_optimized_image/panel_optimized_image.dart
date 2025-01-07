@@ -128,15 +128,15 @@ class ThresholdControlWidget extends StatelessWidget {
   }
 }
 
-Widget panelOptimizedImage(
-  final ui.Image? imageBlackOnWhite,
-  final int kernelSizeErode,
-  final int kernelSizeDilate,
-  final int grayscaleLevel,
-  final Function(int, int, int) thresoldsChanged,
-  final Function onReset,
-  final TransformationController transformationController,
-) {
+Widget panelOptimizedImage({
+  required final ui.Image? imageBlackOnWhite,
+  required final int kernelSizeErode,
+  required final int kernelSizeDilate,
+  required final int grayscaleLevel,
+  required final Function(int, int, int) thresoldsChanged,
+  required final Function onReset,
+  required final TransformationController transformationController,
+}) {
   return PanelContent(
     top: ThresholdControlWidget(
       kernelSizeErode: kernelSizeErode,

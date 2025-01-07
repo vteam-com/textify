@@ -69,14 +69,14 @@ print(text);
 
 ## Supported Characters
 
-This package intentionally supports only the following characters:
+This package currently supports the following characters, with plans to expand support in the future:
 
 - Uppercase letters: `ABCDEFGHIJKLMNOPQRSTUVWXYZ`
 - Lowercase letters: `abcdefghijklmnopqrstuvwxyz`
 - Digits: `0123456789`
 - Punctuation marks: `/\(){}[]<>,;:.!@#$&*-+=?`
 
-Any text containing characters outside of this set may not be processed correctly or may result in errors.
+While the current character set is limited, future updates will aim to include broader language support, starting with common accented characters and symbols.
 
 ## Input image - Clean Digital Image Guidelines
 

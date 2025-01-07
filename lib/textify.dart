@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:textify/artifact.dart';
 import 'package:textify/band.dart';
 import 'package:textify/character_definitions.dart';
+import 'package:textify/correction.dart';
 import 'package:textify/matrix.dart';
 import 'package:textify/score_match.dart';
 
@@ -52,6 +53,13 @@ class Textify {
 
   /// Ignore horizontal and vertical lines
   bool excludeLongLines = true;
+
+  /// Whether to apply dictionary-based corrections during text recognition.
+  ///
+  /// When set to true, the recognition process will attempt to correct potential
+  /// misidentified characters by comparing them against a dictionary of known words.
+  /// This can improve accuracy but may increase processing time.
+  bool applyDictionary = false;
 
   /// Initializes the Textify instance by loading character definitions.
   ///
@@ -207,7 +215,7 @@ class Textify {
 
     final Matrix imageAsMatrix = await Matrix.fromImage(imageBlackAndWhite);
 
-    return getTextFromMatrix(
+    return await getTextFromMatrix(
       imageAsMatrix: imageAsMatrix,
       supportedCharacters: supportedCharacters,
     );
@@ -218,10 +226,10 @@ class Textify {
   /// [imageAsMatrix] is the binary representation of the image.
   /// [supportedCharacters] is an optional string of characters to limit the recognition to.
   /// Returns the extracted text as a string.
-  String getTextFromMatrix({
+  Future<String> getTextFromMatrix({
     required final Matrix imageAsMatrix,
     final String supportedCharacters = '',
-  }) {
+  }) async {
     assert(
       characterDefinitions.count > 0,
       'No character definitions loaded, did you forget to call Init()',
@@ -232,7 +240,7 @@ class Textify {
 
     identifyArtifactsAndBandsInBanaryImage(imageAsMatrix);
 
-    final String result = _getTextFromArtifacts(
+    String result = await _getTextFromArtifacts(
       supportedCharacters: supportedCharacters,
     );
 
@@ -791,8 +799,10 @@ class Textify {
   /// Returns:
   ///   A String containing the extracted text, with attempts made to preserve
   ///   the original layout through the use of spaces between rows.
-  String _getTextFromArtifacts({final String supportedCharacters = ''}) {
-    textFound = '';
+  Future<String> _getTextFromArtifacts({
+    final String supportedCharacters = '',
+  }) async {
+    this.textFound = '';
 
     final List<String> linesFound = [];
 
@@ -810,9 +820,15 @@ class Textify {
       linesFound.add(line);
     }
 
-    textFound += linesFound.join('\n');
+    this.textFound += linesFound.join('\n');
 
-    return textFound; // Trim to remove leading space
+    if (applyDictionary) {
+      this.textFound = await applyDictionaryCorrection(
+        this.textFound,
+      );
+    }
+
+    return textFound.trim(); // Trim to remove leading space
   }
 
   /// Merges overlapping artifacts in the list.

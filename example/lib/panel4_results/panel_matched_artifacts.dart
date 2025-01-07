@@ -1,98 +1,104 @@
 import 'package:flutter/material.dart';
+import 'package:textify/artifact.dart';
+import 'package:textify/band.dart';
 import 'package:textify/textify.dart';
 import 'package:textify_dashboard/panel1_source/panel_content.dart';
 import 'package:textify_dashboard/widgets/gap.dart';
 import 'edit.dart';
 import 'matched_artifact.dart';
 
-class PanelMatchedArtifacts extends StatelessWidget {
+class PanelMatchedArtifacts extends StatefulWidget {
   const PanelMatchedArtifacts({
     super.key,
     required this.textify,
     required this.expectedStrings,
     required this.font,
+    required this.onSettingsChanged,
   });
 
   final String font;
   final Textify textify;
   final List<String> expectedStrings;
+  final Function onSettingsChanged;
 
   @override
+  State<PanelMatchedArtifacts> createState() => _PanelMatchedArtifactsState();
+}
+
+class _PanelMatchedArtifactsState extends State<PanelMatchedArtifacts> {
+  @override
   Widget build(BuildContext context) {
-    if (expectedStrings.isEmpty) {
+    if (widget.expectedStrings.isEmpty) {
       return _buildFreeStyleResults(context);
     } else {
       return _buildMatchingCharacter(context);
     }
   }
 
-  int countSpaces(final String text) {
-    int count = 0;
-
-    for (int i = 0; i < text.length; i++) {
-      if (text[i] == ' ') {
-        count++;
-      }
-    }
-
-    return count;
-  }
-
+  /// Builds a free-style results view for the `Textify` data, displaying the full text found in a selectable `Text` widget with a Courier font and blue cursor.
   Widget _buildFreeStyleResults(final BuildContext context) {
-    return SizedBox(
-      height: 300,
-      child: SingleChildScrollView(
-        child: SelectableText(
-          textify.textFound,
-          style: const TextStyle(
-            fontFamily: 'Courier',
-            fontSize: 16.0,
+    return PanelContent(
+      top: _buildCheckbox(),
+      center: SizedBox(
+        height: 300,
+        child: SingleChildScrollView(
+          child: SelectableText(
+            widget.textify.textFound,
+            style: const TextStyle(
+              fontFamily: 'Courier',
+              fontSize: 16.0,
+            ),
+            showCursor: true,
+            cursorColor: Colors.blue,
+            cursorWidth: 2.0,
+            cursorRadius: const Radius.circular(2.0),
           ),
-          showCursor: true,
-          cursorColor: Colors.blue,
-          cursorWidth: 2.0,
-          cursorRadius: const Radius.circular(2.0),
         ),
       ),
     );
   }
 
+  /// Builds a list of matched artifacts for each band in the `Textify` data.
+  ///
+  /// This method iterates through the bands and lines in the `Textify` data,
+  /// and for each band, it builds a list of `MatchedArtifact` widgets that
+  /// represent the characters in the current line and the expected characters.
+  /// The resulting list of widgets is wrapped in a `SingleChildScrollView` and
+  /// `Row` to allow horizontal scrolling.
+  ///
+  /// Parameters:
+  /// - `context`: The `BuildContext` for the current widget.
+  ///
+  /// Returns:
+  /// A `Widget` that displays the list of matched artifacts.
   Widget _buildListOfMatches(final BuildContext context) {
-    List<Widget> widgets = [];
-    int line = 0;
+    final List<Widget> widgets = [];
+    final List<String> stringsPerBand = widget.textify.textFound.split('\n');
 
-    for (final band in textify.bands) {
-      int charIndex = 0;
-      for (final artifact in band.artifacts) {
-        final String text =
-            line < expectedStrings.length ? expectedStrings[line] : '';
+    for (int lineIndex = 0;
+        lineIndex < widget.textify.bands.length;
+        lineIndex++) {
+      // Band
+      final Band band = widget.textify.bands[lineIndex];
 
-        final expectedCharacter =
-            charIndex < text.length ? text[charIndex] : '!';
+      // Line
+      final String currentLine =
+          lineIndex < stringsPerBand.length ? stringsPerBand[lineIndex] : '';
 
-        charIndex++;
-        final button = InkWell(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => EditScreen(
-                  textify: textify,
-                  artifact: artifact,
-                  characterExpected: expectedCharacter,
-                  characterFound: artifact.characterMatched,
-                ),
-              ),
-            );
-          },
-          child: MatchedArtifact(
-            characterExpected: expectedCharacter,
-            characterFound: artifact.characterMatched,
-          ),
-        );
-        widgets.add(button);
-      }
-      line++;
+      // Line expected
+      final String expectedText = lineIndex < widget.expectedStrings.length
+          ? widget.expectedStrings[lineIndex]
+          : '';
+
+      widgets.addAll(
+        _buildArtifactsForBand(
+          context,
+          band,
+          currentLine,
+          expectedText,
+        ),
+      );
+
       widgets.add(gap());
     }
 
@@ -105,13 +111,82 @@ class PanelMatchedArtifacts extends StatelessWidget {
     );
   }
 
+  /// Builds a list of `MatchedArtifact` widgets for the given band, current line,
+  /// and expected text. Each `MatchedArtifact` widget represents a character in
+  /// the current line and the expected character.
+  ///
+  /// The resulting list of widgets is returned, which can be used to display the
+  /// matched artifacts for the given band.
+  ///
+  /// Parameters:
+  /// - `context`: The `BuildContext` for the current widget.
+  /// - `band`: The `Band` object containing the artifacts to be displayed.
+  /// - `currentLine`: The current line of text being displayed.
+  /// - `expectedText`: The expected text for the current line.
+  ///
+  /// Returns:
+  /// A list of `MatchedArtifact` widgets representing the matched artifacts for
+  /// the given band.
+  List<Widget> _buildArtifactsForBand(
+    BuildContext context,
+    Band band,
+    String currentLine,
+    String expectedText,
+  ) {
+    return band.artifacts.asMap().entries.map((entry) {
+      final int charIndex = entry.key;
+
+      final Artifact artifact = entry.value;
+
+      final String expectedCharacter =
+          charIndex < expectedText.length ? expectedText[charIndex] : '!';
+
+      final String characterCorrected =
+          charIndex < currentLine.length ? currentLine[charIndex] : '!';
+
+      return InkWell(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => EditScreen(
+                textify: widget.textify,
+                artifact: artifact,
+                characterExpected: expectedCharacter,
+                characterFound: artifact.characterMatched,
+              ),
+            ),
+          );
+        },
+        child: MatchedArtifact(
+          characterExpected: expectedCharacter,
+          characterFound: artifact.characterMatched,
+          characterCorrected: characterCorrected,
+          showCorrectionRow: widget.textify.applyDictionary,
+        ),
+      );
+    }).toList();
+  }
+
+  /// Builds a widget that displays the matching characters for a given context.
+  ///
+  /// This method creates a `PanelContent` widget that contains a `Center` widget,
+  /// which in turn contains a `Padding` widget with a `SizedBox` that has a
+  /// `Row` with two children: the result of calling `_buildPrefixTextForMatches()`
+  /// and the result of calling `_buildListOfMatches(context)`.
+  ///
+  /// Parameters:
+  ///   - `context`: The `BuildContext` for the current widget.
+  ///
+  /// Returns:
+  ///   A `Widget` that displays the matching characters for the given context.
   Widget _buildMatchingCharacter(final BuildContext context) {
     return PanelContent(
+      top: _buildCheckbox(),
       center: Center(
         child: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: SizedBox(
-            height: 80,
+          child: IntrinsicHeight(
             child: Row(
               children: [
                 _buildPrefixTextForMatches(),
@@ -124,15 +199,43 @@ class PanelMatchedArtifacts extends StatelessWidget {
     );
   }
 
+  SizedBox _buildCheckbox() {
+    return SizedBox(
+      width: 220,
+      child: CheckboxListTile(
+        title: const Text('Apply Dictionary'),
+        value: widget.textify.applyDictionary,
+        onChanged: (bool? value) {
+          setState(() {
+            widget.textify.applyDictionary = value ?? false;
+            widget.onSettingsChanged();
+          });
+        },
+      ),
+    );
+  }
+
+  /// Builds a widget that displays the prefix text for the matched artifacts.
+  ///
+  /// This method creates a `Padding` widget that contains a `Column` with three
+  /// `Text` widgets, one for each of the "Expected:", "Found:", and "Corrected:"
+  /// labels.
+  ///
+  /// Returns:
+  ///   A `Widget` that displays the prefix text for the matched artifacts.
   Widget _buildPrefixTextForMatches() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        const Text('Expected: '),
-        gap(10),
-        const Text('Found: '),
-      ],
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        spacing: 10,
+        children: [
+          const Text('Expected: '),
+          const Text('Found: '),
+          if (widget.textify.applyDictionary) const Text('Corrected: '),
+        ],
+      ),
     );
   }
 }
