@@ -5,7 +5,7 @@ version: 0.3.0
 homepage: https://github.com/vteam-com/textify
 
 environment:
-  sdk: ">=3.6.0"
+  sdk: ^3.6.0
   flutter: ">=3.27.0"
 
 dependencies:
