@@ -116,13 +116,13 @@ While the current character set is limited, future updates will aim to include b
 
 #### Quick Validation Checklist
 
-- [X] Text is clearly separated
-- [X] Fonts are similar to Helvetica, Courier, Times New Roman
-- [X] Size is consistent throughout
-- [X] No touching characters
-- [X] Clean background
-- [X] High contrast
-- [X] Proper resolution
+- ✅ Text is clearly separated
+- ✅ Fonts are similar to Helvetica, Courier, Times New Roman
+- ✅ Size is consistent throughout
+- ✅ No touching characters
+- ✅ Clean background
+- ✅ High contrast
+- ✅ Proper resolution
 
 ## Language Support
 

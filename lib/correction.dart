@@ -1,12 +1,10 @@
 import 'dart:math';
 import 'package:textify/english_words.dart';
 
-/// Applies dictionary-based correction to an entire paragraph of text. It first tries to match words
+/// Applies dictionary-based correction to an entire paragraph of [inputParagraph]. It first tries to match words
 /// directly in the dictionary, then attempts to substitute commonly confused characters,
 /// and finally finds the closest match in the dictionary if no direct match is found.
 /// The original casing of the input words is preserved in the corrected output.
-/// @param inputParagraph The input string
-/// @return The updated corrected string
 String applyDictionaryCorrection(
   final String inputParagraph,
 ) {
@@ -31,11 +29,10 @@ String applyDictionaryCorrection(
   return correctedBlob.join('\n');
 }
 
-/// Applies dictionary-based correction to a single sentence. It first tries to match words
-/// directly in the dictionary, then attempts to substitute commonly confused characters,
+/// Applies dictionary-based correction to [inputSentence]. It first tries to match words
+/// directly in the dictionary, then attempts to substitute commonly confused characters [correctionLetters],
 /// and finally finds the closest match in the dictionary if no direct match is found.
 /// The original casing of the input words is preserved in the corrected output.
-/// @return The updated corrected string
 String applyDictionaryCorrectionOnSingleSentence(
   final String inputSentence,
   final Map<String, List<String>> correctionLetters,
@@ -120,10 +117,8 @@ String applyDictionaryCorrectionOnSingleSentence(
   return normalizeCassing(cleanedUpText);
 }
 
-/// This function replaces problematic characters in the input string with their digit representations,
+/// This function replaces problematic characters in the [input] string with their digit representations,
 /// but only if the word is mostly composed of digits.
-/// @param input The input text
-/// @return The updated corrected string
 String digitCorrection(final String input) {
   const Map<String, String> map = {
     'o': '0',
@@ -158,7 +153,7 @@ String digitCorrection(final String input) {
   return correction == input ? '' : correction;
 }
 
-/// Finds the closest matching word in a dictionary for a given input word.
+/// Finds the closest matching word in a [dictionary] for a given input [word].
 ///
 /// This function takes a set of dictionary words and an input word, and returns the
 /// closest matching word from the dictionary based on the Levenshtein distance.
@@ -166,10 +161,6 @@ String digitCorrection(final String input) {
 /// the input word, and returns the dictionary word with the minimum Levenshtein
 /// distance, or the longest word with the same minimum distance if there are
 /// multiple candidates.
-///
-/// @param dictionary The set of dictionary words to search.
-/// @param word The input word to find the closest match for.
-/// @return The closest matching word from the dictionary, or `null` if no match is found.
 String? findClosestWord(
   final Set<String> dictionary,
   final String word,
@@ -199,13 +190,9 @@ String? findClosestWord(
 /// strings. It is the minimum number of single-character edits (insertions,
 /// deletions or substitutions) required to change one string into the other.
 ///
-/// This function takes two strings `s1` and `s2` and returns the Levenshtein
+/// This function takes two strings [s1] and [s2] and returns the Levenshtein
 /// distance between them.
-///
-/// @param s1 The first string.
-/// @param s2 The second string.
-/// @return The Levenshtein distance between `s1` and `s2`.
-int levenshteinDistance(String s1, String s2) {
+int levenshteinDistance(final String s1, final String s2) {
   if (s1 == s2) {
     return 0;
   }
@@ -237,15 +224,14 @@ int levenshteinDistance(String s1, String s2) {
 
 /// Applies the casing of the original string to the corrected string, preserving the casing of unchanged characters.
 ///
-/// This function takes two strings, `original` and `corrected`, and returns a new string where the casing of the `corrected` string
+/// This function takes two strings, [original] and [corrected], and returns a new string where the casing of the `corrected` string
 /// is modified to match the casing of the `original` string, except for characters that have been changed. The first modified character
 /// is always uppercase, and subsequent modified characters match the casing of the following character in the `original` string, unless
 /// the modified character is the last one, in which case it matches the casing of the previous character in the `original` string.
-///
-/// @param original The original string.
-/// @param corrected The corrected string.
-/// @return A new string with the casing of the `corrected` string modified to match the `original` string.
-String applyCasingToDifferingChars(String original, String corrected) {
+String applyCasingToDifferingChars(
+  final String original,
+  final String corrected,
+) {
   if (original.length != corrected.length) {
     return corrected;
   }
@@ -290,7 +276,7 @@ String applyCasingToDifferingChars(String original, String corrected) {
 
 /// Normalizes the casing of the input string by processing each sentence.
 ///
-/// This function takes a [String] input and returns a new string with the casing
+/// This function takes a [String] [input] and returns a new string with the casing
 /// normalized. It processes the input by breaking it into sentences, and then
 /// applies the following rules to each sentence:
 ///
@@ -301,9 +287,6 @@ String applyCasingToDifferingChars(String original, String corrected) {
 ///
 /// The function handles various sentence-ending characters (`.`, `!`, `?`, `\n`)
 /// and preserves any non-letter characters in the input.
-///
-/// @param input The input string to normalize.
-/// @return A new string with the casing normalized.
 String normalizeCassing(final String input) {
   if (input.isEmpty) {
     return input;
@@ -388,10 +371,9 @@ String normalizeCassing(final String input) {
 
 /// Checks whether the given string is all uppercase.
 ///
-/// This function takes a [String] and returns `true` if the string contains only
+/// This function takes a [String] [str] and returns `true` if the string contains only
 /// uppercase characters, and `false` otherwise.
-/// @return The true if it is upper case
-bool isUpperCase(String str) {
+bool isUpperCase(final String str) {
   return str == str.toUpperCase();
 }
 
@@ -399,7 +381,6 @@ bool isUpperCase(String str) {
 ///
 /// This function takes a [String] and returns `true` if the string represents a
 /// digit from 0 to 9, and `false` otherwise.
-/// @return The true if 0 to 9
 bool isDigit(final String char) {
   const List<String> digits = [
     '0',
@@ -418,10 +399,10 @@ bool isDigit(final String char) {
 
 /// Checks whether the given character is a letter.
 ///
-/// This function takes a [String] representing a single character and returns
+/// This function takes a [String] representing a single [character] and returns
 /// `true` if the character is a letter (uppercase or lowercase), and `false`
 /// otherwise.
-bool isLetter(final String char) {
+bool isLetter(final String character) {
   // use this trick to see if the character can have different casing
-  return char.toLowerCase() != char.toUpperCase();
+  return character.toLowerCase() != character.toUpperCase();
 }
