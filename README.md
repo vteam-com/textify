@@ -82,7 +82,7 @@ While the current character set is limited, future updates will aim to include b
 
 ### What Makes a Clean Digital Image?
 
-![Call Graph](example/clean%20text.png)
+![Clean Text Image](example/clean%20text.png)
 
 #### Font Selection
 
