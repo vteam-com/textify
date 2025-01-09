@@ -5,9 +5,9 @@ import 'package:textify/english_words.dart';
 /// directly in the dictionary, then attempts to substitute commonly confused characters,
 /// and finally finds the closest match in the dictionary if no direct match is found.
 /// The original casing of the input words is preserved in the corrected output.
-Future<String> applyDictionaryCorrection(
-  final String input,
-) async {
+String applyDictionaryCorrection(
+  final String inputParagraph,
+) {
   const Map<String, List<String>> correctionLetters = {
     '0': ['O', 'o', 'B', '8'],
     '5': ['S', 's'],
@@ -18,12 +18,30 @@ Future<String> applyDictionaryCorrection(
     '!': ['T', 'I', 'i', 'l', '1'],
     '@': ['A', 'a'],
   };
+  final linesOfText = inputParagraph.split('\n');
+  final List<String> correctedBlob = [];
 
-  String cleanedUpText = input;
-  List<String> words = input.split(' ');
+  for (final line in linesOfText) {
+    correctedBlob.add(
+      applyDictionaryCorrectionOnSingleSentence(line, correctionLetters),
+    );
+  }
+  return correctedBlob.join('\n');
+}
+
+/// Applies dictionary-based correction to a single sentence. It first tries to match words
+/// directly in the dictionary, then attempts to substitute commonly confused characters,
+/// and finally finds the closest match in the dictionary if no direct match is found.
+/// The original casing of the input words is preserved in the corrected output.
+String applyDictionaryCorrectionOnSingleSentence(
+  final String inputSentence,
+  final Map<String, List<String>> correctionLetters,
+) {
+  String cleanedUpText = inputSentence;
+  List<String> words = inputSentence.split(' ');
 
   for (int i = 0; i < words.length; i++) {
-    String word = words[i];
+    String word = words[i].replaceAll('\n', '');
     if (word.isEmpty) {
       continue;
     }
@@ -49,6 +67,7 @@ Future<String> applyDictionaryCorrection(
       for (final String substitute in entry.value) {
         if (word.contains(entry.key)) {
           String testWord = word.replaceAll(entry.key, substitute);
+
           if (englishWords.contains(testWord.toLowerCase())) {
             modifiedWord = testWord;
             foundMatch = true;
@@ -64,14 +83,14 @@ Future<String> applyDictionaryCorrection(
     // If no direct match after substitutions, find closest match
     if (!foundMatch) {
       String? suggestion =
-          await findClosestWord(englishWords, modifiedWord.toLowerCase());
+          findClosestWord(englishWords, modifiedWord.toLowerCase());
       if (suggestion == null) {
         // If the last letter is an 's' or 'S', remove it and try again to see if there's a hit on the singular version of the word
         String lastChar = modifiedWord[modifiedWord.length - 1];
         if (lastChar == 's' || lastChar == 'S') {
           String withoutLastLetter =
               modifiedWord.substring(0, modifiedWord.length - 1);
-          suggestion = await findClosestWord(
+          suggestion = findClosestWord(
             englishWords,
             withoutLastLetter.toLowerCase(),
           );
@@ -135,10 +154,10 @@ String digitCorrection(final String input) {
 }
 
 /// Finds the closest matching word in a dictionary for a given input word.
-Future<String?> findClosestWord(
+String? findClosestWord(
   final Set<String> dictionary,
   final String word,
-) async {
+) {
   String? closestMatch;
   int minDistance = 3; // Max edit distance to consider
 

@@ -69,7 +69,7 @@ class _ImageSourceSamplesState extends State<ImageSourceSamples> {
     ),
     ImageData(
       'the-quick-brown-fox.png',
-      "''The quick brown fox jumps over the lazy dog''",
+      'THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG\nThe quick brown fox jumps over the lazy dog\n2025-12-31',
     ),
   ];
 

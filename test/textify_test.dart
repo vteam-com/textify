@@ -180,7 +180,7 @@ Future<void> myExpectWord(
   final String expected,
 ) async {
   expect(
-    await applyDictionaryCorrection(input),
+    applyDictionaryCorrection(input),
     equals(expected),
     reason: 'INPUT WAS  "$input"',
   );

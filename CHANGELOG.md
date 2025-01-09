@@ -4,6 +4,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.1] - 2025-01-09
+
+### Change
+
+- Update README.md show example of Good Clean vs Problematic text in input images
+- Improve Example using the sample of "Good Clean Image"
+
 ## [0.3.0] - 2025-01-07
 
 ### Add

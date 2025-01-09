@@ -1,4 +1,4 @@
-// ignore_for_file: avoid_print, unnecessary_this
+// ignore_for_file: unnecessary_this
 
 import 'dart:ui' as ui;
 

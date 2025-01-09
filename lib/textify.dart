@@ -823,9 +823,7 @@ class Textify {
     this.textFound += linesFound.join('\n');
 
     if (applyDictionary) {
-      this.textFound = await applyDictionaryCorrection(
-        this.textFound,
-      );
+      this.textFound = applyDictionaryCorrection(this.textFound);
     }
 
     return textFound.trim(); // Trim to remove leading space

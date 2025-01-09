@@ -2,7 +2,6 @@ import 'dart:math';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:textify/matrix.dart';
 import 'package:textify/textify.dart';
 import 'package:textify_dashboard/panel1_source/debounce.dart';
@@ -10,6 +9,7 @@ import 'package:textify_dashboard/panel1_source/image_source_selector.dart';
 import 'package:textify_dashboard/panel1_source/panel_content.dart';
 import 'package:textify_dashboard/panel2_optimized_image/panel_optimized_image.dart';
 import 'package:textify_dashboard/panel3_artifacts/panel_artifacts_found.dart';
+import 'package:textify_dashboard/settings.dart';
 import 'panel4_results/panel_matched_artifacts.dart';
 
 ///
@@ -29,6 +29,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Debouncer debouncer = Debouncer(const Duration(milliseconds: 1000));
 
+  final Settings _settings = Settings();
+
   late int _grayScale;
   late int _kernelSizeErode;
   late int _kernelSizeDilate;
@@ -38,11 +40,6 @@ class _HomeScreenState extends State<HomeScreen> {
   List<String> _stringsExpectedToBeFoundInTheImage = [];
   bool _cleanUpArtifactFound = false;
   String _textFound = '';
-
-  bool _isExpandedArtifactFound = true;
-  bool _isExpandedOptimized = true;
-  bool _isExpandedResults = true;
-  bool _isExpandedSource = true;
 
   final TransformationController _transformationController =
       TransformationController();
@@ -63,14 +60,14 @@ class _HomeScreenState extends State<HomeScreen> {
       await _textify.init();
       _convertImageToText();
     });
-    _loadLastPreferences();
+    _settings.load();
   }
 
   @override
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
-    final String textFoundSingleString = _textFound.replaceAll('\n', '');
+    final String textFoundSingleString = _textFound.replaceAll('\n', ' ');
 
     return Scaffold(
       backgroundColor: colorScheme.primaryContainer,
@@ -86,16 +83,16 @@ class _HomeScreenState extends State<HomeScreen> {
                 setState(() {
                   switch (index) {
                     case 0:
-                      _isExpandedSource = isExpanded;
+                      _settings.isExpandedSource = isExpanded;
                     case 1:
-                      _isExpandedOptimized = isExpanded;
+                      _settings.isExpandedOptimized = isExpanded;
                     case 2:
-                      _isExpandedArtifactFound = isExpanded;
+                      _settings.isExpandedArtifactFound = isExpanded;
                     case 3:
-                      _isExpandedResults = isExpanded;
+                      _settings.isExpandedResults = isExpanded;
                   }
                 });
-                _savePreferences();
+                _settings.save();
               },
               children: [
                 //
@@ -105,7 +102,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   titleLeft: 'TEXTIFY',
                   titleCenter: 'Source',
                   titleRight: '',
-                  isExpanded: _isExpandedSource,
+                  isExpanded: _settings.isExpandedSource,
                   content: ImageSourceSelector(
                     transformationController: _transformationController,
                     onSourceChanged: (
@@ -132,7 +129,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   titleLeft: 'Optimized image',
                   titleCenter: _getDimensionOfImageSource(_imageSource),
                   titleRight: '',
-                  isExpanded: _isExpandedOptimized,
+                  isExpanded: _settings.isExpandedOptimized,
                   content: panelOptimizedImage(
                     imageBlackOnWhite: _imageBlackOnWhite,
                     kernelSizeErode: _kernelSizeErode,
@@ -175,7 +172,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   titleCenter: '${_textify.count} Artifacts',
                   titleRight:
                       '${NumberFormat.decimalPattern().format(_textify.duration)}ms',
-                  isExpanded: _isExpandedArtifactFound,
+                  isExpanded: _settings.isExpandedArtifactFound,
                   content: panelArtifactFound(
                     _textify,
                     _cleanUpArtifactFound,
@@ -195,11 +192,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   titleLeft: 'Results',
                   titleCenter: getPercentageText(textFoundSingleString),
                   titleRight: '',
-                  isExpanded: _isExpandedResults,
+                  isExpanded: _settings.isExpandedResults,
                   content: PanelMatchedArtifacts(
                     font: _fontName,
                     expectedStrings: _stringsExpectedToBeFoundInTheImage,
                     textify: _textify,
+                    settings: _settings,
                     onSettingsChanged: () {
                       setState(() {
                         _convertImageToText();
@@ -233,6 +231,7 @@ class _HomeScreenState extends State<HomeScreen> {
     if (mounted) {
       setState(() {
         _imageBlackOnWhite = null;
+        _textify.applyDictionary = _settings.applyDictionary;
         _textFound = '';
       });
     }
@@ -281,22 +280,5 @@ class _HomeScreenState extends State<HomeScreen> {
         _textFound = theTextFound;
       });
     }
-  }
-
-  Future<void> _loadLastPreferences() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    _isExpandedSource = prefs.getBool('expanded_source') ?? true;
-    _isExpandedArtifactFound = prefs.getBool('expanded_found') ?? true;
-    _isExpandedOptimized = prefs.getBool('expanded_contrast') ?? true;
-    _isExpandedResults = prefs.getBool('expanded_results') ?? true;
-  }
-
-  Future<void> _savePreferences() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    await prefs.setBool('expanded_source', _isExpandedSource);
-    await prefs.setBool('expanded_found', _isExpandedArtifactFound);
-    await prefs.setBool('expanded_contrast', _isExpandedOptimized);
-    await prefs.setBool('expanded_results', _isExpandedResults);
   }
 }

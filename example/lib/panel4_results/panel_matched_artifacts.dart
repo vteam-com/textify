@@ -3,6 +3,7 @@ import 'package:textify/artifact.dart';
 import 'package:textify/band.dart';
 import 'package:textify/textify.dart';
 import 'package:textify_dashboard/panel1_source/panel_content.dart';
+import 'package:textify_dashboard/settings.dart';
 import 'package:textify_dashboard/widgets/gap.dart';
 import 'edit.dart';
 import 'matched_artifact.dart';
@@ -13,6 +14,7 @@ class PanelMatchedArtifacts extends StatefulWidget {
     required this.textify,
     required this.expectedStrings,
     required this.font,
+    required this.settings,
     required this.onSettingsChanged,
   });
 
@@ -20,6 +22,7 @@ class PanelMatchedArtifacts extends StatefulWidget {
   final Textify textify;
   final List<String> expectedStrings;
   final Function onSettingsChanged;
+  final Settings settings;
 
   @override
   State<PanelMatchedArtifacts> createState() => _PanelMatchedArtifactsState();
@@ -204,10 +207,11 @@ class _PanelMatchedArtifactsState extends State<PanelMatchedArtifacts> {
       width: 220,
       child: CheckboxListTile(
         title: const Text('Apply Dictionary'),
-        value: widget.textify.applyDictionary,
+        value: widget.settings.applyDictionary,
         onChanged: (bool? value) {
           setState(() {
-            widget.textify.applyDictionary = value ?? false;
+            widget.settings.applyDictionary = value == true;
+            widget.settings.save();
             widget.onSettingsChanged();
           });
         },
