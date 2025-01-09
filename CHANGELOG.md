@@ -4,6 +4,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.2] - 2025-01-09
+
+### Change
+
+- Improve API document/comment of file [correction.dart]
+
 ## [0.3.1] - 2025-01-09
 
 ### Change
