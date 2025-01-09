@@ -82,6 +82,8 @@ While the current character set is limited, future updates will aim to include b
 
 ### What Makes a Clean Digital Image?
 
+![Call Graph](example/clean%20text.png)
+
 #### Font Selection
 
 - Use Helvetica (sans-serif) or Courier (monospace)
