@@ -44,10 +44,13 @@ ui.Image inputImage = await loadImage('scan.png');
 // instentiate Textify once
 Textify textify = await Textify().init();
 
+// Optionally apply English dictionary word correction
+textify.applyDictionary = true;
+
 // extract text from the image
 String extractedText = await textify.getTextFromImage(image: inputImage);
 
-print(text);
+print(extractedText);
 
 ```
 

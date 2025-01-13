@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:ui' as ui;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -129,7 +128,7 @@ void main() async {
 
   test('Convert image to text', () async {
     final ui.Image uiImage =
-        await loadImage('assets/test/input_test_image.png');
+        await loadImageFromAssets('assets/test/input_test_image.png');
     final String text = await instance.getTextFromImage(image: uiImage);
 
     // the result are not perfect 90% accuracy, but its trending in the right direction
@@ -150,20 +149,6 @@ void main() async {
     await myExpectWord('D@te', 'Date');
     await myExpectWord('D@tes', 'Dates');
     await myExpectWord('Bathr0Om', 'Bathroom');
-    // await myExpectWord('l23456', '123456');
-
-    // expect(
-    //   await Textify.applyDictionaryCorrection(dictionary, '0O0O'),
-    //   equals('0000'),
-    //   reason: 'Should normalize O to 0 when in number context',
-    // );
-
-    // expect(
-    //   await Textify.applyDictionaryCorrection(dictionary, 'ABCDEFGHl'),
-    //   equals('ABCDEFGHI'),
-    //   reason: 'Should correct lowercase L to uppercase I in letter context',
-    // );
-
     await myExpectWord('5pecial Ca5e', 'Special case');
   });
 
@@ -184,13 +169,4 @@ Future<void> myExpectWord(
     equals(expected),
     reason: 'INPUT WAS  "$input"',
   );
-}
-
-Future<ui.Image> loadImage(String assetPath) async {
-  final assetImage = AssetImage(assetPath);
-  final completer = Completer<ui.Image>();
-  assetImage.resolve(ImageConfiguration.empty).addListener(
-        ImageStreamListener((info, _) => completer.complete(info.image)),
-      );
-  return completer.future;
 }

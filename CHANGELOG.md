@@ -4,6 +4,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.3] - 2025-01-13
+
+### Add
+
+- Examples "Simplified" and "Dashboard"
+
 ## [0.3.2] - 2025-01-09
 
 ### Change

@@ -5,38 +5,31 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "textify",
-            "request": "launch",
-            "type": "dart"
-        },
-        {
-            "name": "textify (profile mode)",
-            "request": "launch",
-            "type": "dart",
-            "flutterMode": "profile"
-        },
-        {
-            "name": "textify (release mode)",
-            "request": "launch",
-            "type": "dart",
-            "flutterMode": "release"
-        },
-        {
-            "name": "example",
+            "name": "Example",
+            "program": "lib/main.dart",
             "cwd": "example",
             "request": "launch",
             "type": "dart"
         },
         {
-            "name": "example (profile mode)",
+            "name": "Dashboard",
             "cwd": "example",
+            "program": "lib/main_dashboard.dart",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "Dashboard (profile mode)",
+            "cwd": "example",
+            "program": "lib/main_dashboard.dart",
             "request": "launch",
             "type": "dart",
             "flutterMode": "profile"
         },
         {
-            "name": "example (release mode)",
+            "name": "Dashboard (release mode)",
             "cwd": "example",
+            "program": "lib/main_dashboard.dart",
             "request": "launch",
             "type": "dart",
             "flutterMode": "release"

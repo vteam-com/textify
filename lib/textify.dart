@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 import 'dart:ui' as ui;
 import 'package:flutter/widgets.dart';
@@ -873,4 +874,25 @@ class Textify {
 
     _artifactsToProcess.removeWhere((artifact) => toRemove.contains(artifact));
   }
+}
+
+/// Loads an image from the specified asset path.
+///
+/// This function asynchronously loads an image from the specified asset path and
+/// returns a [Future] that completes with the loaded [ui.Image] instance.
+///
+/// The function uses [AssetImage] to resolve the image and listens to the
+/// [ImageStream] to get the loaded image.
+///
+/// Example usage:
+///
+/// final image = await loadImage('assets/my_image.png');
+///
+Future<ui.Image> loadImageFromAssets(String assetPath) async {
+  final assetImage = AssetImage(assetPath);
+  final completer = Completer<ui.Image>();
+  assetImage.resolve(ImageConfiguration.empty).addListener(
+        ImageStreamListener((info, _) => completer.complete(info.image)),
+      );
+  return completer.future;
 }
