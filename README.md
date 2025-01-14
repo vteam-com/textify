@@ -60,7 +60,7 @@ print(extractedText);
 - Supports standard fonts like "Arial", "Courier", "Helvetica", "Times New Roman"
 - Fully cross-platform
 - Pure Dart and Flutter implementation
-- Offline functionality
+- Works 100% Offline
 - No external package dependencies
 
 ## Limitations
