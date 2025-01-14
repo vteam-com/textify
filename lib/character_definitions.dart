@@ -11,7 +11,7 @@ export 'package:textify/character_definition.dart';
 /// in different fonts or styles.
 class CharacterDefinitions {
   /// The list of character definitions.
-  List<CharacterDefinition> _definitions = [];
+  List<CharacterDefinition> _definitions = const [];
 
   /// Returns the number of character definitions.
   int get count => _definitions.length;
@@ -19,7 +19,7 @@ class CharacterDefinitions {
   /// Adds a new character definition to the collection.
   ///
   /// [definition] The character definition to add.
-  void addDefinition(CharacterDefinition definition) {
+  void addDefinition(final CharacterDefinition definition) {
     _definitions.add(definition);
   }
 
@@ -31,7 +31,7 @@ class CharacterDefinitions {
   /// Parses character definitions from a JSON string.
   ///
   /// [jsonString] A JSON string containing character definitions.
-  void fromJsonString(String jsonString) {
+  void fromJsonString(final String jsonString) {
     final dynamic jsonObject = jsonDecode(jsonString);
     final List<dynamic> jsonList = jsonObject['templates'];
     _definitions =
@@ -52,7 +52,7 @@ class CharacterDefinitions {
     }
   }
 
-  /// Returns a sorted list of all supported characters.
+  /// Returns a list of all supported characters.
   List<String> get supportedCharacters {
     return letterUpperCase +
         letterLowerCase +
@@ -119,7 +119,10 @@ class CharacterDefinitions {
 
   /// Sorts character definitions alphabetically by character.
   void _sortDefinitions() {
-    _definitions.sort((a, b) => a.character.compareTo(b.character));
+    _definitions.sort(
+      (final CharacterDefinition a, final CharacterDefinition b) =>
+          a.character.compareTo(b.character),
+    );
   }
 
   /// Converts character definitions to a JSON string.
@@ -129,7 +132,9 @@ class CharacterDefinitions {
     _sortDefinitions();
 
     final Map<String, dynamic> matricesMap = {
-      'templates': definitions.map((template) => template.toJson()).toList(),
+      'templates': definitions
+          .map((final CharacterDefinition template) => template.toJson())
+          .toList(),
     };
 
     return jsonEncode(matricesMap);
@@ -158,8 +163,8 @@ class CharacterDefinitions {
       _definitions.add(newDefinition);
       return true;
     } else {
-      final existingMatrixIndex =
-          found.matrices.indexWhere((m) => m.font == font);
+      final int existingMatrixIndex =
+          found.matrices.indexWhere((final Matrix m) => m.font == font);
 
       if (existingMatrixIndex == -1) {
         found.matrices.add(matrix);
@@ -172,7 +177,7 @@ class CharacterDefinitions {
 }
 
 /// All Characters representing Letters in upper case
-List<String> letterUpperCase = [
+const List<String> letterUpperCase = [
   'A',
   'B',
   'C',
@@ -202,7 +207,7 @@ List<String> letterUpperCase = [
 ];
 
 /// All Characters representing Letters in lower case
-List<String> letterLowerCase = [
+const List<String> letterLowerCase = [
   'a',
   'b',
   'c',
@@ -232,7 +237,7 @@ List<String> letterLowerCase = [
 ];
 
 /// All Characters representing Digits
-List<String> digits = [
+const List<String> digits = [
   '0',
   '1',
   '2',
@@ -246,7 +251,7 @@ List<String> digits = [
 ];
 
 /// All Characters representing punctuation
-List<String> punctuationMarks = [
+const List<String> punctuationMarks = [
   ' ', // Space
   '.', // Period
   ',', // Comma
@@ -268,7 +273,7 @@ List<String> punctuationMarks = [
 ];
 
 /// All Characters not digits, letters or punctuation
-List<String> otherCharacters = [
+const List<String> otherCharacters = [
   '/', // Slash
   '\\', // Back Slash
   '+', // Plus (the minus is a dash punctuation)
