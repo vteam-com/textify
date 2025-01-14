@@ -661,6 +661,7 @@ Set<String> englishWords = {
   'perspective',
   'phone',
   'photo',
+  'phrase',
   'physical',
   'pick',
   'picture',

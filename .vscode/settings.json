@@ -30,7 +30,8 @@
         "Upscaling",
         "Upsert",
         "vsync",
-        "vteam"
+        "vteam",
+        "webp"
     ],
     "explorer.fileNesting.enabled": true,
     "editor.formatOnSave": true,
