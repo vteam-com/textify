@@ -1420,11 +1420,11 @@ class Matrix {
 /// Binarize an input image by converting it to black and white based on a brightness threshold.
 ///
 /// This function takes an input [ui.Image] and converts it to a black and white image
-/// where pixels brighter than the specified [backgroundBrightNestthreshold_0_255] become white, and those below become black.
+/// where pixels brighter than the specified [backgroundBrightnessThreshold_0_255] become white, and those below become black.
 ///
 /// Parameters:
 /// - [inputImage]: The source image to be binarized.
-/// - [backgroundBrightNestthreshold_0_255]: Optional. The brightness threshold used to determine black or white pixels.
+/// - [backgroundBrightnessThreshold_0_255]: Optional. The brightness threshold used to determine black or white pixels.
 ///   Defaults to 190. Range is 0-255.
 ///
 /// Returns:
@@ -1434,7 +1434,7 @@ class Matrix {
 /// An [Exception] if it fails to get image data from the input image.
 Future<ui.Image> imageToBlackOnWhite(
   final ui.Image inputImage, {
-  final int backgroundBrightNestthreshold_0_255 = 190,
+  final int backgroundBrightnessThreshold_0_255 = 190,
 }) async {
   final int width = inputImage.width;
   final int height = inputImage.height;
@@ -1454,7 +1454,7 @@ Future<ui.Image> imageToBlackOnWhite(
     final double brightness = (0.299 * r + 0.587 * g + 0.114 * b);
 
     // If brightness is above the threshold, set pixel to white, otherwise black
-    if (brightness > backgroundBrightNestthreshold_0_255) {
+    if (brightness > backgroundBrightnessThreshold_0_255) {
       // make this the background paper
       outputPixels[i] = 255; // R
       outputPixels[i + 1] = 255; // G

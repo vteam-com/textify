@@ -135,5 +135,13 @@ Textify is currently designed to work with the English language only. While it m
 
 ![Call Graph](graph.svg)
 
+*How to generate the above graph. Run these commands on macOS .*
+
+```bash
+dart pub global activate lakos
+brew install graphviz
+./tool/graph.sh
+```
+
 Please contribute and report issues on the GitHub repository.
 <https://github.com/vteam-com/textify>

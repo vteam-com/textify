@@ -6,39 +6,37 @@
         "editor.defaultFormatter": "Dart-Code.dart-code"
     },
     "editor.formatOnType": true,
+    "cSpell.enabled": true,
+    "cSpell.diagnosticLevel": "Warning",
+    "cSpell.language": "en",
+    "cSpell.files": [
+        "lib/**",
+        "example/**"
+    ],
     "cSpell.words": [
         "ADEFGHIJKLMNOPQRSTUVWXYZ",
         "ARGB",
         "binarize",
         "binarized",
+        "Debouncer",
+        "explorable",
         "grayscale",
         "LTRB",
         "LTWH",
         "prefs",
         "Rgba",
+        "sublist",
         "textify",
         "Upscaling",
+        "Upsert",
         "vsync",
-        "vteam",
-    ],
-    "cSpell.ignoreRegExpList": [
-        "^(?!lib/).*$"
+        "vteam"
     ],
     "explorer.fileNesting.enabled": true,
     "editor.formatOnSave": true,
     "workbench.editor.closeOnFileDelete": true,
-    "files.exclude": {
-        "android": true,
-        "ios": true,
-        "linux": true,
-        "macos": true,
-        "windows": true,
-        "web": true,
-    },
-    "cSpell.enabled": true,
     "cmake.ignoreCMakeListsMissing": true,
     "explorer.fileNesting.patterns": {
-        "pubspec.yaml": "changelog.md, readme.md, privacy.html, license, .metadata, pubspec.lock, analysis_options.yaml, devtools_options.yaml, graph.dot, graph.svg, cSpell.json, .gitignore",
+        "pubspec.yaml": "changelog.md, readme.md, privacy.html, license, .metadata, pubspec.lock, analysis_options.yaml, devtools_options.yaml, graph.dot, graph.svg, .gitignore",
     },
-    "java.compile.nullAnalysis.mode": "disabled",
 }

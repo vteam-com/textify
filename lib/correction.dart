@@ -114,7 +114,7 @@ String applyDictionaryCorrectionOnSingleSentence(
   }
 
   cleanedUpText = words.join(' ');
-  return normalizeCassing(cleanedUpText);
+  return normalizeCasing(cleanedUpText);
 }
 
 /// This function replaces problematic characters in the [input] string with their digit representations,
@@ -287,7 +287,7 @@ String applyCasingToDifferingChars(
 ///
 /// The function handles various sentence-ending characters (`.`, `!`, `?`, `\n`)
 /// and preserves any non-letter characters in the input.
-String normalizeCassing(final String input) {
+String normalizeCasing(final String input) {
   if (input.isEmpty) {
     return input;
   }

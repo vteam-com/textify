@@ -21,7 +21,7 @@ class Textify {
   /// List of text bands identified in the image.
   final List<Band> bands = [];
 
-  /// List of diescovred artifacts on the image
+  /// List of discovered artifacts on the image
   final List<Artifact> artifactsFound = [];
 
   /// List of artifacts (potential characters) identified in the image.
@@ -239,7 +239,7 @@ class Textify {
     /// Start
     processBegin = DateTime.now();
 
-    identifyArtifactsAndBandsInBanaryImage(imageAsMatrix);
+    identifyArtifactsAndBandsInBinaryImage(imageAsMatrix);
 
     String result = await _getTextFromArtifacts(
       supportedCharacters: supportedCharacters,
@@ -269,7 +269,7 @@ class Textify {
   ///
   /// Note: This method assumes that the input [Matrix] is a valid binary image.
   /// Behavior may be undefined for non-binary input.
-  void identifyArtifactsAndBandsInBanaryImage(final Matrix imageAsBinary) {
+  void identifyArtifactsAndBandsInBinaryImage(final Matrix imageAsBinary) {
     // (1) Find artifact using flood fill
     _findArtifacts(imageAsBinary);
 

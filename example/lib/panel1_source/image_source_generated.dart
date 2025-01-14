@@ -3,9 +3,9 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:textify_dashboard/panel1_source/update_character_definitions.dart';
+import 'package:textify_dashboard/widgets/gap.dart';
 import 'package:textify_dashboard/widgets/image_viewer.dart';
 
-import '../../widgets/gap.dart';
 import 'debounce.dart';
 import 'image_generator_input.dart';
 import 'panel_content.dart';
@@ -55,7 +55,7 @@ class _ImageSourceGeneratedState extends State<ImageSourceGenerated> {
   ];
 
   Debouncer debouncer = Debouncer(const Duration(milliseconds: 700));
-  Debouncer debouncerGenerteImage =
+  Debouncer debouncerGenerateImage =
       Debouncer(const Duration(milliseconds: 400));
 
   final TextEditingController _textControllerLine1 = TextEditingController();
@@ -103,7 +103,7 @@ class _ImageSourceGeneratedState extends State<ImageSourceGenerated> {
     );
   }
 
-  /// Builds the input dahsboard, for customizing, FontSize,FontFamily and text input.
+  /// Builds the input dashboard, for customizing, FontSize,FontFamily and text input.
   Widget _buildDashboardInputs() {
     return Padding(
       padding: const EdgeInsets.all(20.0),
@@ -155,7 +155,7 @@ class _ImageSourceGeneratedState extends State<ImageSourceGenerated> {
             label: imageSettings.fontSize.toString(),
             onChanged: (value) {
               setState(() {
-                // this widge we need to call setState in order to show the UI animation of the slider
+                // this widget we need to call setState in order to show the UI animation of the slider
                 imageSettings.fontSize = value.round().toDouble();
                 inputHasChanged();
               });
@@ -296,7 +296,7 @@ class _ImageSourceGeneratedState extends State<ImageSourceGenerated> {
   }
 
   void inputHasChanged() {
-    debouncerGenerteImage.run(() {
+    debouncerGenerateImage.run(() {
       _generateImage();
     });
   }

@@ -253,7 +253,7 @@ class _HomeScreenState extends State<HomeScreen> {
     // Convert color image source to a grid of on=ink/off=paper
     ui.Image tmpImageBlackOnWhite = await imageToBlackOnWhite(
       _imageSource!,
-      backgroundBrightNestthreshold_0_255: _grayScale,
+      backgroundBrightnessThreshold_0_255: _grayScale,
     );
 
     if (_kernelSizeErode > 0) {

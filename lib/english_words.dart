@@ -205,6 +205,7 @@ Set<String> englishWords = {
   'coffee',
   'cold',
   'college',
+  'color',
   'colour',
   'combination',
   'comfort',
