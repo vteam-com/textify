@@ -1,20 +1,24 @@
-# Textify (OCR)
+# TEXTify (OCR)
 
-Textify is a Dart package that provides utilities for working with text representations in a specific character set. It is designed to handle text processing tasks for the English language and a limited set of characters.
+TEXTify is a Dart package that provides utilities for working with text representations in a specific character set. It is designed to handle text processing tasks for the English language and a limited set of characters.
 
  It is 100% cross-platform, utilizing native Dart and Flutter code, and works offline without any package dependencies.
 
-## Why Textify?
+## Why TEXTify?
 
-Textify addresses common limitations of existing OCR (Optical Character Recognition) solutions:
+TEXTify addresses common limitations of existing OCR (Optical Character Recognition) solutions:
 
-1. Lightweight: Most OCR libraries are heavy and often rely on external system dependencies or remote cloud services, complicating deployment and increasing costs.
+1. **Small & Fast**: Most OCR libraries are heavy and often rely on external system dependencies or remote cloud services, complicating deployment and increasing costs.
 
-2. Simplified Setup: Popular solutions like Tesseract require complex build configurations, including C/C++ compilation, which can be difficult to manage across platforms.
+2. **Supports All Platforms**: Many OCR solutions only supports some platforms, TEXTify works on Android, iOS, macOS, Windows, Linux, and Web.
 
-3. Web Compatibility: Many OCR solutions do not support Flutter web clients, limiting their cross-platform usability.
+3. **Offline**: Works 100% offline without requiring internet connectivity or cloud services for text extraction.
 
-Textify overcomes these issues with a lightweight, pure Dart implementation that works seamlessly across all Flutter platforms, including web, without external dependencies.
+4. **Privacy**: No dependency on external services means your data stays on device, ensuring complete privacy and security.
+
+5. **Simplified Setup**: Popular solutions like Tesseract require complex build configurations, including C/C++ compilation, which can be difficult to manage across platforms.
+
+TEXTify overcomes these issues with a lightweight, pure Dart implementation that works seamlessly across all Flutter platforms, including web, without external dependencies.
 
 ## Installation
 
@@ -33,7 +37,7 @@ flutter pub get
 
 ## How to use
 
-Here's a basic example of how to use Textify:
+Here is an example of how to use TEXTify:
 
 ``` dart
 import 'package:textify/textify.dart';
@@ -41,7 +45,7 @@ import 'package:textify/textify.dart';
 // load your image
 ui.Image inputImage = await loadImage('scan.png');
 
-// instentiate Textify once
+// instentiate TEXTify once
 Textify textify = await Textify().init();
 
 // Optionally apply English dictionary word correction
@@ -129,7 +133,7 @@ While the current character set is limited, future updates will aim to include b
 
 ## Language Support
 
-Textify is currently designed to work with the English language only. While it may handle some text in other languages that use the supported character set, its functionality is optimized and intended for English text processing.
+TEXTify is currently designed to work with the English language only. While it may handle some text in other languages that use the supported character set, its functionality is optimized and intended for English text processing.
 
 ## Components
 
