@@ -6,6 +6,10 @@ All notable changes to this project will be documented in this file.
 
 ## [0.3.4] - 2025-01-14
 
+### Add
+
+- Add 300 more English words
+
 ### Fix
 
 - Fix Dashboard "Apply Dictionary"
