@@ -3,15 +3,15 @@ import 'package:flutter/material.dart';
 class MatchedArtifact extends StatelessWidget {
   const MatchedArtifact({
     super.key,
-    required this.characterExpected,
     required this.characterFound,
     required this.characterCorrected,
+    required this.characterExpected,
     required this.showCorrectionRow,
   });
 
-  final String characterExpected;
   final String characterFound;
   final String characterCorrected;
+  final String characterExpected;
   final bool showCorrectionRow;
 
   @override
@@ -21,18 +21,24 @@ class MatchedArtifact extends StatelessWidget {
       fontFamily: 'Courier',
     );
 
-    final TextStyle greenStyle =
+    final TextStyle styleExpected = style.copyWith(color: Colors.white);
+
+    final TextStyle styleMatching =
         style.copyWith(color: Colors.lightGreen.shade400);
-    final TextStyle blackStyle =
-        style.copyWith(color: Theme.of(context).colorScheme.onPrimaryContainer);
-    final TextStyle redStyle = style.copyWith(color: Colors.orange);
+
+    final TextStyle styleNoMatch = style.copyWith(color: Colors.red);
+
+    final TextStyle styleCorrected = style.copyWith(color: Colors.orange);
+
+    final String endResultChar =
+        showCorrectionRow ? characterCorrected : characterFound;
 
     return Container(
       margin: const EdgeInsets.all(1),
       width: 18,
       decoration: BoxDecoration(
         border: Border.all(
-          color: characterExpected == characterCorrected
+          color: characterExpected == endResultChar
               ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2)
               : Colors.orange.withValues(alpha: 0.5),
           width: 1.0,
@@ -44,21 +50,27 @@ class MatchedArtifact extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         spacing: 6,
         children: [
+          // As Found
           Text(
             characterFound,
-            style: characterExpected == characterFound ? greenStyle : redStyle,
+            style: characterExpected == characterFound
+                ? styleMatching
+                : styleNoMatch,
           ),
           if (showCorrectionRow)
+            // Spell checked
             Text(
               characterCorrected,
-              style: characterExpected == characterCorrected
-                  ? greenStyle
-                  : redStyle,
+              style: characterExpected == characterFound
+                  ? styleMatching
+                  : styleCorrected,
             ),
+          // Expected vs final result
           Text(
             characterExpected,
-            style:
-                characterExpected == characterFound ? greenStyle : blackStyle,
+            style: characterExpected == endResultChar
+                ? styleExpected
+                : styleNoMatch,
           ),
         ],
       ),

@@ -209,9 +209,10 @@ class _PanelMatchedArtifactsState extends State<PanelMatchedArtifacts> {
         title: const Text('Apply Dictionary'),
         value: widget.settings.applyDictionary,
         onChanged: (bool? value) {
-          setState(() {
-            widget.settings.applyDictionary = value == true;
-            widget.settings.save();
+          setState(() async {
+            widget.settings.applyDictionary = (value == true);
+            await widget.settings.save();
+            widget.textify.applyDictionary = widget.settings.applyDictionary;
             widget.onSettingsChanged();
           });
         },
